@@ -1,0 +1,26 @@
+{
+  "home": {
+    "title": "Hệ thống quản lý học tập thời gian thực",
+    "subtitle": "Hệ thống hiện đại với chat thời gian thực, phát trực tiếp và bài kiểm tra tương tác.",
+    "getStarted": "Bắt đầu",
+    "signIn": "Đăng nhập"
+  },
+  "auth": {
+    "login": {
+      "title": "Chào mừng trở lại",
+      "email": "Email",
+      "password": "Mật khẩu",
+      "submit": "Đăng nhập"
+    },
+    "register": {
+      "title": "Tạo tài khoản",
+      "fullName": "Họ và tên",
+      "email": "Email",
+      "password": "Mật khẩu",
+      "submit": "Tạo tài khoản"
+    }
+  }
+}
+
+
+

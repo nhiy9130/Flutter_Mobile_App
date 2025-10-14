@@ -1,0 +1,26 @@
+{
+  "home": {
+    "title": "Real-Time LMS",
+    "subtitle": "A modern learning management system with real-time chat, live streaming, and interactive quizzes. Perfect for engaging online education experiences.",
+    "getStarted": "Get Started",
+    "signIn": "Sign In"
+  },
+  "auth": {
+    "login": {
+      "title": "Welcome Back",
+      "email": "Email",
+      "password": "Password",
+      "submit": "Sign In"
+    },
+    "register": {
+      "title": "Create Account",
+      "fullName": "Full Name",
+      "email": "Email",
+      "password": "Password",
+      "submit": "Create Account"
+    }
+  }
+}
+
+
+
