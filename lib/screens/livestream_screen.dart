@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../core/webrtc/webrtc_client.dart';
+import '../core/widgets/safe_wrapper.dart';
 
 class LiveStreamScreen extends StatefulWidget {
   const LiveStreamScreen({super.key, required this.courseId});
@@ -21,26 +22,30 @@ class _LiveStreamScreenState extends State<LiveStreamScreen> {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            Row(
+            SafeRow(
               children: [
-                ElevatedButton(
-                  onPressed: started
-                      ? null
-                      : () async {
-                          await webRtc.startLocal(video: true, audio: true);
-                          setState(() => started = true);
-                        },
-                  child: const Text('Start (local)'),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: started
+                        ? null
+                        : () async {
+                            await webRtc.startLocal(video: true, audio: true);
+                            setState(() => started = true);
+                          },
+                    child: const Text('Start (local)'),
+                  ),
                 ),
                 const SizedBox(width: 12),
-                ElevatedButton(
-                  onPressed: !started
-                      ? null
-                      : () {
-                          webRtc.stopLocal();
-                          setState(() => started = false);
-                        },
-                  child: const Text('End'),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: !started
+                        ? null
+                        : () {
+                            webRtc.stopLocal();
+                            setState(() => started = false);
+                          },
+                    child: const Text('End'),
+                  ),
                 ),
               ],
             ),

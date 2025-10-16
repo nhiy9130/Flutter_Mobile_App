@@ -19,14 +19,14 @@ class LMSApp extends ConsumerWidget {
 
     return OverlaySupport.global(
       child: MaterialApp.router(
-      debugShowCheckedModeBanner: false,
-      routerConfig: router,
-      theme: theme.lightTheme,
-      darkTheme: theme.darkTheme,
-      themeMode: theme.mode,
-      locale: context.locale,
-      supportedLocales: context.supportedLocales,
-      localizationsDelegates: context.localizationDelegates,
+        debugShowCheckedModeBanner: false,
+        routerConfig: router,
+        theme: theme.lightTheme,
+        darkTheme: theme.darkTheme,
+        themeMode: theme.mode,
+        locale: context.locale,
+        supportedLocales: context.supportedLocales,
+        localizationsDelegates: context.localizationDelegates,
       builder: (context, child) {
         // Ensure auth state initialized (demo)
         ref.read(authProvider.notifier).initializeDemo();
@@ -53,7 +53,7 @@ class LMSApp extends ConsumerWidget {
                   ),
                 ),
               ),
-            // Floating AI chatbot
+            // Floating AI chatbot - Now inside MaterialApp context
             const ChatbotFloating(),
           ],
         );

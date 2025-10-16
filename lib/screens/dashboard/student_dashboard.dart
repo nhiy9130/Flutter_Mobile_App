@@ -2,12 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../features/auth/auth_state.dart';
-import '../../core/widgets/quick_action_card.dart';
-import '../../core/widgets/stat_card.dart';
-import '../../core/widgets/progress_card.dart';
-import '../../core/widgets/section_header.dart';
-import '../../features/recommendations/recommendation_service.dart';
-import '../../features/analytics/learning_analytics_service.dart';
+import '../../core/widgets/widgets.dart';
+import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_dimensions.dart';
+import '../../core/theme/app_typography.dart';
 
 class StudentDashboard extends ConsumerWidget {
   const StudentDashboard({super.key, required this.user});
@@ -16,96 +14,148 @@ class StudentDashboard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return ListView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppSpacing.screenHorizontal),
       children: [
         // Welcome Section
         _buildWelcomeCard(context),
-        const SizedBox(height: 24),
+        const SizedBox(height: AppSpacing.sectionSpacing),
 
         // Quick Actions
-        const SectionHeader(
-          title: 'Truy cập nhanh',
-          icon: Icons.flash_on,
-        ),
-        const SizedBox(height: 12),
+        _buildSectionHeader('Truy cập nhanh', Icons.flash_on),
+        const SizedBox(height: AppSpacing.sectionHeaderSpacing),
         _buildQuickActions(context),
-        const SizedBox(height: 24),
+        const SizedBox(height: AppSpacing.sectionSpacing),
 
         // Learning Progress
-        const SectionHeader(
-          title: 'Tiến độ học tập',
-          action: 'Xem tất cả',
-        ),
-        const SizedBox(height: 12),
+        _buildSectionHeader('Tiến độ học tập', Icons.trending_up, action: 'Xem tất cả'),
+        const SizedBox(height: AppSpacing.sectionHeaderSpacing),
         _buildLearningProgress(context),
-        const SizedBox(height: 24),
+        const SizedBox(height: AppSpacing.sectionSpacing),
 
         // Analytics
-        const SectionHeader(
-          title: 'Thống kê',
-          icon: Icons.analytics,
-        ),
-        const SizedBox(height: 12),
+        _buildSectionHeader('Thống kê', Icons.analytics),
+        const SizedBox(height: AppSpacing.sectionHeaderSpacing),
         _buildAnalytics(context),
-        const SizedBox(height: 24),
+        const SizedBox(height: AppSpacing.sectionSpacing),
 
         // Recommendations
-        const SectionHeader(
-          title: 'Gợi ý cho bạn',
-          icon: Icons.recommend,
-        ),
-        const SizedBox(height: 12),
+        _buildSectionHeader('Gợi ý cho bạn', Icons.recommend),
+        const SizedBox(height: AppSpacing.sectionHeaderSpacing),
         _buildRecommendations(context),
       ],
     );
   }
 
+  Widget _buildSectionHeader(String title, IconData icon, {String? action}) {
+    return Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(AppSpacing.xs),
+          decoration: BoxDecoration(
+            color: AppColors.primary.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(AppRadius.sm),
+          ),
+          child: Icon(
+            icon,
+            size: AppSizes.iconSm,
+            color: AppColors.primary,
+          ),
+        ),
+        const SizedBox(width: AppSpacing.sm),
+        Text(
+          title,
+          style: AppTypography.h5,
+        ),
+        if (action != null) ...[
+          const Spacer(),
+          TextButton(
+            onPressed: () {
+              // TODO: Handle action
+            },
+            child: Text(
+              action,
+              style: AppTypography.bodySmall.copyWith(
+                color: AppColors.primary,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+
   Widget _buildWelcomeCard(BuildContext context) {
-    final theme = Theme.of(context);
     final hour = DateTime.now().hour;
     String greeting = 'Chào buổi sáng';
-    if (hour >= 12 && hour < 18) greeting = 'Chào buổi chiều';
-    if (hour >= 18) greeting = 'Chào buổi tối';
+    IconData greetingIcon = Icons.wb_sunny;
+    
+    if (hour >= 12 && hour < 18) {
+      greeting = 'Chào buổi chiều';
+      greetingIcon = Icons.wb_sunny_outlined;
+    }
+    if (hour >= 18) {
+      greeting = 'Chào buổi tối';
+      greetingIcon = Icons.nights_stay;
+    }
 
-    return Container(
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            theme.colorScheme.primary,
-            theme.colorScheme.secondary,
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(16),
-      ),
+    return CustomCard(
+      padding: const EdgeInsets.all(AppSpacing.cardPaddingLarge),
+      gradient: AppColors.primaryGradient,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(AppSpacing.sm),
+                decoration: BoxDecoration(
+                  color: AppColors.white.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(AppRadius.md),
+                ),
+                child: Icon(
+                  greetingIcon,
+                  color: AppColors.white,
+                  size: AppSizes.iconLg,
+                ),
+              ),
+              const SizedBox(width: AppSpacing.md),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '$greeting!',
+                      style: AppTypography.bodyMedium.copyWith(
+                        color: AppColors.white.withOpacity(0.9),
+                      ),
+                    ),
+                    Text(
+                      user.fullName,
+                      style: AppTypography.h4.copyWith(
+                        color: AppColors.white,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.md),
           Text(
-            '$greeting, ${user.fullName}! 👋',
-            style: theme.textTheme.headlineSmall?.copyWith(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
+            'Sẵn sàng để học tập hôm nay chưa? 🚀',
+            style: AppTypography.bodyLarge.copyWith(
+              color: AppColors.white.withOpacity(0.9),
             ),
           ),
-          const SizedBox(height: 8),
-          Text(
-            'Sẵn sàng để học tập hôm nay chưa?',
-            style: theme.textTheme.bodyLarge?.copyWith(
-              color: Colors.white.withOpacity(0.9),
-            ),
-          ),
-          const SizedBox(height: 16),
-          ElevatedButton.icon(
+          const SizedBox(height: AppSpacing.lg),
+          CustomButton(
             onPressed: () => context.go('/my-courses'),
-            icon: const Icon(Icons.school),
-            label: const Text('Xem khóa học của tôi'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.white,
-              foregroundColor: theme.colorScheme.primary,
-            ),
+            text: 'Xem khóa học của tôi',
+            icon: Icons.school,
+            variant: ButtonVariant.secondary,
+            size: ButtonSize.medium,
           ),
         ],
       ),
@@ -117,39 +167,92 @@ class StudentDashboard extends ConsumerWidget {
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       crossAxisCount: 2,
-      childAspectRatio: 1.1,
-      mainAxisSpacing: 12,
-      crossAxisSpacing: 12,
+      childAspectRatio: 1.2,
+      mainAxisSpacing: AppSpacing.md,
+      crossAxisSpacing: AppSpacing.md,
       children: [
-        QuickActionCard(
-          icon: Icons.menu_book,
+        ActionCard(
           title: 'Khóa học',
-          subtitle: '15 khóa học',
-          color: Colors.blue,
+          subtitle: '15 khóa học đang tham gia',
+          icon: Icons.menu_book_outlined,
+          iconColor: AppColors.primary,
+          iconBackgroundColor: AppColors.primaryContainer,
           onTap: () => context.go('/my-courses'),
+          trailing: Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.sm,
+              vertical: AppSpacing.xs2,
+            ),
+            decoration: BoxDecoration(
+              color: AppColors.primary,
+              borderRadius: BorderRadius.circular(AppRadius.full),
+            ),
+            child: Text(
+              '15',
+              style: AppTypography.caption.copyWith(
+                color: AppColors.white,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
         ),
-        QuickActionCard(
-          icon: Icons.notifications_active,
+        ActionCard(
           title: 'Thông báo',
           subtitle: '5 thông báo mới',
-          color: Colors.orange,
-          badge: '5',
+          icon: Icons.notifications_outlined,
+          iconColor: AppColors.warning,
+          iconBackgroundColor: AppColors.warningContainer,
           onTap: () => context.go('/notifications-demo'),
+          trailing: Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.sm,
+              vertical: AppSpacing.xs2,
+            ),
+            decoration: BoxDecoration(
+              color: AppColors.error,
+              borderRadius: BorderRadius.circular(AppRadius.full),
+            ),
+            child: Text(
+              '5',
+              style: AppTypography.caption.copyWith(
+                color: AppColors.white,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
         ),
-        QuickActionCard(
-          icon: Icons.videocam,
+        ActionCard(
           title: 'Live Streams',
           subtitle: '2 buổi học trực tuyến',
-          color: Colors.red,
+          icon: Icons.videocam_outlined,
+          iconColor: AppColors.error,
+          iconBackgroundColor: AppColors.errorContainer,
           onTap: () => context.go('/my-courses'),
         ),
-        QuickActionCard(
-          icon: Icons.quiz,
+        ActionCard(
           title: 'Bài tập',
           subtitle: '3 bài tập chưa nộp',
-          color: Colors.purple,
-          badge: '3',
+          icon: Icons.quiz_outlined,
+          iconColor: AppColors.secondary,
+          iconBackgroundColor: AppColors.secondaryContainer,
           onTap: () => context.go('/my-courses'),
+          trailing: Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.sm,
+              vertical: AppSpacing.xs2,
+            ),
+            decoration: BoxDecoration(
+              color: AppColors.secondary,
+              borderRadius: BorderRadius.circular(AppRadius.full),
+            ),
+            child: Text(
+              '3',
+              style: AppTypography.caption.copyWith(
+                color: AppColors.white,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
         ),
       ],
     );
@@ -162,23 +265,23 @@ class StudentDashboard extends ConsumerWidget {
           title: 'Introduction to Flutter Development',
           subtitle: 'TS. Trần Thị Bình • 12/15 bài học',
           progress: 0.8,
-          color: Colors.blue,
+          progressColor: AppColors.primary,
           onTap: () => context.go('/courses/course-1'),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppSpacing.sm),
         ProgressCard(
           title: 'Advanced React & TypeScript',
           subtitle: 'Dr. John Smith • 8/20 bài học',
           progress: 0.4,
-          color: Colors.green,
+          progressColor: AppColors.success,
           onTap: () => context.go('/courses/course-2'),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppSpacing.sm),
         ProgressCard(
           title: 'Data Science with Python',
           subtitle: 'Prof. Sarah Johnson • 3/18 bài học',
           progress: 0.17,
-          color: Colors.purple,
+          progressColor: AppColors.secondary,
           onTap: () => context.go('/courses/course-3'),
         ),
       ],
@@ -190,41 +293,41 @@ class StudentDashboard extends ConsumerWidget {
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       crossAxisCount: 2,
-      childAspectRatio: 1.3,
-      mainAxisSpacing: 12,
-      crossAxisSpacing: 12,
+      childAspectRatio: 1.4,
+      mainAxisSpacing: AppSpacing.md,
+      crossAxisSpacing: AppSpacing.md,
       children: [
         StatCard(
-          icon: Icons.access_time,
+          title: 'Thời gian học',
           value: '124h',
-          label: 'Thời gian học',
-          color: Colors.blue,
-          trend: '+12%',
-          trendUp: true,
+          icon: Icons.access_time,
+          trend: TrendDirection.up,
+          trendValue: '+12%',
+          valueColor: AppColors.primary,
         ),
         StatCard(
-          icon: Icons.assignment_turned_in,
+          title: 'Điểm trung bình',
           value: '89%',
-          label: 'Điểm trung bình',
-          color: Colors.green,
-          trend: '+5%',
-          trendUp: true,
+          icon: Icons.assignment_turned_in,
+          trend: TrendDirection.up,
+          trendValue: '+5%',
+          valueColor: AppColors.success,
         ),
         StatCard(
-          icon: Icons.local_fire_department,
+          title: 'Chuỗi ngày học',
           value: '15',
-          label: 'Chuỗi ngày học',
-          color: Colors.orange,
-          trend: '+3',
-          trendUp: true,
+          icon: Icons.local_fire_department,
+          trend: TrendDirection.up,
+          trendValue: '+3 ngày',
+          valueColor: AppColors.warning,
         ),
         StatCard(
-          icon: Icons.emoji_events,
+          title: 'Thành tích',
           value: '12',
-          label: 'Thành tích',
-          color: Colors.purple,
-          trend: '+2',
-          trendUp: true,
+          icon: Icons.emoji_events,
+          trend: TrendDirection.up,
+          trendValue: '+2',
+          valueColor: AppColors.secondary,
         ),
       ],
     );
@@ -233,52 +336,39 @@ class StudentDashboard extends ConsumerWidget {
   Widget _buildRecommendations(BuildContext context) {
     return Column(
       children: [
-        _buildRecommendationCard(
-          context,
-          'UI/UX Design Fundamentals',
-          'Dựa trên sở thích của bạn',
-          Icons.design_services,
-          Colors.pink,
+        InfoCard(
+          title: 'UI/UX Design Fundamentals',
+          subtitle: 'Dựa trên sở thích của bạn',
+          description: 'Khóa học cơ bản về thiết kế giao diện và trải nghiệm người dùng',
+          icon: Icons.design_services,
+          iconColor: Colors.pink,
+          onTap: () {
+            // TODO: Navigate to course detail
+          },
         ),
-        const SizedBox(height: 8),
-        _buildRecommendationCard(
-          context,
-          'Mobile App Development',
-          'Phù hợp với kỹ năng hiện tại',
-          Icons.phone_android,
-          Colors.indigo,
+        const SizedBox(height: AppSpacing.sm),
+        InfoCard(
+          title: 'Mobile App Development',
+          subtitle: 'Phù hợp với kỹ năng hiện tại',
+          description: 'Học cách phát triển ứng dụng di động với Flutter và React Native',
+          icon: Icons.phone_android,
+          iconColor: Colors.indigo,
+          onTap: () {
+            // TODO: Navigate to course detail
+          },
+        ),
+        const SizedBox(height: AppSpacing.sm),
+        InfoCard(
+          title: 'Cloud Computing Basics',
+          subtitle: 'Xu hướng công nghệ mới',
+          description: 'Làm quen với điện toán đám mây và các dịch vụ AWS, Azure',
+          icon: Icons.cloud,
+          iconColor: Colors.blue,
+          onTap: () {
+            // TODO: Navigate to course detail
+          },
         ),
       ],
-    );
-  }
-
-  Widget _buildRecommendationCard(
-    BuildContext context,
-    String title,
-    String reason,
-    IconData icon,
-    Color color,
-  ) {
-    return Card(
-      child: ListTile(
-        leading: Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: color.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Icon(icon, color: color),
-        ),
-        title: Text(
-          title,
-          style: const TextStyle(fontWeight: FontWeight.w600),
-        ),
-        subtitle: Text(reason),
-        trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-        onTap: () {
-          // TODO: Navigate to course detail
-        },
-      ),
     );
   }
 }

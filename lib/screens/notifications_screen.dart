@@ -3,6 +3,7 @@ import 'package:overlay_support/overlay_support.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../features/notifications/notification_store.dart';
 import '../features/notifications/notification_models.dart';
+import '../core/widgets/safe_wrapper.dart';
 import 'notifications_prefs_screen.dart';
 
 class NotificationsScreen extends ConsumerWidget {
@@ -33,7 +34,8 @@ class NotificationsScreen extends ConsumerWidget {
         children: [
           Padding(
             padding: const EdgeInsets.all(12),
-            child: Row(
+            child: SafeRow(
+              scrollable: true,
               children: [
                 ElevatedButton(
                   onPressed: () {

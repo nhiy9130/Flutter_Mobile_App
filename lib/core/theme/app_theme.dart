@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'app_colors.dart';
+import 'app_dimensions.dart';
+import 'app_typography.dart';
 
 class AppThemeState {
   const AppThemeState({required this.mode});
@@ -8,33 +12,46 @@ class AppThemeState {
 
   ThemeData get lightTheme => ThemeData(
         colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF6366F1), // Indigo-500
-          primary: const Color(0xFF6366F1),
-          secondary: const Color(0xFF8B5CF6), // Purple-500
-          tertiary: const Color(0xFF06B6D4), // Cyan-500
-          error: const Color(0xFFEF4444), // Red-500
-          surface: Colors.white,
-          background: const Color(0xFFF8FAFC), // Slate-50
+          seedColor: AppColors.primary,
+          primary: AppColors.primary,
+          secondary: AppColors.secondary,
+          tertiary: AppColors.accent,
+          error: AppColors.error,
+          surface: AppColors.white,
+          background: AppColors.grey50,
+          onPrimary: AppColors.white,
+          onSecondary: AppColors.white,
+          onSurface: AppColors.grey900,
+          onBackground: AppColors.grey900,
+          outline: AppColors.grey300,
+          surfaceVariant: AppColors.grey100,
+          onSurfaceVariant: AppColors.grey600,
         ),
         useMaterial3: true,
-        appBarTheme: const AppBarTheme(
-          elevation: 0,
+        scaffoldBackgroundColor: AppColors.grey50,
+        appBarTheme: AppBarTheme(
+          elevation: AppElevation.none,
           centerTitle: false,
-          backgroundColor: Color(0xFFF8FAFC),
-          foregroundColor: Color(0xFF0F172A), // Slate-900
-          titleTextStyle: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.w600,
-            color: Color(0xFF0F172A),
+          backgroundColor: AppColors.grey50,
+          foregroundColor: AppColors.grey900,
+          titleTextStyle: AppTypography.h4,
+          systemOverlayStyle: const SystemUiOverlayStyle(
+            statusBarColor: Colors.transparent,
+            statusBarIconBrightness: Brightness.dark,
           ),
         ),
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
-            elevation: 0,
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
+            elevation: AppElevation.sm,
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.buttonHorizontal,
+              vertical: AppSpacing.buttonVertical,
             ),
+            minimumSize: const Size(0, AppSizes.buttonMd),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(AppRadius.button),
+            ),
+            textStyle: AppTypography.buttonMedium,
           ),
         ),
         outlinedButtonTheme: OutlinedButtonThemeData(

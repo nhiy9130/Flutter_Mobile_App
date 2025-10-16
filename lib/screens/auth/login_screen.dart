@@ -4,6 +4,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../features/auth/auth_state.dart';
 import '../../core/data/demo_data.dart';
+import '../../core/widgets/widgets.dart';
+import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_dimensions.dart';
+import '../../core/theme/app_typography.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -13,153 +17,418 @@ class LoginScreen extends ConsumerStatefulWidget {
 }
 
 class _LoginScreenState extends ConsumerState<LoginScreen> {
+  final _formKey = GlobalKey<FormState>();
   final emailCtrl = TextEditingController();
   final passCtrl = TextEditingController();
   bool loading = false;
+  bool _obscurePassword = true;
+
+  @override
+  void dispose() {
+    emailCtrl.dispose();
+    passCtrl.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(tr('auth.login.title')),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.info_outline),
-            onPressed: () => _showDemoAccountsDialog(),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.screenHorizontal,
+              vertical: AppSpacing.screenVertical,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Header Section
+                const SizedBox(height: AppSpacing.xl2),
+                _buildHeader(),
+                const SizedBox(height: AppSpacing.xl2),
+                
+                // Demo Info Card
+                _buildDemoInfoCard(),
+                const SizedBox(height: AppSpacing.xl),
+                
+                // Login Form
+                _buildLoginForm(),
+                const SizedBox(height: AppSpacing.xl),
+                
+                // Quick Login Section
+                _buildQuickLoginSection(),
+                const SizedBox(height: AppSpacing.xl),
+                
+                // Footer Links
+                _buildFooterLinks(),
+              ],
+            ),
           ),
-        ],
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Demo banner
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.blue.shade50,
-                border: Border.all(color: Colors.blue.shade200),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Row(
-                children: [
-                  Icon(Icons.info, color: Colors.blue.shade700),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      'Demo Mode: Tap the info icon to see demo accounts',
-                      style: TextStyle(color: Colors.blue.shade700, fontSize: 13),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 24),
-            TextField(
-              controller: emailCtrl,
-              decoration: InputDecoration(
-                labelText: tr('auth.login.email'),
-                border: const OutlineInputBorder(),
-                prefixIcon: const Icon(Icons.email),
-              ),
-              keyboardType: TextInputType.emailAddress,
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: passCtrl,
-              obscureText: true,
-              decoration: InputDecoration(
-                labelText: tr('auth.login.password'),
-                border: const OutlineInputBorder(),
-                prefixIcon: const Icon(Icons.lock),
-              ),
-            ),
-            const SizedBox(height: 24),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: loading
-                    ? null
-                    : () async {
-                        setState(() => loading = true);
-                        final ok = await ref.read(authProvider.notifier).login(emailCtrl.text, passCtrl.text);
-                        setState(() => loading = false);
-                        if (ok && mounted) context.go('/dashboard');
-                      },
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                ),
-                child: loading
-                    ? const SizedBox(
-                        height: 20,
-                        width: 20,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : Text(tr('auth.login.submit'), style: const TextStyle(fontSize: 16)),
-              ),
-            ),
-            const SizedBox(height: 16),
-            const Divider(),
-            const SizedBox(height: 16),
-            // Quick login buttons
-            Text(
-              'Quick Login:',
-              style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
-            ),
-            const SizedBox(height: 12),
-            _buildQuickLoginButton(
-              context,
-              'Student Account',
-              'student@demo.com',
-              'student123',
-              Icons.school,
-              Colors.blue,
-            ),
-            const SizedBox(height: 8),
-            _buildQuickLoginButton(
-              context,
-              'Instructor Account',
-              'instructor@demo.com',
-              'instructor123',
-              Icons.person,
-              Colors.green,
-            ),
-            const SizedBox(height: 8),
-            _buildQuickLoginButton(
-              context,
-              'Admin Account',
-              'admin@demo.com',
-              'admin123',
-              Icons.admin_panel_settings,
-              Colors.orange,
-            ),
-          ],
         ),
       ),
     );
   }
 
+  Widget _buildHeader() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(AppSpacing.md),
+              decoration: BoxDecoration(
+                gradient: AppColors.primaryGradient,
+                borderRadius: BorderRadius.circular(AppRadius.xl),
+              ),
+              child: const Icon(
+                Icons.school,
+                color: AppColors.white,
+                size: AppSizes.iconXl,
+              ),
+            ),
+            const SizedBox(width: AppSpacing.md),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'LMS',
+                  style: AppTypography.h2.copyWith(
+                    color: AppColors.primary,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                Text(
+                  'Learning Management System',
+                  style: AppTypography.bodySmall.copyWith(
+                    color: AppColors.grey600,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+        const SizedBox(height: AppSpacing.lg),
+        Text(
+          tr('auth.login.title'),
+          style: AppTypography.h1,
+        ),
+        const SizedBox(height: AppSpacing.sm),
+        Text(
+          'Chào mừng bạn quay trở lại! Đăng nhập để tiếp tục học tập.',
+          style: AppTypography.bodyLarge.copyWith(
+            color: AppColors.grey600,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDemoInfoCard() {
+    return CustomCard(
+      backgroundColor: AppColors.infoContainer,
+      borderColor: AppColors.info.withOpacity(0.3),
+      child: Row(
+        children: [
+          Icon(
+            Icons.info_outline,
+            color: AppColors.info,
+            size: AppSizes.iconLg,
+          ),
+          const SizedBox(width: AppSpacing.md),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Chế độ Demo',
+                  style: AppTypography.labelMedium.copyWith(
+                    color: AppColors.info,
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.xs),
+                Text(
+                  'Sử dụng các tài khoản demo bên dưới để trải nghiệm hệ thống',
+                  style: AppTypography.bodySmall.copyWith(
+                    color: AppColors.infoDark,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          CustomButton(
+            onPressed: _showDemoAccountsDialog,
+            text: 'Xem',
+            variant: ButtonVariant.ghost,
+            size: ButtonSize.small,
+            icon: Icons.visibility,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLoginForm() {
+    return Form(
+      key: _formKey,
+      child: Column(
+        children: [
+          CustomTextField(
+            controller: emailCtrl,
+            label: tr('auth.login.email'),
+            hint: 'Nhập email của bạn',
+            prefixIcon: const Icon(Icons.email_outlined),
+            keyboardType: TextInputType.emailAddress,
+            textInputAction: TextInputAction.next,
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Vui lòng nhập email';
+              }
+              if (!value.contains('@')) {
+                return 'Email không hợp lệ';
+              }
+              return null;
+            },
+          ),
+          const SizedBox(height: AppSpacing.formFieldSpacing),
+          CustomTextField(
+            controller: passCtrl,
+            label: tr('auth.login.password'),
+            hint: 'Nhập mật khẩu của bạn',
+            prefixIcon: const Icon(Icons.lock_outlined),
+            suffixIcon: IconButton(
+              icon: Icon(
+                _obscurePassword ? Icons.visibility : Icons.visibility_off,
+                color: AppColors.grey500,
+              ),
+              onPressed: () {
+                setState(() {
+                  _obscurePassword = !_obscurePassword;
+                });
+              },
+            ),
+            obscureText: _obscurePassword,
+            textInputAction: TextInputAction.done,
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Vui lòng nhập mật khẩu';
+              }
+              return null;
+            },
+            onSubmitted: (_) => _handleLogin(),
+          ),
+          const SizedBox(height: AppSpacing.lg),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  Checkbox(
+                    value: false,
+                    onChanged: (value) {},
+                    visualDensity: VisualDensity.compact,
+                  ),
+                  Text(
+                    'Ghi nhớ đăng nhập',
+                    style: AppTypography.bodySmall,
+                  ),
+                ],
+              ),
+              TextButton(
+                onPressed: () {
+                  context.push('/forgot-password');
+                },
+                child: Text(
+                  'Quên mật khẩu?',
+                  style: AppTypography.bodySmall.copyWith(
+                    color: AppColors.primary,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.xl),
+          CustomButton(
+            onPressed: loading ? null : _handleLogin,
+            text: tr('auth.login.submit'),
+            isExpanded: true,
+            isLoading: loading,
+            size: ButtonSize.large,
+            icon: Icons.login,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildQuickLoginSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Expanded(child: Divider(color: AppColors.grey300)),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+              child: Text(
+                'Hoặc đăng nhập nhanh',
+                style: AppTypography.bodySmall.copyWith(
+                  color: AppColors.grey500,
+                ),
+              ),
+            ),
+            Expanded(child: Divider(color: AppColors.grey300)),
+          ],
+        ),
+        const SizedBox(height: AppSpacing.lg),
+        _buildQuickLoginButton(
+          'Tài khoản Sinh viên',
+          'student@demo.com',
+          'student123',
+          Icons.school_outlined,
+          AppColors.studentPrimary,
+        ),
+        const SizedBox(height: AppSpacing.sm),
+        _buildQuickLoginButton(
+          'Tài khoản Giảng viên',
+          'instructor@demo.com',
+          'instructor123',
+          Icons.person_outlined,
+          AppColors.teacherPrimary,
+        ),
+        const SizedBox(height: AppSpacing.sm),
+        _buildQuickLoginButton(
+          'Tài khoản Quản trị',
+          'admin@demo.com',
+          'admin123',
+          Icons.admin_panel_settings_outlined,
+          AppColors.adminPrimary,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildFooterLinks() {
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'Chưa có tài khoản? ',
+              style: AppTypography.bodyMedium,
+            ),
+            TextButton(
+              onPressed: () {
+                context.push('/register');
+              },
+              child: Text(
+                'Đăng ký ngay',
+                style: AppTypography.bodyMedium.copyWith(
+                  color: AppColors.primary,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: AppSpacing.md),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            TextButton.icon(
+              onPressed: () {
+                // TODO: Show help
+              },
+              icon: Icon(
+                Icons.help_outline,
+                size: AppSizes.iconSm,
+                color: AppColors.grey500,
+              ),
+              label: Text(
+                'Trợ giúp',
+                style: AppTypography.bodySmall.copyWith(
+                  color: AppColors.grey500,
+                ),
+              ),
+            ),
+            Text(
+              ' • ',
+              style: AppTypography.bodySmall.copyWith(
+                color: AppColors.grey400,
+              ),
+            ),
+            TextButton.icon(
+              onPressed: () {
+                // TODO: Show privacy policy
+              },
+              icon: Icon(
+                Icons.privacy_tip_outlined,
+                size: AppSizes.iconSm,
+                color: AppColors.grey500,
+              ),
+              label: Text(
+                'Bảo mật',
+                style: AppTypography.bodySmall.copyWith(
+                  color: AppColors.grey500,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  void _handleLogin() async {
+    if (!_formKey.currentState!.validate()) return;
+    
+    setState(() => loading = true);
+    try {
+      final ok = await ref.read(authProvider.notifier).login(
+        emailCtrl.text.trim(),
+        passCtrl.text,
+      );
+      if (ok && mounted) {
+        context.go('/dashboard');
+      }
+    } finally {
+      if (mounted) {
+        setState(() => loading = false);
+      }
+    }
+  }
+
   Widget _buildQuickLoginButton(
-    BuildContext context,
     String label,
     String email,
     String password,
     IconData icon,
     Color color,
   ) {
-    return OutlinedButton.icon(
-      onPressed: () {
+    return ActionCard(
+      title: label,
+      subtitle: email,
+      icon: icon,
+      iconColor: color,
+      iconBackgroundColor: color.withOpacity(0.1),
+      onTap: () {
         emailCtrl.text = email;
         passCtrl.text = password;
       },
-      icon: Icon(icon, color: color),
-      label: Text(label),
-      style: OutlinedButton.styleFrom(
-        alignment: Alignment.centerLeft,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      trailing: Container(
+        padding: const EdgeInsets.all(AppSpacing.xs),
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(AppRadius.sm),
+        ),
+        child: Icon(
+          Icons.login,
+          size: AppSizes.iconSm,
+          color: color,
+        ),
       ),
     );
   }

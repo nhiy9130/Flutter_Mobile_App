@@ -8,6 +8,7 @@ class EmptyState extends StatelessWidget {
     required this.title,
     this.subtitle,
     this.actionLabel,
+    this.actionText, // Added for backward compatibility
     this.onAction,
   });
 
@@ -15,6 +16,7 @@ class EmptyState extends StatelessWidget {
   final String title;
   final String? subtitle;
   final String? actionLabel;
+  final String? actionText; // Added for backward compatibility
   final VoidCallback? onAction;
 
   @override
@@ -57,12 +59,12 @@ class EmptyState extends StatelessWidget {
                 textAlign: TextAlign.center,
               ),
             ],
-            if (actionLabel != null && onAction != null) ...[
+            if ((actionLabel != null || actionText != null) && onAction != null) ...[
               const SizedBox(height: 24),
               ElevatedButton.icon(
                 onPressed: onAction,
                 icon: const Icon(Icons.add),
-                label: Text(actionLabel!),
+                label: Text(actionLabel ?? actionText ?? ''),
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                 ),

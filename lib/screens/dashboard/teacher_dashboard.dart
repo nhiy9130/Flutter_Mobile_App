@@ -119,25 +119,29 @@ class TeacherDashboard extends ConsumerWidget {
           const SizedBox(height: 16),
           Row(
             children: [
-              ElevatedButton.icon(
-                onPressed: () => context.go('/my-courses'),
-                icon: const Icon(Icons.school),
-                label: const Text('Quản lý khóa học'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  foregroundColor: Colors.green.shade600,
+              Expanded(
+                child: ElevatedButton.icon(
+                  onPressed: () => context.go('/my-courses'),
+                  icon: const Icon(Icons.school),
+                  label: const Text('Quản lý khóa học'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    foregroundColor: Colors.green.shade600,
+                  ),
                 ),
               ),
               const SizedBox(width: 12),
-              OutlinedButton.icon(
-                onPressed: () {
-                  // TODO: Create new course
-                },
-                icon: const Icon(Icons.add),
-                label: const Text('Tạo khóa học'),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: Colors.white,
-                  side: const BorderSide(color: Colors.white),
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: () {
+                    // TODO: Create new course
+                  },
+                  icon: const Icon(Icons.add),
+                  label: const Text('Tạo khóa học'),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: Colors.white,
+                    side: const BorderSide(color: Colors.white),
+                  ),
                 ),
               ),
             ],
@@ -148,13 +152,24 @@ class TeacherDashboard extends ConsumerWidget {
   }
 
   Widget _buildQuickActions(BuildContext context) {
-    return GridView.count(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      crossAxisCount: 2,
-      childAspectRatio: 1.1,
-      mainAxisSpacing: 12,
-      crossAxisSpacing: 12,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // Tính toán height dựa trên content thực tế
+        final cardHeight = (constraints.maxWidth - 12) / 2 / 1.1; // childAspectRatio = 1.1
+        final totalHeight = (cardHeight * 2) + 12; // 2 hàng + spacing
+        
+        return ConstrainedBox(
+          constraints: BoxConstraints(
+            maxHeight: totalHeight + 20, // Thêm padding
+            minHeight: 200,
+          ),
+          child: GridView.count(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            crossAxisCount: 2,
+            childAspectRatio: 1.1,
+            mainAxisSpacing: 12,
+            crossAxisSpacing: 12,
       children: [
         QuickActionCard(
           icon: Icons.videocam,
@@ -193,6 +208,9 @@ class TeacherDashboard extends ConsumerWidget {
           },
         ),
       ],
+          ),
+        );
+      },
     );
   }
 
@@ -249,13 +267,24 @@ class TeacherDashboard extends ConsumerWidget {
   }
 
   Widget _buildTeachingStats(BuildContext context) {
-    return GridView.count(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      crossAxisCount: 2,
-      childAspectRatio: 1.3,
-      mainAxisSpacing: 12,
-      crossAxisSpacing: 12,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // Tính toán height dựa trên content thực tế cho stats
+        final cardHeight = (constraints.maxWidth - 12) / 2 / 1.3; // childAspectRatio = 1.3
+        final totalHeight = (cardHeight * 2) + 12; // 2 hàng + spacing
+        
+        return ConstrainedBox(
+          constraints: BoxConstraints(
+            maxHeight: totalHeight + 20,
+            minHeight: 180,
+          ),
+          child: GridView.count(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            crossAxisCount: 2,
+            childAspectRatio: 1.3,
+            mainAxisSpacing: 12,
+            crossAxisSpacing: 12,
       children: [
         StatCard(
           icon: Icons.school,
@@ -288,6 +317,9 @@ class TeacherDashboard extends ConsumerWidget {
           trendUp: true,
         ),
       ],
+          ),
+        );
+      },
     );
   }
 

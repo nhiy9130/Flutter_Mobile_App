@@ -5,10 +5,17 @@ import 'package:hive_flutter/hive_flutter.dart';
 
 import 'app.dart';
 import 'core/config/app_config.dart';
+import 'core/error/global_error_handler.dart';
 import 'features/notifications/local_notification_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  
+  // Initialize Global Error Handler
+  GlobalErrorHandler.initialize();
+  
+  // Set custom error widget builder
+  ErrorWidget.builder = CustomErrorWidget.builder;
   
   // Initialize EasyLocalization
   await EasyLocalization.ensureInitialized();
