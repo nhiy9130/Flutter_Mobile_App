@@ -46,11 +46,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
             children: [
               _buildHeader(),
               const SizedBox(height: AppSpacing.xl2),
-              
-              if (_emailSent)
-                _buildSuccessContent()
-              else
-                _buildFormContent(),
+
+              if (_emailSent) _buildSuccessContent() else _buildFormContent(),
             ],
           ),
         ),
@@ -65,7 +62,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         Container(
           padding: const EdgeInsets.all(AppSpacing.md),
           decoration: BoxDecoration(
-            color: AppColors.primary.withOpacity(0.1),
+            color: AppColors.primary.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(AppRadius.xl),
           ),
           child: Icon(
@@ -81,12 +78,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         ),
         const SizedBox(height: AppSpacing.sm),
         Text(
-          _emailSent 
-            ? 'Chúng tôi đã gửi hướng dẫn khôi phục mật khẩu đến email của bạn.'
-            : 'Nhập địa chỉ email của bạn để nhận hướng dẫn khôi phục mật khẩu.',
-          style: AppTypography.bodyLarge.copyWith(
-            color: AppColors.grey600,
-          ),
+          _emailSent
+              ? 'Chúng tôi đã gửi hướng dẫn khôi phục mật khẩu đến email của bạn.'
+              : 'Nhập địa chỉ email của bạn để nhận hướng dẫn khôi phục mật khẩu.',
+          style: AppTypography.bodyLarge.copyWith(color: AppColors.grey600),
         ),
       ],
     );
@@ -108,7 +103,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               if (value == null || value.isEmpty) {
                 return 'Vui lòng nhập địa chỉ email';
               }
-              if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+              if (!RegExp(
+                r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+              ).hasMatch(value)) {
                 return 'Địa chỉ email không hợp lệ';
               }
               return null;
@@ -116,7 +113,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
             onSubmitted: (_) => _handleSendEmail(),
           ),
           const SizedBox(height: AppSpacing.xl),
-          
+
           CustomButton(
             onPressed: _isLoading ? null : _handleSendEmail,
             text: 'Gửi hướng dẫn khôi phục',
@@ -126,25 +123,23 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
             icon: Icons.send,
           ),
           const SizedBox(height: AppSpacing.lg),
-          
+
           // Information card
           InfoCard(
             title: 'Lưu ý',
-            description: 'Vui lòng kiểm tra cả hộp thư spam/junk nếu bạn không thấy email trong vòng vài phút.',
+            description:
+                'Vui lòng kiểm tra cả hộp thư spam/junk nếu bạn không thấy email trong vòng vài phút.',
             icon: Icons.info_outlined,
             iconColor: AppColors.info,
             backgroundColor: AppColors.infoContainer,
           ),
           const SizedBox(height: AppSpacing.xl),
-          
+
           // Back to login
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(
-                'Nhớ lại mật khẩu? ',
-                style: AppTypography.bodyMedium,
-              ),
+              Text('Nhớ lại mật khẩu? ', style: AppTypography.bodyMedium),
               TextButton(
                 onPressed: () => context.pop(),
                 child: Text(
@@ -167,7 +162,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       children: [
         CustomCard(
           backgroundColor: AppColors.successContainer,
-          borderColor: AppColors.success.withOpacity(0.3),
+          borderColor: AppColors.success.withValues(alpha: 0.3),
           child: Column(
             children: [
               Icon(
@@ -178,9 +173,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               const SizedBox(height: AppSpacing.md),
               Text(
                 'Email khôi phục đã được gửi!',
-                style: AppTypography.h6.copyWith(
-                  color: AppColors.success,
-                ),
+                style: AppTypography.h6.copyWith(color: AppColors.success),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: AppSpacing.sm),
@@ -202,7 +195,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           ),
         ),
         const SizedBox(height: AppSpacing.xl),
-        
+
         // Action buttons
         CustomButton(
           onPressed: () => context.go('/login'),
@@ -213,7 +206,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           icon: Icons.login,
         ),
         const SizedBox(height: AppSpacing.md),
-        
+
         CustomButton(
           onPressed: () {
             setState(() {
@@ -227,11 +220,12 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           icon: Icons.refresh,
         ),
         const SizedBox(height: AppSpacing.xl),
-        
+
         // Support information
         InfoCard(
           title: 'Cần trợ giúp?',
-          description: 'Nếu bạn không nhận được email, hãy liên hệ với đội hỗ trợ để được giúp đỡ.',
+          description:
+              'Nếu bạn không nhận được email, hãy liên hệ với đội hỗ trợ để được giúp đỡ.',
           icon: Icons.support_agent,
           iconColor: AppColors.secondary,
           backgroundColor: AppColors.secondaryContainer,
@@ -250,21 +244,21 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
   Future<void> _handleSendEmail() async {
     if (!_formKey.currentState!.validate()) return;
-    
+
     setState(() => _isLoading = true);
-    
+
     try {
       // Simulate API call
       await Future.delayed(const Duration(seconds: 2));
-      
+
       // TODO: Implement actual forgot password API call
       // final success = await AuthService.sendPasswordResetEmail(_emailController.text);
-      
+
       setState(() {
         _emailSent = true;
         _isLoading = false;
       });
-      
+
       // Show success message
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -283,7 +277,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       }
     } catch (e) {
       setState(() => _isLoading = false);
-      
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

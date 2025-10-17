@@ -21,8 +21,14 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     routes: [
       GoRoute(path: '/', builder: (context, state) => const HomeScreen()),
       GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
-      GoRoute(path: '/register', builder: (context, state) => const RegisterScreen()),
-      GoRoute(path: '/forgot-password', builder: (context, state) => const ForgotPasswordScreen()),
+      GoRoute(
+        path: '/register',
+        builder: (context, state) => const RegisterScreen(),
+      ),
+      GoRoute(
+        path: '/forgot-password',
+        builder: (context, state) => const ForgotPasswordScreen(),
+      ),
 
       ShellRoute(
         builder: (context, state, child) => RootShell(child: child),
@@ -35,28 +41,26 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: '/my-courses',
             redirect: (context, state) => requireAuth(context, state),
-            builder: (context, state) => const CoursesScreen(myCoursesOnly: true),
+            builder: (context, state) =>
+                const CoursesScreen(myCoursesOnly: true),
           ),
           GoRoute(
             path: '/courses/:courseId',
             redirect: (context, state) => requireAuth(context, state),
-            builder: (context, state) => CourseDetailScreen(
-              courseId: state.pathParameters['courseId']!,
-            ),
+            builder: (context, state) =>
+                CourseDetailScreen(courseId: state.pathParameters['courseId']!),
           ),
           GoRoute(
             path: '/course/:id',
             redirect: (context, state) => requireAuth(context, state),
-            builder: (context, state) => CourseDetailScreen(
-              courseId: state.pathParameters['id']!,
-            ),
+            builder: (context, state) =>
+                CourseDetailScreen(courseId: state.pathParameters['id']!),
           ),
           GoRoute(
             path: '/course/:id/live',
             redirect: (context, state) => requireAuth(context, state),
-            builder: (context, state) => LiveStreamScreen(
-              courseId: state.pathParameters['id']!,
-            ),
+            builder: (context, state) =>
+                LiveStreamScreen(courseId: state.pathParameters['id']!),
           ),
           GoRoute(
             path: '/notifications-demo',
@@ -79,5 +83,3 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     errorBuilder: (context, state) => const NotFoundScreen(),
   );
 });
-
-

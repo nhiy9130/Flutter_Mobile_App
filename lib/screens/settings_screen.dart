@@ -1,3 +1,4 @@
+// ignore_for_file: deprecated_member_use
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -14,24 +15,15 @@ class SettingsScreen extends ConsumerWidget {
       body: ListView(
         children: [
           const ListTile(title: Text('Theme')),
-          RadioListTile<ThemeMode>(
-            value: ThemeMode.system,
-            groupValue: theme.mode,
-            onChanged: (m) => ref.read(appThemeProvider.notifier).setMode(m ?? ThemeMode.system),
-            title: const Text('System'),
+          _buildThemeRadioOption(
+            context,
+            ref,
+            theme,
+            ThemeMode.system,
+            'System',
           ),
-          RadioListTile<ThemeMode>(
-            value: ThemeMode.light,
-            groupValue: theme.mode,
-            onChanged: (m) => ref.read(appThemeProvider.notifier).setMode(m ?? ThemeMode.light),
-            title: const Text('Light'),
-          ),
-          RadioListTile<ThemeMode>(
-            value: ThemeMode.dark,
-            groupValue: theme.mode,
-            onChanged: (m) => ref.read(appThemeProvider.notifier).setMode(m ?? ThemeMode.dark),
-            title: const Text('Dark'),
-          ),
+          _buildThemeRadioOption(context, ref, theme, ThemeMode.light, 'Light'),
+          _buildThemeRadioOption(context, ref, theme, ThemeMode.dark, 'Dark'),
           const Divider(),
           const ListTile(title: Text('Language')),
           ListTile(
@@ -46,7 +38,25 @@ class SettingsScreen extends ConsumerWidget {
       ),
     );
   }
+
+  Widget _buildThemeRadioOption(
+    BuildContext context,
+    WidgetRef ref,
+    AppThemeState theme,
+    ThemeMode value,
+    String label,
+  ) {
+    return ListTile(
+      title: Text(label),
+      leading: GestureDetector(
+        onTap: () => ref.read(appThemeProvider.notifier).setMode(value),
+        child: Radio<ThemeMode>(
+          value: value,
+          groupValue: theme.mode,
+          onChanged: (_) {},
+        ),
+      ),
+      onTap: () => ref.read(appThemeProvider.notifier).setMode(value),
+    );
+  }
 }
-
-
-

@@ -1,6 +1,6 @@
+// ignore_for_file: deprecated_member_use
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../features/auth/auth_state.dart';
@@ -23,7 +23,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
   final _phoneController = TextEditingController();
-  
+
   bool _isLoading = false;
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
@@ -89,16 +89,11 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           ),
         ),
         const SizedBox(height: AppSpacing.lg),
-        Text(
-          tr('auth.register.title'),
-          style: AppTypography.h1,
-        ),
+        Text(tr('auth.register.title'), style: AppTypography.h1),
         const SizedBox(height: AppSpacing.sm),
         Text(
           'Tạo tài khoản để bắt đầu hành trình học tập của bạn.',
-          style: AppTypography.bodyLarge.copyWith(
-            color: AppColors.grey600,
-          ),
+          style: AppTypography.bodyLarge.copyWith(color: AppColors.grey600),
         ),
       ],
     );
@@ -113,21 +108,16 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           // Role Selection
           Text(
             'Loại tài khoản',
-            style: AppTypography.labelMedium.copyWith(
-              color: AppColors.grey700,
-            ),
+            style: AppTypography.labelMedium.copyWith(color: AppColors.grey700),
           ),
           const SizedBox(height: AppSpacing.sm),
           _buildRoleSelector(),
           const SizedBox(height: AppSpacing.formSectionSpacing),
-          
+
           // Personal Information
-          Text(
-            'Thông tin cá nhân',
-            style: AppTypography.h6,
-          ),
+          Text('Thông tin cá nhân', style: AppTypography.h6),
           const SizedBox(height: AppSpacing.md),
-          
+
           CustomTextField(
             controller: _nameController,
             label: tr('auth.register.fullName'),
@@ -145,7 +135,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             },
           ),
           const SizedBox(height: AppSpacing.formFieldSpacing),
-          
+
           CustomTextField(
             controller: _emailController,
             label: tr('auth.register.email'),
@@ -157,14 +147,16 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               if (value == null || value.isEmpty) {
                 return 'Vui lòng nhập địa chỉ email';
               }
-              if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+              if (!RegExp(
+                r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+              ).hasMatch(value)) {
                 return 'Địa chỉ email không hợp lệ';
               }
               return null;
             },
           ),
           const SizedBox(height: AppSpacing.formFieldSpacing),
-          
+
           CustomTextField(
             controller: _phoneController,
             label: 'Số điện thoại',
@@ -176,21 +168,20 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               if (value == null || value.isEmpty) {
                 return 'Vui lòng nhập số điện thoại';
               }
-              if (!RegExp(r'^\d{10,11}$').hasMatch(value.replaceAll(RegExp(r'[\s\-\(\)]'), ''))) {
+              if (!RegExp(
+                r'^\d{10,11}$',
+              ).hasMatch(value.replaceAll(RegExp(r'[\s\-\(\)]'), ''))) {
                 return 'Số điện thoại không hợp lệ';
               }
               return null;
             },
           ),
           const SizedBox(height: AppSpacing.formSectionSpacing),
-          
+
           // Password Section
-          Text(
-            'Mật khẩu',
-            style: AppTypography.h6,
-          ),
+          Text('Mật khẩu', style: AppTypography.h6),
           const SizedBox(height: AppSpacing.md),
-          
+
           CustomTextField(
             controller: _passwordController,
             label: tr('auth.register.password'),
@@ -223,7 +214,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             },
           ),
           const SizedBox(height: AppSpacing.formFieldSpacing),
-          
+
           CustomTextField(
             controller: _confirmPasswordController,
             label: 'Xác nhận mật khẩu',
@@ -231,7 +222,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             prefixIcon: const Icon(Icons.lock_outlined),
             suffixIcon: IconButton(
               icon: Icon(
-                _obscureConfirmPassword ? Icons.visibility : Icons.visibility_off,
+                _obscureConfirmPassword
+                    ? Icons.visibility
+                    : Icons.visibility_off,
                 color: AppColors.grey500,
               ),
               onPressed: () {
@@ -254,7 +247,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             onSubmitted: (_) => _handleRegister(),
           ),
           const SizedBox(height: AppSpacing.xl),
-          
+
           // Terms and Conditions
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -300,7 +293,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             ],
           ),
           const SizedBox(height: AppSpacing.xl),
-          
+
           // Register Button
           CustomButton(
             onPressed: _isLoading || !_agreeToTerms ? null : _handleRegister,
@@ -351,7 +344,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     Color color,
   ) {
     final isSelected = _selectedRole == value;
-    
+
     return InkWell(
       onTap: () {
         setState(() {
@@ -366,7 +359,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             Container(
               padding: const EdgeInsets.all(AppSpacing.sm),
               decoration: BoxDecoration(
-                color: (isSelected ? color : AppColors.grey500).withOpacity(0.1),
+                color: (isSelected ? color : AppColors.grey500).withValues(
+                  alpha: 0.1,
+                ),
                 borderRadius: BorderRadius.circular(AppRadius.md),
               ),
               child: Icon(
@@ -396,15 +391,18 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 ],
               ),
             ),
-            Radio<String>(
-              value: value,
-              groupValue: _selectedRole,
-              onChanged: (value) {
+            GestureDetector(
+              onTap: () {
                 setState(() {
-                  _selectedRole = value!;
+                  _selectedRole = value;
                 });
               },
-              activeColor: color,
+              child: Radio<String>(
+                value: value,
+                groupValue: _selectedRole,
+                onChanged: (_) {},
+                activeColor: color,
+              ),
             ),
           ],
         ),
@@ -418,10 +416,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
-              'Đã có tài khoản? ',
-              style: AppTypography.bodyMedium,
-            ),
+            Text('Đã có tài khoản? ', style: AppTypography.bodyMedium),
             TextButton(
               onPressed: () => context.pop(),
               child: Text(
@@ -452,13 +447,13 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       );
       return;
     }
-    
+
     setState(() => _isLoading = true);
-    
+
     try {
       // Simulate API call
       await Future.delayed(const Duration(seconds: 2));
-      
+
       // TODO: Implement actual registration API call
       // final success = await AuthService.register({
       //   'name': _nameController.text.trim(),
@@ -467,13 +462,12 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       //   'phone': _phoneController.text.trim(),
       //   'role': _selectedRole,
       // });
-      
+
       // Demo: Auto login after registration
-      await ref.read(authProvider.notifier).login(
-        _emailController.text.trim(),
-        _passwordController.text,
-      );
-      
+      await ref
+          .read(authProvider.notifier)
+          .login(_emailController.text.trim(), _passwordController.text);
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -488,12 +482,12 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             ),
           ),
         );
-        
+
         context.go('/dashboard');
       }
     } catch (e) {
       setState(() => _isLoading = false);
-      
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -512,5 +506,3 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     }
   }
 }
-
-

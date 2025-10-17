@@ -27,9 +27,7 @@ class ProgressCard extends StatelessWidget {
 
     return Card(
       elevation: 1,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(12),
@@ -56,7 +54,9 @@ class ProgressCard extends StatelessWidget {
                         Text(
                           subtitle,
                           style: theme.textTheme.bodySmall?.copyWith(
-                            color: theme.textTheme.bodySmall?.color?.withOpacity(0.7),
+                            color: theme.textTheme.bodySmall?.color?.withValues(
+                              alpha: 0.7,
+                            ),
                           ),
                         ),
                       ],
@@ -82,7 +82,7 @@ class ProgressCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8),
                 child: LinearProgressIndicator(
                   value: progress,
-                  backgroundColor: progressColor.withOpacity(0.2),
+                  backgroundColor: progressColor.withValues(alpha: 0.2),
                   valueColor: AlwaysStoppedAnimation<Color>(progressColor),
                   minHeight: 8,
                 ),

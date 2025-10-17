@@ -6,13 +6,17 @@ class Prefs {
   static const _kToken = 'auth_token';
   static const _kUser = 'auth_user';
 
-  static Future<void> saveAuth({required String token, required Map<String, dynamic> user}) async {
+  static Future<void> saveAuth({
+    required String token,
+    required Map<String, dynamic> user,
+  }) async {
     final sp = await SharedPreferences.getInstance();
     await sp.setString(_kToken, token);
     await sp.setString(_kUser, jsonEncode(user));
   }
 
-  static Future<({String? token, Map<String, dynamic>? user})> loadAuth() async {
+  static Future<({String? token, Map<String, dynamic>? user})>
+  loadAuth() async {
     final sp = await SharedPreferences.getInstance();
     final token = sp.getString(_kToken);
     final userStr = sp.getString(_kUser);
@@ -31,6 +35,3 @@ class Prefs {
     await sp.remove(_kUser);
   }
 }
-
-
-

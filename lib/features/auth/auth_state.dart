@@ -3,7 +3,12 @@ import '../../core/storage/prefs.dart';
 import '../../core/data/demo_data.dart';
 
 class User {
-  const User({required this.id, required this.email, required this.fullName, required this.role});
+  const User({
+    required this.id,
+    required this.email,
+    required this.fullName,
+    required this.role,
+  });
   final int id;
   final String email;
   final String fullName;
@@ -11,7 +16,13 @@ class User {
 }
 
 class AuthState {
-  const AuthState({this.user, this.token, this.isLoading = false, this.initialized = false, this.error});
+  const AuthState({
+    this.user,
+    this.token,
+    this.isLoading = false,
+    this.initialized = false,
+    this.error,
+  });
   final User? user;
   final String? token;
   final bool isLoading;
@@ -20,13 +31,19 @@ class AuthState {
 
   bool get isAuthenticated => user != null && token != null;
 
-  AuthState copyWith({User? user, String? token, bool? isLoading, bool? initialized, String? error}) => AuthState(
-        user: user ?? this.user,
-        token: token ?? this.token,
-        isLoading: isLoading ?? this.isLoading,
-        initialized: initialized ?? this.initialized,
-        error: error,
-      );
+  AuthState copyWith({
+    User? user,
+    String? token,
+    bool? isLoading,
+    bool? initialized,
+    String? error,
+  }) => AuthState(
+    user: user ?? this.user,
+    token: token ?? this.token,
+    isLoading: isLoading ?? this.isLoading,
+    initialized: initialized ?? this.initialized,
+    error: error,
+  );
 }
 
 class AuthNotifier extends StateNotifier<AuthState> {
@@ -53,7 +70,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
   Future<bool> login(String email, String password) async {
     state = state.copyWith(isLoading: true, error: null);
     await Future.delayed(const Duration(milliseconds: 800));
-    
+
     // Try demo accounts first
     final demoUser = DemoAccounts.authenticate(email, password);
     if (demoUser != null) {
@@ -73,19 +90,22 @@ class AuthNotifier extends StateNotifier<AuthState> {
       );
       return true;
     }
-    
+
     // Fallback: any email/password returns a mock user
     state = AuthState(
       user: User(id: 1, email: email, fullName: 'Demo User', role: 'student'),
       token: 'demo-token',
       initialized: true,
     );
-    await Prefs.saveAuth(token: 'demo-token', user: {
-      'id': 1,
-      'email': email,
-      'fullName': 'Demo User',
-      'role': 'student',
-    });
+    await Prefs.saveAuth(
+      token: 'demo-token',
+      user: {
+        'id': 1,
+        'email': email,
+        'fullName': 'Demo User',
+        'role': 'student',
+      },
+    );
     return true;
   }
 
@@ -95,5 +115,6 @@ class AuthNotifier extends StateNotifier<AuthState> {
   }
 }
 
-final authProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) => AuthNotifier());
-
+final authProvider = StateNotifierProvider<AuthNotifier, AuthState>(
+  (ref) => AuthNotifier(),
+);

@@ -27,7 +27,7 @@ class CourseCard extends StatelessWidget {
         children: [
           // Course Image
           _buildCourseImage(),
-          
+
           Padding(
             padding: const EdgeInsets.all(AppSpacing.md),
             child: Column(
@@ -36,7 +36,7 @@ class CourseCard extends StatelessWidget {
                 // Category and Duration
                 _buildCourseMetadata(),
                 const SizedBox(height: AppSpacing.sm),
-                
+
                 // Course Title
                 Text(
                   course.title ?? 'Untitled Course',
@@ -45,7 +45,7 @@ class CourseCard extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: AppSpacing.xs),
-                
+
                 // Course Description
                 Text(
                   course.description ?? 'No description available',
@@ -56,13 +56,13 @@ class CourseCard extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: AppSpacing.md),
-                
+
                 // Progress Bar (if enrolled)
                 if (isEnrolled && showProgress) ...[
                   _buildProgressBar(),
                   const SizedBox(height: AppSpacing.md),
                 ],
-                
+
                 // Course Stats and Action
                 Row(
                   children: [
@@ -84,7 +84,7 @@ class CourseCard extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(width: AppSpacing.md),
-                    
+
                     // Rating
                     Row(
                       children: [
@@ -102,9 +102,9 @@ class CourseCard extends StatelessWidget {
                         ),
                       ],
                     ),
-                    
+
                     const Spacer(),
-                    
+
                     // Price or Status
                     _buildPriceOrStatus(),
                   ],
@@ -149,14 +149,14 @@ class CourseCard extends StatelessWidget {
             )
           else
             _buildPlaceholderImage(),
-          
+
           // Category Badge
           Positioned(
             top: AppSpacing.sm,
             left: AppSpacing.sm,
             child: _buildCategoryBadge(),
           ),
-          
+
           // Favorite Button (if not enrolled)
           if (!isEnrolled)
             Positioned(
@@ -164,7 +164,7 @@ class CourseCard extends StatelessWidget {
               right: AppSpacing.sm,
               child: _buildFavoriteButton(),
             ),
-          
+
           // Progress Badge (if enrolled)
           if (isEnrolled)
             Positioned(
@@ -191,7 +191,7 @@ class CourseCard extends StatelessWidget {
       child: Icon(
         _getCategoryIcon(),
         size: AppSizes.iconXl2,
-        color: AppColors.white.withOpacity(0.8),
+        color: AppColors.white.withValues(alpha: 0.8),
       ),
     );
   }
@@ -203,14 +203,12 @@ class CourseCard extends StatelessWidget {
         vertical: AppSpacing.xs,
       ),
       decoration: BoxDecoration(
-        color: AppColors.white.withOpacity(0.9),
+        color: AppColors.white.withValues(alpha: 0.9),
         borderRadius: BorderRadius.circular(AppRadius.sm),
       ),
       child: Text(
         course.category ?? 'General',
-        style: AppTypography.bodySmall.copyWith(
-          fontWeight: FontWeight.w600,
-        ),
+        style: AppTypography.bodySmall.copyWith(fontWeight: FontWeight.w600),
       ),
     );
   }
@@ -219,7 +217,7 @@ class CourseCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.xs),
       decoration: BoxDecoration(
-        color: AppColors.white.withOpacity(0.9),
+        color: AppColors.white.withValues(alpha: 0.9),
         borderRadius: BorderRadius.circular(AppRadius.sm),
       ),
       child: Icon(
@@ -238,7 +236,7 @@ class CourseCard extends StatelessWidget {
         vertical: AppSpacing.xs,
       ),
       decoration: BoxDecoration(
-        color: AppColors.success.withOpacity(0.9),
+        color: AppColors.success.withValues(alpha: 0.9),
         borderRadius: BorderRadius.circular(AppRadius.sm),
       ),
       child: Text(
@@ -262,22 +260,14 @@ class CourseCard extends StatelessWidget {
         const SizedBox(width: AppSpacing.xs),
         Text(
           '${course.duration ?? '30'} phút',
-          style: AppTypography.bodySmall.copyWith(
-            color: AppColors.grey600,
-          ),
+          style: AppTypography.bodySmall.copyWith(color: AppColors.grey600),
         ),
         const SizedBox(width: AppSpacing.md),
-        Icon(
-          Icons.schedule,
-          size: AppSizes.iconSm,
-          color: AppColors.grey600,
-        ),
+        Icon(Icons.schedule, size: AppSizes.iconSm, color: AppColors.grey600),
         const SizedBox(width: AppSpacing.xs),
         Text(
           _getDifficultyText(),
-          style: AppTypography.bodySmall.copyWith(
-            color: AppColors.grey600,
-          ),
+          style: AppTypography.bodySmall.copyWith(color: AppColors.grey600),
         ),
       ],
     );
@@ -352,18 +342,14 @@ class CourseCard extends StatelessWidget {
         vertical: AppSpacing.xs,
       ),
       decoration: BoxDecoration(
-        color: chipColor.withOpacity(0.1),
+        color: chipColor.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppRadius.sm),
-        border: Border.all(color: chipColor.withOpacity(0.3)),
+        border: Border.all(color: chipColor.withValues(alpha: 0.3)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            statusIcon,
-            size: AppSizes.iconSm,
-            color: chipColor,
-          ),
+          Icon(statusIcon, size: AppSizes.iconSm, color: chipColor),
           const SizedBox(width: AppSpacing.xs),
           Text(
             statusText,
@@ -387,10 +373,14 @@ class CourseCard extends StatelessWidget {
         vertical: AppSpacing.xs,
       ),
       decoration: BoxDecoration(
-        color: isFree ? AppColors.success.withOpacity(0.1) : AppColors.primary.withOpacity(0.1),
+        color: isFree
+            ? AppColors.success.withValues(alpha: 0.1)
+            : AppColors.primary.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppRadius.sm),
         border: Border.all(
-          color: isFree ? AppColors.success.withOpacity(0.3) : AppColors.primary.withOpacity(0.3),
+          color: isFree
+              ? AppColors.success.withValues(alpha: 0.3)
+              : AppColors.primary.withValues(alpha: 0.3),
         ),
       ),
       child: Text(
@@ -405,7 +395,7 @@ class CourseCard extends StatelessWidget {
 
   LinearGradient _getCategoryGradient() {
     final category = course.category?.toLowerCase() ?? 'general';
-    
+
     switch (category) {
       case 'programming':
         return LinearGradient(
@@ -448,7 +438,7 @@ class CourseCard extends StatelessWidget {
 
   IconData _getCategoryIcon() {
     final category = course.category?.toLowerCase() ?? 'general';
-    
+
     switch (category) {
       case 'programming':
         return Icons.code;
@@ -467,7 +457,7 @@ class CourseCard extends StatelessWidget {
 
   String _getDifficultyText() {
     final difficulty = course.difficulty?.toLowerCase() ?? 'beginner';
-    
+
     switch (difficulty) {
       case 'beginner':
         return 'Cơ bản';

@@ -17,7 +17,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   @override
   Widget build(BuildContext context) {
     final user = ref.watch(authProvider).user;
-    
+
     if (user == null) {
       return Scaffold(
         appBar: AppBar(title: const Text('Dashboard')),
@@ -62,11 +62,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
       case 'admin':
         return AdminDashboard(user: user);
       default:
-        return const Center(
-          child: Text('Unsupported user role'),
-        );
+        return const Center(child: Text('Unsupported user role'));
     }
   }
 }
-
-

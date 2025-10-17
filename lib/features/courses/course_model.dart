@@ -17,6 +17,3 @@ class Course {
   final String? thumbnailUrl;
   final int enrollmentCount;
 }
-
-
-

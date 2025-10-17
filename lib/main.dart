@@ -10,13 +10,13 @@ import 'features/notifications/local_notification_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   // Initialize Global Error Handler
   GlobalErrorHandler.initialize();
-  
+
   // Set custom error widget builder
   ErrorWidget.builder = CustomErrorWidget.builder;
-  
+
   // Initialize EasyLocalization
   await EasyLocalization.ensureInitialized();
 
@@ -28,8 +28,14 @@ Future<void> main() async {
   await notificationService.initialize();
   await notificationService.requestPermission();
 
-  const apiBaseUrl = String.fromEnvironment('API_BASE_URL', defaultValue: 'http://localhost:3000/api');
-  const socketUrl = String.fromEnvironment('SOCKET_URL', defaultValue: 'http://localhost:3003');
+  const apiBaseUrl = String.fromEnvironment(
+    'API_BASE_URL',
+    defaultValue: 'http://localhost:3000/api',
+  );
+  const socketUrl = String.fromEnvironment(
+    'SOCKET_URL',
+    defaultValue: 'http://localhost:3003',
+  );
   const demo = bool.fromEnvironment('DEMO_MODE', defaultValue: true);
 
   runApp(

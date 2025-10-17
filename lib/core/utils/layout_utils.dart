@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 /// Utility để kiểm tra và tự động thêm Material ancestor khi cần thiết
 class MaterialChecker {
-  
   /// Kiểm tra xem widget có cần Material ancestor hay không
   static bool needsMaterial(Widget widget) {
     if (widget is Scaffold ||
@@ -13,7 +12,7 @@ class MaterialChecker {
         widget is Material) {
       return false;
     }
-    
+
     // Kiểm tra các widget con có thể cần Material
     if (widget is InkWell ||
         widget is InkResponse ||
@@ -23,17 +22,14 @@ class MaterialChecker {
         widget is IconButton) {
       return true;
     }
-    
+
     return false;
   }
-  
+
   /// Tự động wrap widget với Material nếu cần
   static Widget ensureMaterial(Widget widget, {Color? color}) {
     if (needsMaterial(widget)) {
-      return Material(
-        color: color ?? Colors.transparent,
-        child: widget,
-      );
+      return Material(color: color ?? Colors.transparent, child: widget);
     }
     return widget;
   }
@@ -45,19 +41,15 @@ extension MaterialWrapper on Widget {
   Widget ensureMaterial({Color? color}) {
     return MaterialChecker.ensureMaterial(this, color: color);
   }
-  
+
   /// Luôn wrap với Material (force)
   Widget withMaterial({Color? color}) {
-    return Material(
-      color: color ?? Colors.transparent,
-      child: this,
-    );
+    return Material(color: color ?? Colors.transparent, child: this);
   }
 }
 
 /// Widget helper để tránh các lỗi layout phổ biến
 class LayoutHelper {
-  
   /// Tạo Row an toàn không bị overflow
   static Widget safeRow({
     required List<Widget> children,
@@ -75,7 +67,7 @@ class LayoutHelper {
         ),
       );
     }
-    
+
     return Row(
       mainAxisAlignment: mainAxisAlignment,
       crossAxisAlignment: crossAxisAlignment,
@@ -87,7 +79,7 @@ class LayoutHelper {
       }).toList(),
     );
   }
-  
+
   /// Tạo Column an toàn không bị overflow
   static Widget safeColumn({
     required List<Widget> children,
@@ -104,7 +96,7 @@ class LayoutHelper {
         ),
       );
     }
-    
+
     return Column(
       mainAxisAlignment: mainAxisAlignment,
       crossAxisAlignment: crossAxisAlignment,
@@ -116,7 +108,7 @@ class LayoutHelper {
       }).toList(),
     );
   }
-  
+
   /// Tạo GridView an toàn với kích thước cố định
   static Widget safeGridView({
     required List<Widget> children,
@@ -137,14 +129,14 @@ class LayoutHelper {
       padding: padding,
       children: children,
     );
-    
+
     if (height != null) {
       return SizedBox(height: height, child: gridView);
     }
-    
+
     return gridView;
   }
-  
+
   /// Text an toàn không bị overflow
   static Widget safeText(
     String text, {
@@ -161,7 +153,7 @@ class LayoutHelper {
       textAlign: textAlign,
     );
   }
-  
+
   /// Container với constraints an toàn
   static Widget safeContainer({
     Widget? child,
@@ -175,21 +167,22 @@ class LayoutHelper {
   }) {
     return LayoutBuilder(
       builder: (context, layoutConstraints) {
-        final maxWidth = layoutConstraints.maxWidth.isFinite 
-            ? layoutConstraints.maxWidth 
+        final maxWidth = layoutConstraints.maxWidth.isFinite
+            ? layoutConstraints.maxWidth
             : MediaQuery.of(context).size.width;
-        final maxHeight = layoutConstraints.maxHeight.isFinite 
-            ? layoutConstraints.maxHeight 
+        final maxHeight = layoutConstraints.maxHeight.isFinite
+            ? layoutConstraints.maxHeight
             : MediaQuery.of(context).size.height;
-        
+
         final safeWidth = width != null && width > maxWidth ? maxWidth : width;
-        final safeHeight = height != null && height > maxHeight ? maxHeight : height;
-        
-        final safeConstraints = constraints ?? BoxConstraints(
-          maxWidth: maxWidth,
-          maxHeight: maxHeight,
-        );
-        
+        final safeHeight = height != null && height > maxHeight
+            ? maxHeight
+            : height;
+
+        final safeConstraints =
+            constraints ??
+            BoxConstraints(maxWidth: maxWidth, maxHeight: maxHeight);
+
         return Container(
           width: safeWidth,
           height: safeHeight,
@@ -214,20 +207,20 @@ class LayoutDebugger extends StatelessWidget {
     this.color,
     this.label,
   });
-  
+
   final Widget child;
   final bool showBounds;
   final Color? color;
   final String? label;
-  
+
   @override
   Widget build(BuildContext context) {
     if (!showBounds) return child;
-    
+
     return Container(
       decoration: BoxDecoration(
         border: Border.all(
-          color: color ?? Colors.red.withOpacity(0.5),
+          color: color ?? Colors.red.withValues(alpha: 0.5),
           width: 1,
         ),
       ),
@@ -240,7 +233,7 @@ class LayoutDebugger extends StatelessWidget {
               left: 0,
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                color: color ?? Colors.red.withOpacity(0.7),
+                color: color ?? Colors.red.withValues(alpha: 0.7),
                 child: Text(
                   label!,
                   style: const TextStyle(
@@ -259,11 +252,7 @@ class LayoutDebugger extends StatelessWidget {
 
 /// Extension để debug layout
 extension LayoutDebugExtension on Widget {
-  Widget debugLayout({
-    bool show = true,
-    Color? color,
-    String? label,
-  }) {
+  Widget debugLayout({bool show = true, Color? color, String? label}) {
     return LayoutDebugger(
       showBounds: show,
       color: color,

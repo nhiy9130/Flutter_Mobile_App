@@ -15,7 +15,9 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> {
   @override
   void initState() {
     super.initState();
-    controller = PdfControllerPinch(document: PdfDocument.openFile(widget.path));
+    controller = PdfControllerPinch(
+      document: PdfDocument.openFile(widget.path),
+    );
   }
 
   @override
@@ -32,6 +34,3 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> {
     );
   }
 }
-
-
-

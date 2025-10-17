@@ -4,17 +4,9 @@ import '../theme/app_colors.dart';
 import '../theme/app_dimensions.dart';
 import '../theme/app_typography.dart';
 
-enum TextFieldVariant {
-  outlined,
-  filled,
-  underlined,
-}
+enum TextFieldVariant { outlined, filled, underlined }
 
-enum TextFieldSize {
-  small,
-  medium,
-  large,
-}
+enum TextFieldSize { small, medium, large }
 
 class CustomTextField extends StatefulWidget {
   const CustomTextField({
@@ -110,10 +102,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
       mainAxisSize: MainAxisSize.min,
       children: [
         if (widget.label != null) ...[
-          Text(
-            widget.label!,
-            style: _getLabelStyle(),
-          ),
+          Text(widget.label!, style: _getLabelStyle()),
           const SizedBox(height: AppSpacing.sm),
         ],
         TextFormField(
@@ -150,7 +139,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
 
   InputDecoration _getInputDecoration() {
     final hasError = widget.errorText != null;
-    
+
     switch (widget.variant) {
       case TextFieldVariant.outlined:
         return InputDecoration(
@@ -170,7 +159,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
           focusedErrorBorder: _getOutlinedBorder(AppColors.error, width: 2),
           disabledBorder: _getOutlinedBorder(AppColors.grey200),
         );
-      
+
       case TextFieldVariant.filled:
         return InputDecoration(
           hintText: widget.hint,
@@ -196,7 +185,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
           ),
           disabledBorder: _getFilledBorder(),
         );
-      
+
       case TextFieldVariant.underlined:
         return InputDecoration(
           hintText: widget.hint,
@@ -271,9 +260,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
 
   TextStyle _getLabelStyle() {
     return AppTypography.labelMedium.copyWith(
-      color: widget.errorText != null 
-        ? AppColors.error 
-        : AppColors.grey700,
+      color: widget.errorText != null ? AppColors.error : AppColors.grey700,
     );
   }
 

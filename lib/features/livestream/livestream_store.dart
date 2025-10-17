@@ -72,7 +72,10 @@ class LivestreamNotifier extends StateNotifier<LivestreamState> {
     try {
       final stream = await _webrtcClient.startLocal(video: true, audio: true);
       if (stream == null) {
-        state = state.copyWith(error: 'Failed to access camera/microphone. Please check permissions.');
+        state = state.copyWith(
+          error:
+              'Failed to access camera/microphone. Please check permissions.',
+        );
         return;
       }
 
@@ -94,7 +97,10 @@ class LivestreamNotifier extends StateNotifier<LivestreamState> {
     try {
       final stream = await _webrtcClient.startLocal(video: true, audio: true);
       if (stream == null) {
-        state = state.copyWith(error: 'Failed to access camera/microphone. Please check permissions.');
+        state = state.copyWith(
+          error:
+              'Failed to access camera/microphone. Please check permissions.',
+        );
         return;
       }
 
@@ -117,24 +123,28 @@ class LivestreamNotifier extends StateNotifier<LivestreamState> {
   void _simulateRemoteParticipants() {
     // Simulate 2-3 remote participants for demo
     Future.delayed(const Duration(seconds: 2), () {
-      _webrtcClient.addParticipant(Participant(
-        userId: 101,
-        userName: 'Instructor John',
-        role: 'instructor',
-        videoEnabled: true,
-        audioEnabled: true,
-      ));
+      _webrtcClient.addParticipant(
+        Participant(
+          userId: 101,
+          userName: 'Instructor John',
+          role: 'instructor',
+          videoEnabled: true,
+          audioEnabled: true,
+        ),
+      );
       _updateParticipants();
     });
 
     Future.delayed(const Duration(seconds: 4), () {
-      _webrtcClient.addParticipant(Participant(
-        userId: 102,
-        userName: 'Student Alice',
-        role: 'student',
-        videoEnabled: true,
-        audioEnabled: false,
-      ));
+      _webrtcClient.addParticipant(
+        Participant(
+          userId: 102,
+          userName: 'Student Alice',
+          role: 'student',
+          videoEnabled: true,
+          audioEnabled: false,
+        ),
+      );
       _updateParticipants();
     });
   }
@@ -186,7 +196,10 @@ class LivestreamNotifier extends StateNotifier<LivestreamState> {
     );
   }
 
-  Future<void> handleIceCandidate(int fromUserId, Map<String, dynamic> candidateData) async {
+  Future<void> handleIceCandidate(
+    int fromUserId,
+    Map<String, dynamic> candidateData,
+  ) async {
     final candidate = RTCIceCandidate(
       candidateData['candidate'],
       candidateData['sdpMid'],
@@ -202,6 +215,7 @@ class LivestreamNotifier extends StateNotifier<LivestreamState> {
   }
 }
 
-final livestreamProvider = StateNotifierProvider<LivestreamNotifier, LivestreamState>(
-  (ref) => LivestreamNotifier(),
-);
+final livestreamProvider =
+    StateNotifierProvider<LivestreamNotifier, LivestreamState>(
+      (ref) => LivestreamNotifier(),
+    );

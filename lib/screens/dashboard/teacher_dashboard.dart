@@ -22,10 +22,7 @@ class TeacherDashboard extends ConsumerWidget {
         const SizedBox(height: 24),
 
         // Quick Actions
-        const SectionHeader(
-          title: 'Truy cập nhanh',
-          icon: Icons.dashboard,
-        ),
+        const SectionHeader(title: 'Truy cập nhanh', icon: Icons.dashboard),
         const SizedBox(height: 12),
         _buildQuickActions(context),
         const SizedBox(height: 24),
@@ -40,19 +37,13 @@ class TeacherDashboard extends ConsumerWidget {
         const SizedBox(height: 24),
 
         // Teaching Stats
-        const SectionHeader(
-          title: 'Thống kê giảng dạy',
-          icon: Icons.analytics,
-        ),
+        const SectionHeader(title: 'Thống kê giảng dạy', icon: Icons.analytics),
         const SizedBox(height: 12),
         _buildTeachingStats(context),
         const SizedBox(height: 24),
 
         // Recent Activities
-        const SectionHeader(
-          title: 'Hoạt động gần đây',
-          icon: Icons.history,
-        ),
+        const SectionHeader(title: 'Hoạt động gần đây', icon: Icons.history),
         const SizedBox(height: 12),
         _buildRecentActivities(context),
       ],
@@ -61,15 +52,12 @@ class TeacherDashboard extends ConsumerWidget {
 
   Widget _buildWelcomeCard(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [
-            Colors.green.shade600,
-            Colors.teal.shade600,
-          ],
+          colors: [Colors.green.shade600, Colors.teal.shade600],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -83,14 +71,10 @@ class TeacherDashboard extends ConsumerWidget {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
+                  color: Colors.white.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: const Icon(
-                  Icons.person,
-                  color: Colors.white,
-                  size: 24,
-                ),
+                child: const Icon(Icons.person, color: Colors.white, size: 24),
               ),
               const SizedBox(width: 16),
               Expanded(
@@ -108,7 +92,7 @@ class TeacherDashboard extends ConsumerWidget {
                     Text(
                       'Sẵn sàng truyền cảm hứng học tập hôm nay!',
                       style: theme.textTheme.bodyLarge?.copyWith(
-                        color: Colors.white.withOpacity(0.9),
+                        color: Colors.white.withValues(alpha: 0.9),
                       ),
                     ),
                   ],
@@ -155,9 +139,10 @@ class TeacherDashboard extends ConsumerWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         // Tính toán height dựa trên content thực tế
-        final cardHeight = (constraints.maxWidth - 12) / 2 / 1.1; // childAspectRatio = 1.1
+        final cardHeight =
+            (constraints.maxWidth - 12) / 2 / 1.1; // childAspectRatio = 1.1
         final totalHeight = (cardHeight * 2) + 12; // 2 hàng + spacing
-        
+
         return ConstrainedBox(
           constraints: BoxConstraints(
             maxHeight: totalHeight + 20, // Thêm padding
@@ -170,44 +155,44 @@ class TeacherDashboard extends ConsumerWidget {
             childAspectRatio: 1.1,
             mainAxisSpacing: 12,
             crossAxisSpacing: 12,
-      children: [
-        QuickActionCard(
-          icon: Icons.videocam,
-          title: 'Live Stream',
-          subtitle: 'Bắt đầu buổi học trực tuyến',
-          color: Colors.red,
-          onTap: () {
-            // TODO: Start livestream
-          },
-        ),
-        QuickActionCard(
-          icon: Icons.add_circle_outline,
-          title: 'Tạo thông báo',
-          subtitle: 'Gửi thông báo đến sinh viên',
-          color: Colors.orange,
-          onTap: () {
-            // TODO: Create announcement
-          },
-        ),
-        QuickActionCard(
-          icon: Icons.quiz,
-          title: 'Tạo bài kiểm tra',
-          subtitle: 'Tạo quiz và bài tập',
-          color: Colors.purple,
-          onTap: () {
-            // TODO: Create quiz
-          },
-        ),
-        QuickActionCard(
-          icon: Icons.people,
-          title: 'Sinh viên',
-          subtitle: 'Xem danh sách sinh viên',
-          color: Colors.blue,
-          onTap: () {
-            // TODO: View students
-          },
-        ),
-      ],
+            children: [
+              QuickActionCard(
+                icon: Icons.videocam,
+                title: 'Live Stream',
+                subtitle: 'Bắt đầu buổi học trực tuyến',
+                color: Colors.red,
+                onTap: () {
+                  // TODO: Start livestream
+                },
+              ),
+              QuickActionCard(
+                icon: Icons.add_circle_outline,
+                title: 'Tạo thông báo',
+                subtitle: 'Gửi thông báo đến sinh viên',
+                color: Colors.orange,
+                onTap: () {
+                  // TODO: Create announcement
+                },
+              ),
+              QuickActionCard(
+                icon: Icons.quiz,
+                title: 'Tạo bài kiểm tra',
+                subtitle: 'Tạo quiz và bài tập',
+                color: Colors.purple,
+                onTap: () {
+                  // TODO: Create quiz
+                },
+              ),
+              QuickActionCard(
+                icon: Icons.people,
+                title: 'Sinh viên',
+                subtitle: 'Xem danh sách sinh viên',
+                color: Colors.blue,
+                onTap: () {
+                  // TODO: View students
+                },
+              ),
+            ],
           ),
         );
       },
@@ -225,7 +210,7 @@ class TeacherDashboard extends ConsumerWidget {
           trailing: Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
-              color: Colors.green.withOpacity(0.1),
+              color: Colors.green.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: const Text(
@@ -248,7 +233,7 @@ class TeacherDashboard extends ConsumerWidget {
           trailing: Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
-              color: Colors.blue.withOpacity(0.1),
+              color: Colors.blue.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: const Text(
@@ -270,9 +255,10 @@ class TeacherDashboard extends ConsumerWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         // Tính toán height dựa trên content thực tế cho stats
-        final cardHeight = (constraints.maxWidth - 12) / 2 / 1.3; // childAspectRatio = 1.3
+        final cardHeight =
+            (constraints.maxWidth - 12) / 2 / 1.3; // childAspectRatio = 1.3
         final totalHeight = (cardHeight * 2) + 12; // 2 hàng + spacing
-        
+
         return ConstrainedBox(
           constraints: BoxConstraints(
             maxHeight: totalHeight + 20,
@@ -285,38 +271,38 @@ class TeacherDashboard extends ConsumerWidget {
             childAspectRatio: 1.3,
             mainAxisSpacing: 12,
             crossAxisSpacing: 12,
-      children: [
-        StatCard(
-          icon: Icons.school,
-          value: '2',
-          label: 'Khóa học',
-          color: Colors.blue,
-        ),
-        StatCard(
-          icon: Icons.people,
-          value: '73',
-          label: 'Sinh viên',
-          color: Colors.green,
-          trend: '+5',
-          trendUp: true,
-        ),
-        StatCard(
-          icon: Icons.star,
-          value: '4.8',
-          label: 'Đánh giá TB',
-          color: Colors.orange,
-          trend: '+0.2',
-          trendUp: true,
-        ),
-        StatCard(
-          icon: Icons.assignment_turned_in,
-          value: '156',
-          label: 'Bài tập đã chấm',
-          color: Colors.purple,
-          trend: '+12',
-          trendUp: true,
-        ),
-      ],
+            children: [
+              StatCard(
+                icon: Icons.school,
+                value: '2',
+                label: 'Khóa học',
+                color: Colors.blue,
+              ),
+              StatCard(
+                icon: Icons.people,
+                value: '73',
+                label: 'Sinh viên',
+                color: Colors.green,
+                trend: '+5',
+                trendUp: true,
+              ),
+              StatCard(
+                icon: Icons.star,
+                value: '4.8',
+                label: 'Đánh giá TB',
+                color: Colors.orange,
+                trend: '+0.2',
+                trendUp: true,
+              ),
+              StatCard(
+                icon: Icons.assignment_turned_in,
+                value: '156',
+                label: 'Bài tập đã chấm',
+                color: Colors.purple,
+                trend: '+12',
+                trendUp: true,
+              ),
+            ],
           ),
         );
       },
@@ -330,7 +316,7 @@ class TeacherDashboard extends ConsumerWidget {
           leading: Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: Colors.green.withOpacity(0.1),
+              color: Colors.green.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8),
             ),
             child: const Icon(Icons.quiz, color: Colors.green),
@@ -344,7 +330,7 @@ class TeacherDashboard extends ConsumerWidget {
           leading: Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: Colors.blue.withOpacity(0.1),
+              color: Colors.blue.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8),
             ),
             child: const Icon(Icons.message, color: Colors.blue),
@@ -358,7 +344,7 @@ class TeacherDashboard extends ConsumerWidget {
           leading: Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: Colors.purple.withOpacity(0.1),
+              color: Colors.purple.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8),
             ),
             child: const Icon(Icons.videocam, color: Colors.purple),

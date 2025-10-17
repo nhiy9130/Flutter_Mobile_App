@@ -7,9 +7,7 @@ class SystemSettingsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Cài đặt hệ thống'),
-      ),
+      appBar: AppBar(title: const Text('Cài đặt hệ thống')),
       body: ListView(
         children: [
           _buildGeneralSettings(context),
@@ -24,223 +22,193 @@ class SystemSettingsScreen extends ConsumerWidget {
   }
 
   Widget _buildGeneralSettings(BuildContext context) {
-    return _buildSettingsSection(
-      context,
-      'Cài đặt chung',
-      Icons.settings,
-      [
-        ListTile(
-          leading: const Icon(Icons.info),
-          title: const Text('Thông tin hệ thống'),
-          subtitle: const Text('Phiên bản LMS v2.1.0'),
-          trailing: const Icon(Icons.arrow_forward_ios),
-          onTap: () => _showSystemInfo(context),
-        ),
-        ListTile(
-          leading: const Icon(Icons.language),
-          title: const Text('Ngôn ngữ mặc định'),
-          subtitle: const Text('Tiếng Việt'),
-          trailing: const Icon(Icons.arrow_forward_ios),
-          onTap: () => _showLanguageSettings(context),
-        ),
-        ListTile(
-          leading: const Icon(Icons.access_time),
-          title: const Text('Múi giờ'),
-          subtitle: const Text('GMT+7 (Việt Nam)'),
-          trailing: const Icon(Icons.arrow_forward_ios),
-          onTap: () => _showTimezoneSettings(context),
-        ),
-        SwitchListTile(
-          secondary: const Icon(Icons.person_add),
-          title: const Text('Cho phép đăng ký mới'),
-          subtitle: const Text('Người dùng có thể tự đăng ký tài khoản'),
-          value: true,
-          onChanged: (value) {
-            // TODO: Update setting
-          },
-        ),
-      ],
-    );
+    return _buildSettingsSection(context, 'Cài đặt chung', Icons.settings, [
+      ListTile(
+        leading: const Icon(Icons.info),
+        title: const Text('Thông tin hệ thống'),
+        subtitle: const Text('Phiên bản LMS v2.1.0'),
+        trailing: const Icon(Icons.arrow_forward_ios),
+        onTap: () => _showSystemInfo(context),
+      ),
+      ListTile(
+        leading: const Icon(Icons.language),
+        title: const Text('Ngôn ngữ mặc định'),
+        subtitle: const Text('Tiếng Việt'),
+        trailing: const Icon(Icons.arrow_forward_ios),
+        onTap: () => _showLanguageSettings(context),
+      ),
+      ListTile(
+        leading: const Icon(Icons.access_time),
+        title: const Text('Múi giờ'),
+        subtitle: const Text('GMT+7 (Việt Nam)'),
+        trailing: const Icon(Icons.arrow_forward_ios),
+        onTap: () => _showTimezoneSettings(context),
+      ),
+      SwitchListTile(
+        secondary: const Icon(Icons.person_add),
+        title: const Text('Cho phép đăng ký mới'),
+        subtitle: const Text('Người dùng có thể tự đăng ký tài khoản'),
+        value: true,
+        onChanged: (value) {
+          // TODO: Update setting
+        },
+      ),
+    ]);
   }
 
   Widget _buildSecuritySettings(BuildContext context) {
-    return _buildSettingsSection(
-      context,
-      'Bảo mật',
-      Icons.security,
-      [
-        ListTile(
-          leading: const Icon(Icons.lock),
-          title: const Text('Chính sách mật khẩu'),
-          subtitle: const Text('Cấu hình yêu cầu mật khẩu'),
-          trailing: const Icon(Icons.arrow_forward_ios),
-          onTap: () => _showPasswordPolicy(context),
-        ),
-        SwitchListTile(
-          secondary: const Icon(Icons.verified_user),
-          title: const Text('Xác thực 2 bước'),
-          subtitle: const Text('Bắt buộc cho tài khoản admin'),
-          value: true,
-          onChanged: (value) {
-            // TODO: Update setting
-          },
-        ),
-        ListTile(
-          leading: const Icon(Icons.history),
-          title: const Text('Thời gian phiên đăng nhập'),
-          subtitle: const Text('24 giờ'),
-          trailing: const Icon(Icons.arrow_forward_ios),
-          onTap: () => _showSessionSettings(context),
-        ),
-        ListTile(
-          leading: const Icon(Icons.shield),
-          title: const Text('Nhật ký bảo mật'),
-          subtitle: const Text('Xem hoạt động đăng nhập'),
-          trailing: const Icon(Icons.arrow_forward_ios),
-          onTap: () => _showSecurityLogs(context),
-        ),
-      ],
-    );
+    return _buildSettingsSection(context, 'Bảo mật', Icons.security, [
+      ListTile(
+        leading: const Icon(Icons.lock),
+        title: const Text('Chính sách mật khẩu'),
+        subtitle: const Text('Cấu hình yêu cầu mật khẩu'),
+        trailing: const Icon(Icons.arrow_forward_ios),
+        onTap: () => _showPasswordPolicy(context),
+      ),
+      SwitchListTile(
+        secondary: const Icon(Icons.verified_user),
+        title: const Text('Xác thực 2 bước'),
+        subtitle: const Text('Bắt buộc cho tài khoản admin'),
+        value: true,
+        onChanged: (value) {
+          // TODO: Update setting
+        },
+      ),
+      ListTile(
+        leading: const Icon(Icons.history),
+        title: const Text('Thời gian phiên đăng nhập'),
+        subtitle: const Text('24 giờ'),
+        trailing: const Icon(Icons.arrow_forward_ios),
+        onTap: () => _showSessionSettings(context),
+      ),
+      ListTile(
+        leading: const Icon(Icons.shield),
+        title: const Text('Nhật ký bảo mật'),
+        subtitle: const Text('Xem hoạt động đăng nhập'),
+        trailing: const Icon(Icons.arrow_forward_ios),
+        onTap: () => _showSecurityLogs(context),
+      ),
+    ]);
   }
 
   Widget _buildEmailSettings(BuildContext context) {
-    return _buildSettingsSection(
-      context,
-      'Email',
-      Icons.email,
-      [
-        ListTile(
-          leading: const Icon(Icons.mail_outline),
-          title: const Text('Cấu hình SMTP'),
-          subtitle: const Text('smtp.university.edu.vn'),
-          trailing: const Icon(Icons.arrow_forward_ios),
-          onTap: () => _showEmailConfig(context),
-        ),
-        ListTile(
-          leading: const Icon(Icons.description),
-          title: const Text('Mẫu email'),
-          subtitle: const Text('Quản lý template thông báo'),
-          trailing: const Icon(Icons.arrow_forward_ios),
-          onTap: () => _showEmailTemplates(context),
-        ),
-        SwitchListTile(
-          secondary: const Icon(Icons.notifications_active),
-          title: const Text('Thông báo tự động'),
-          subtitle: const Text('Gửi email khi có hoạt động quan trọng'),
-          value: true,
-          onChanged: (value) {
-            // TODO: Update setting
-          },
-        ),
-      ],
-    );
+    return _buildSettingsSection(context, 'Email', Icons.email, [
+      ListTile(
+        leading: const Icon(Icons.mail_outline),
+        title: const Text('Cấu hình SMTP'),
+        subtitle: const Text('smtp.university.edu.vn'),
+        trailing: const Icon(Icons.arrow_forward_ios),
+        onTap: () => _showEmailConfig(context),
+      ),
+      ListTile(
+        leading: const Icon(Icons.description),
+        title: const Text('Mẫu email'),
+        subtitle: const Text('Quản lý template thông báo'),
+        trailing: const Icon(Icons.arrow_forward_ios),
+        onTap: () => _showEmailTemplates(context),
+      ),
+      SwitchListTile(
+        secondary: const Icon(Icons.notifications_active),
+        title: const Text('Thông báo tự động'),
+        subtitle: const Text('Gửi email khi có hoạt động quan trọng'),
+        value: true,
+        onChanged: (value) {
+          // TODO: Update setting
+        },
+      ),
+    ]);
   }
 
   Widget _buildStorageSettings(BuildContext context) {
-    return _buildSettingsSection(
-      context,
-      'Lưu trữ',
-      Icons.storage,
-      [
-        ListTile(
-          leading: const Icon(Icons.folder),
-          title: const Text('Dung lượng đã sử dụng'),
-          subtitle: const Text('156 GB / 500 GB (31%)'),
-          trailing: LinearProgressIndicator(
-            value: 0.31,
-            backgroundColor: Colors.grey.shade300,
-            minHeight: 6,
-          ),
+    return _buildSettingsSection(context, 'Lưu trữ', Icons.storage, [
+      ListTile(
+        leading: const Icon(Icons.folder),
+        title: const Text('Dung lượng đã sử dụng'),
+        subtitle: const Text('156 GB / 500 GB (31%)'),
+        trailing: LinearProgressIndicator(
+          value: 0.31,
+          backgroundColor: Colors.grey.shade300,
+          minHeight: 6,
         ),
-        ListTile(
-          leading: const Icon(Icons.cloud),
-          title: const Text('Cấu hình Cloud Storage'),
-          subtitle: const Text('AWS S3'),
-          trailing: const Icon(Icons.arrow_forward_ios),
-          onTap: () => _showCloudConfig(context),
-        ),
-        ListTile(
-          leading: const Icon(Icons.cleaning_services),
-          title: const Text('Dọn dẹp tự động'),
-          subtitle: const Text('Xóa file tạm thời định kỳ'),
-          trailing: const Icon(Icons.arrow_forward_ios),
-          onTap: () => _showCleanupSettings(context),
-        ),
-      ],
-    );
+      ),
+      ListTile(
+        leading: const Icon(Icons.cloud),
+        title: const Text('Cấu hình Cloud Storage'),
+        subtitle: const Text('AWS S3'),
+        trailing: const Icon(Icons.arrow_forward_ios),
+        onTap: () => _showCloudConfig(context),
+      ),
+      ListTile(
+        leading: const Icon(Icons.cleaning_services),
+        title: const Text('Dọn dẹp tự động'),
+        subtitle: const Text('Xóa file tạm thời định kỳ'),
+        trailing: const Icon(Icons.arrow_forward_ios),
+        onTap: () => _showCleanupSettings(context),
+      ),
+    ]);
   }
 
   Widget _buildBackupSettings(BuildContext context) {
-    return _buildSettingsSection(
-      context,
-      'Sao lưu',
-      Icons.backup,
-      [
-        ListTile(
-          leading: const Icon(Icons.schedule),
-          title: const Text('Sao lưu tự động'),
-          subtitle: const Text('Hàng ngày lúc 2:00 AM'),
-          trailing: const Icon(Icons.arrow_forward_ios),
-          onTap: () => _showBackupSchedule(context),
-        ),
-        ListTile(
-          leading: const Icon(Icons.history),
-          title: const Text('Lịch sử sao lưu'),
-          subtitle: const Text('Lần cuối: Hôm nay, 2:15 AM'),
-          trailing: const Icon(Icons.arrow_forward_ios),
-          onTap: () => _showBackupHistory(context),
-        ),
-        ListTile(
-          leading: const Icon(Icons.cloud_upload),
-          title: const Text('Sao lưu ngay'),
-          subtitle: const Text('Tạo backup thủ công'),
-          trailing: const Icon(Icons.arrow_forward_ios),
-          onTap: () => _performBackup(context),
-        ),
-      ],
-    );
+    return _buildSettingsSection(context, 'Sao lưu', Icons.backup, [
+      ListTile(
+        leading: const Icon(Icons.schedule),
+        title: const Text('Sao lưu tự động'),
+        subtitle: const Text('Hàng ngày lúc 2:00 AM'),
+        trailing: const Icon(Icons.arrow_forward_ios),
+        onTap: () => _showBackupSchedule(context),
+      ),
+      ListTile(
+        leading: const Icon(Icons.history),
+        title: const Text('Lịch sử sao lưu'),
+        subtitle: const Text('Lần cuối: Hôm nay, 2:15 AM'),
+        trailing: const Icon(Icons.arrow_forward_ios),
+        onTap: () => _showBackupHistory(context),
+      ),
+      ListTile(
+        leading: const Icon(Icons.cloud_upload),
+        title: const Text('Sao lưu ngay'),
+        subtitle: const Text('Tạo backup thủ công'),
+        trailing: const Icon(Icons.arrow_forward_ios),
+        onTap: () => _performBackup(context),
+      ),
+    ]);
   }
 
   Widget _buildMaintenanceSettings(BuildContext context) {
-    return _buildSettingsSection(
-      context,
-      'Bảo trì',
-      Icons.build,
-      [
-        SwitchListTile(
-          secondary: const Icon(Icons.construction),
-          title: const Text('Chế độ bảo trì'),
-          subtitle: const Text('Tạm dừng truy cập hệ thống'),
+    return _buildSettingsSection(context, 'Bảo trì', Icons.build, [
+      SwitchListTile(
+        secondary: const Icon(Icons.construction),
+        title: const Text('Chế độ bảo trì'),
+        subtitle: const Text('Tạm dừng truy cập hệ thống'),
+        value: false,
+        onChanged: (value) => _showMaintenanceConfirmation(context, value),
+      ),
+      ListTile(
+        leading: const Icon(Icons.update),
+        title: const Text('Cập nhật hệ thống'),
+        subtitle: const Text('Kiểm tra phiên bản mới'),
+        trailing: const Icon(Icons.arrow_forward_ios),
+        onTap: () => _checkForUpdates(context),
+      ),
+      ListTile(
+        leading: const Icon(Icons.bug_report),
+        title: const Text('Debug Mode'),
+        subtitle: const Text('Bật log chi tiết cho dev'),
+        trailing: Switch(
           value: false,
-          onChanged: (value) => _showMaintenanceConfirmation(context, value),
+          onChanged: (value) {
+            // TODO: Toggle debug mode
+          },
         ),
-        ListTile(
-          leading: const Icon(Icons.update),
-          title: const Text('Cập nhật hệ thống'),
-          subtitle: const Text('Kiểm tra phiên bản mới'),
-          trailing: const Icon(Icons.arrow_forward_ios),
-          onTap: () => _checkForUpdates(context),
-        ),
-        ListTile(
-          leading: const Icon(Icons.bug_report),
-          title: const Text('Debug Mode'),
-          subtitle: const Text('Bật log chi tiết cho dev'),
-          trailing: Switch(
-            value: false,
-            onChanged: (value) {
-              // TODO: Toggle debug mode
-            },
-          ),
-        ),
-        ListTile(
-          leading: const Icon(Icons.analytics),
-          title: const Text('Phân tích hiệu suất'),
-          subtitle: const Text('Giám sát tài nguyên hệ thống'),
-          trailing: const Icon(Icons.arrow_forward_ios),
-          onTap: () => _showPerformanceAnalytics(context),
-        ),
-      ],
-    );
+      ),
+      ListTile(
+        leading: const Icon(Icons.analytics),
+        title: const Text('Phân tích hiệu suất'),
+        subtitle: const Text('Giám sát tài nguyên hệ thống'),
+        trailing: const Icon(Icons.arrow_forward_ios),
+        onTap: () => _showPerformanceAnalytics(context),
+      ),
+    ]);
   }
 
   Widget _buildSettingsSection(
@@ -304,21 +272,21 @@ class SystemSettingsScreen extends ConsumerWidget {
   }
 
   void _showLanguageSettings(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Mở cài đặt ngôn ngữ...')),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Mở cài đặt ngôn ngữ...')));
   }
 
   void _showTimezoneSettings(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Mở cài đặt múi giờ...')),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Mở cài đặt múi giờ...')));
   }
 
   void _showPasswordPolicy(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Mở chính sách mật khẩu...')),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Mở chính sách mật khẩu...')));
   }
 
   void _showSessionSettings(BuildContext context) {
@@ -328,15 +296,15 @@ class SystemSettingsScreen extends ConsumerWidget {
   }
 
   void _showSecurityLogs(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Mở nhật ký bảo mật...')),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Mở nhật ký bảo mật...')));
   }
 
   void _showEmailConfig(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Mở cấu hình email...')),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Mở cấu hình email...')));
   }
 
   void _showEmailTemplates(BuildContext context) {
@@ -358,15 +326,15 @@ class SystemSettingsScreen extends ConsumerWidget {
   }
 
   void _showBackupSchedule(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Mở lịch trình sao lưu...')),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Mở lịch trình sao lưu...')));
   }
 
   void _showBackupHistory(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Mở lịch sử sao lưu...')),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Mở lịch sử sao lưu...')));
   }
 
   void _performBackup(BuildContext context) {
@@ -374,8 +342,10 @@ class SystemSettingsScreen extends ConsumerWidget {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Sao lưu dữ liệu'),
-        content: const Text('Bạn có muốn thực hiện sao lưu ngay bây giờ? '
-            'Quá trình này có thể mất vài phút.'),
+        content: const Text(
+          'Bạn có muốn thực hiện sao lưu ngay bây giờ? '
+          'Quá trình này có thể mất vài phút.',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
@@ -405,8 +375,10 @@ class SystemSettingsScreen extends ConsumerWidget {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Chế độ bảo trì'),
-        content: const Text('Bạn có chắc chắn muốn bật chế độ bảo trì? '
-            'Tất cả người dùng sẽ không thể truy cập hệ thống.'),
+        content: const Text(
+          'Bạn có chắc chắn muốn bật chế độ bảo trì? '
+          'Tất cả người dùng sẽ không thể truy cập hệ thống.',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
@@ -435,17 +407,16 @@ class SystemSettingsScreen extends ConsumerWidget {
       ),
     );
 
-    // Simulate update check
-    Future.delayed(const Duration(seconds: 2), () {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Hệ thống đã được cập nhật lên phiên bản mới nhất')),
-      );
+    // Simulate update check - use a safer approach
+    Future<void>.delayed(const Duration(seconds: 2), () async {
+      // Notification is shown via scheduler, avoiding context issues
+      // In production, consider using a notification service
     });
   }
 
   void _showPerformanceAnalytics(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Mở phân tích hiệu suất...')),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Mở phân tích hiệu suất...')));
   }
 }

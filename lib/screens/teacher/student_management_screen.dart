@@ -31,10 +31,7 @@ class StudentManagementScreen extends ConsumerWidget {
           const SizedBox(height: 24),
 
           // Student List
-          const SectionHeader(
-            title: 'Danh sách sinh viên',
-            action: 'Tìm kiếm',
-          ),
+          const SectionHeader(title: 'Danh sách sinh viên', action: 'Tìm kiếm'),
           const SizedBox(height: 12),
           _buildSearchBar(context),
           const SizedBox(height: 16),
@@ -74,15 +71,9 @@ class StudentManagementScreen extends ConsumerWidget {
                   const SizedBox(height: 8),
                   const Text(
                     '45',
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                   ),
-                  const Text(
-                    'Sinh viên',
-                    style: TextStyle(fontSize: 12),
-                  ),
+                  const Text('Sinh viên', style: TextStyle(fontSize: 12)),
                 ],
               ),
             ),
@@ -95,23 +86,13 @@ class StudentManagementScreen extends ConsumerWidget {
               padding: const EdgeInsets.all(16),
               child: Column(
                 children: [
-                  Icon(
-                    Icons.check_circle,
-                    size: 32,
-                    color: Colors.green,
-                  ),
+                  Icon(Icons.check_circle, size: 32, color: Colors.green),
                   const SizedBox(height: 8),
                   const Text(
                     '38',
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                   ),
-                  const Text(
-                    'Hoạt động',
-                    style: TextStyle(fontSize: 12),
-                  ),
+                  const Text('Hoạt động', style: TextStyle(fontSize: 12)),
                 ],
               ),
             ),
@@ -124,18 +105,11 @@ class StudentManagementScreen extends ConsumerWidget {
               padding: const EdgeInsets.all(16),
               child: Column(
                 children: [
-                  Icon(
-                    Icons.trending_up,
-                    size: 32,
-                    color: Colors.orange,
-                  ),
+                  Icon(Icons.trending_up, size: 32, color: Colors.orange),
                   const SizedBox(height: 8),
                   const Text(
                     '84%',
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                   ),
                   const Text(
                     'Tỷ lệ hoàn thành',
@@ -159,9 +133,7 @@ class StudentManagementScreen extends ConsumerWidget {
           icon: const Icon(Icons.filter_list),
           onPressed: () => _showFilterDialog(context),
         ),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
       ),
     );
   }
@@ -199,14 +171,16 @@ class StudentManagementScreen extends ConsumerWidget {
     ];
 
     return Column(
-      children: students.map((student) => _buildStudentCard(context, student)).toList(),
+      children: students
+          .map((student) => _buildStudentCard(context, student))
+          .toList(),
     );
   }
 
   Widget _buildStudentCard(BuildContext context, Map<String, dynamic> student) {
     final theme = Theme.of(context);
     final isActive = student['status'] == 'active';
-    
+
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
       child: Padding(
@@ -216,7 +190,13 @@ class StudentManagementScreen extends ConsumerWidget {
             CircleAvatar(
               backgroundColor: theme.colorScheme.primary,
               child: Text(
-                student['name'].toString().split(' ').map((word) => word[0]).take(2).join('').toUpperCase(),
+                student['name']
+                    .toString()
+                    .split(' ')
+                    .map((word) => word[0])
+                    .take(2)
+                    .join('')
+                    .toUpperCase(),
                 style: const TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
@@ -239,9 +219,14 @@ class StudentManagementScreen extends ConsumerWidget {
                         ),
                       ),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
                         decoration: BoxDecoration(
-                          color: isActive ? Colors.green.withOpacity(0.1) : Colors.grey.withOpacity(0.1),
+                          color: isActive
+                              ? Colors.green.withValues(alpha: 0.1)
+                              : Colors.grey.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
@@ -288,10 +273,7 @@ class StudentManagementScreen extends ConsumerWidget {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
-                          Text(
-                            'Điểm TB',
-                            style: theme.textTheme.bodySmall,
-                          ),
+                          Text('Điểm TB', style: theme.textTheme.bodySmall),
                           Text(
                             '${student['grade']}/10',
                             style: theme.textTheme.titleMedium?.copyWith(
@@ -316,7 +298,8 @@ class StudentManagementScreen extends ConsumerWidget {
                       Row(
                         children: [
                           TextButton(
-                            onPressed: () => _viewStudentDetail(context, student['id']),
+                            onPressed: () =>
+                                _viewStudentDetail(context, student['id']),
                             child: const Text('Chi tiết'),
                           ),
                           PopupMenuButton(
@@ -334,7 +317,11 @@ class StudentManagementScreen extends ConsumerWidget {
                                 child: Text('Xóa khỏi lớp'),
                               ),
                             ],
-                            onSelected: (value) => _handleStudentAction(context, student['id'], value.toString()),
+                            onSelected: (value) => _handleStudentAction(
+                              context,
+                              student['id'],
+                              value.toString(),
+                            ),
                           ),
                         ],
                       ),
@@ -359,7 +346,7 @@ class StudentManagementScreen extends ConsumerWidget {
         'requestDate': '2 ngày trước',
       },
       {
-        'id': '2',  
+        'id': '2',
         'name': 'Hoàng Thị Ê',
         'email': 'e.hoang@email.com',
         'requestDate': '3 ngày trước',
@@ -370,9 +357,7 @@ class StudentManagementScreen extends ConsumerWidget {
       return const Card(
         child: Padding(
           padding: EdgeInsets.all(32),
-          child: Center(
-            child: Text('Không có yêu cầu tham gia nào'),
-          ),
+          child: Center(child: Text('Không có yêu cầu tham gia nào')),
         ),
       );
     }
@@ -381,7 +366,7 @@ class StudentManagementScreen extends ConsumerWidget {
       children: requests.map((request) {
         return InfoCard(
           leading: CircleAvatar(
-            backgroundColor: Colors.orange.withOpacity(0.2),
+            backgroundColor: Colors.orange.withValues(alpha: 0.2),
             child: Icon(Icons.person_add, color: Colors.orange),
           ),
           title: request['name'] as String,
@@ -391,11 +376,13 @@ class StudentManagementScreen extends ConsumerWidget {
             children: [
               IconButton(
                 icon: const Icon(Icons.check, color: Colors.green),
-                onPressed: () => _approveRequest(context, request['id'] as String),
+                onPressed: () =>
+                    _approveRequest(context, request['id'] as String),
               ),
               IconButton(
                 icon: const Icon(Icons.close, color: Colors.red),
-                onPressed: () => _rejectRequest(context, request['id'] as String),
+                onPressed: () =>
+                    _rejectRequest(context, request['id'] as String),
               ),
             ],
           ),
@@ -458,7 +445,11 @@ class StudentManagementScreen extends ConsumerWidget {
     // TODO: Navigate to student detail
   }
 
-  void _handleStudentAction(BuildContext context, String studentId, String action) {
+  void _handleStudentAction(
+    BuildContext context,
+    String studentId,
+    String action,
+  ) {
     switch (action) {
       case 'message':
         // TODO: Send message to student
@@ -477,7 +468,9 @@ class StudentManagementScreen extends ConsumerWidget {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Xóa sinh viên'),
-        content: const Text('Bạn có chắc chắn muốn xóa sinh viên này khỏi lớp?'),
+        content: const Text(
+          'Bạn có chắc chắn muốn xóa sinh viên này khỏi lớp?',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
@@ -499,9 +492,9 @@ class StudentManagementScreen extends ConsumerWidget {
   }
 
   void _approveRequest(BuildContext context, String requestId) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Đã duyệt yêu cầu tham gia')),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Đã duyệt yêu cầu tham gia')));
   }
 
   void _rejectRequest(BuildContext context, String requestId) {

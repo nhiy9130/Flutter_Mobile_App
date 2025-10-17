@@ -6,7 +6,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'notification_models.dart';
 
 class NotificationState {
-  const NotificationState({this.items = const [], this.prefs = const NotificationPrefs()});
+  const NotificationState({
+    this.items = const [],
+    this.prefs = const NotificationPrefs(),
+  });
   final List<AppNotification> items;
   final NotificationPrefs prefs;
 
@@ -52,30 +55,38 @@ class NotificationNotifier extends StateNotifier<NotificationState> {
   }
 
   void markRead(String id) {
-    final items = state.items.map((n) => n.id == id ? AppNotification(
-      id: n.id,
-      type: n.type,
-      title: n.title,
-      message: n.message,
-      courseId: n.courseId,
-      isRead: true,
-      createdAt: n.createdAt,
-    ) : n).toList();
+    final items = state.items
+        .map(
+          (n) => n.id == id
+              ? AppNotification(
+                  id: n.id,
+                  type: n.type,
+                  title: n.title,
+                  message: n.message,
+                  courseId: n.courseId,
+                  isRead: true,
+                  createdAt: n.createdAt,
+                )
+              : n,
+        )
+        .toList();
     state = NotificationState(items: items, prefs: state.prefs);
     _save();
   }
 
   void markAllRead() {
     final items = state.items
-        .map((n) => AppNotification(
-              id: n.id,
-              type: n.type,
-              title: n.title,
-              message: n.message,
-              courseId: n.courseId,
-              isRead: true,
-              createdAt: n.createdAt,
-            ))
+        .map(
+          (n) => AppNotification(
+            id: n.id,
+            type: n.type,
+            title: n.title,
+            message: n.message,
+            courseId: n.courseId,
+            isRead: true,
+            createdAt: n.createdAt,
+          ),
+        )
         .toList();
     state = NotificationState(items: items, prefs: state.prefs);
     _save();
@@ -87,39 +98,39 @@ class NotificationNotifier extends StateNotifier<NotificationState> {
   }
 
   Map<String, dynamic> _toMap(AppNotification n) => {
-        'id': n.id,
-        'type': n.type,
-        'title': n.title,
-        'message': n.message,
-        'courseId': n.courseId,
-        'isRead': n.isRead,
-        'createdAt': n.createdAt.toIso8601String(),
-      };
+    'id': n.id,
+    'type': n.type,
+    'title': n.title,
+    'message': n.message,
+    'courseId': n.courseId,
+    'isRead': n.isRead,
+    'createdAt': n.createdAt.toIso8601String(),
+  };
 
   AppNotification _fromMap(Map<String, dynamic> m) => AppNotification(
-        id: m['id'] as String,
-        type: m['type'] as String,
-        title: m['title'] as String,
-        message: m['message'] as String,
-        courseId: m['courseId'] as String?,
-        isRead: m['isRead'] as bool? ?? false,
-        createdAt: DateTime.parse(m['createdAt'] as String),
-      );
+    id: m['id'] as String,
+    type: m['type'] as String,
+    title: m['title'] as String,
+    message: m['message'] as String,
+    courseId: m['courseId'] as String?,
+    isRead: m['isRead'] as bool? ?? false,
+    createdAt: DateTime.parse(m['createdAt'] as String),
+  );
 
   Map<String, dynamic> _prefsTo(NotificationPrefs p) => {
-        'enableSound': p.enableSound,
-        'enableBrowser': p.enableBrowser,
-        'categories': p.categories,
-      };
+    'enableSound': p.enableSound,
+    'enableBrowser': p.enableBrowser,
+    'categories': p.categories,
+  };
 
   NotificationPrefs _prefsFrom(Map<String, dynamic> m) => NotificationPrefs(
-        enableSound: m['enableSound'] as bool? ?? true,
-        enableBrowser: m['enableBrowser'] as bool? ?? false,
-        categories: Map<String, bool>.from(m['categories'] as Map? ?? {}),
-      );
+    enableSound: m['enableSound'] as bool? ?? true,
+    enableBrowser: m['enableBrowser'] as bool? ?? false,
+    categories: Map<String, bool>.from(m['categories'] as Map? ?? {}),
+  );
 }
 
-final notificationProvider = StateNotifierProvider<NotificationNotifier, NotificationState>((ref) => NotificationNotifier());
-
-
-
+final notificationProvider =
+    StateNotifierProvider<NotificationNotifier, NotificationState>(
+      (ref) => NotificationNotifier(),
+    );

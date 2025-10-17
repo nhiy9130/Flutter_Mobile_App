@@ -3,11 +3,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'dart:async';
 
-enum NetworkStatus {
-  online,
-  offline,
-  unknown,
-}
+enum NetworkStatus { online, offline, unknown }
 
 class ConnectivityState {
   const ConnectivityState({
@@ -54,12 +50,13 @@ class ConnectivityNotifier extends StateNotifier<ConnectivityState> {
   }
 
   void _updateStatus(List<ConnectivityResult> results) {
-    final isConnected = results.any((result) => 
-      result == ConnectivityResult.mobile || 
-      result == ConnectivityResult.wifi ||
-      result == ConnectivityResult.ethernet
+    final isConnected = results.any(
+      (result) =>
+          result == ConnectivityResult.mobile ||
+          result == ConnectivityResult.wifi ||
+          result == ConnectivityResult.ethernet,
     );
-    
+
     state = state.copyWith(
       status: isConnected ? NetworkStatus.online : NetworkStatus.offline,
     );
@@ -80,14 +77,15 @@ class ConnectivityNotifier extends StateNotifier<ConnectivityState> {
   }
 }
 
-final connectivityProvider = StateNotifierProvider<ConnectivityNotifier, ConnectivityState>(
-  (ref) => ConnectivityNotifier(),
-);
+final connectivityProvider =
+    StateNotifierProvider<ConnectivityNotifier, ConnectivityState>(
+      (ref) => ConnectivityNotifier(),
+    );
 
 // Timeout wrapper for API calls
 class ApiTimeout {
   static const defaultTimeout = Duration(seconds: 30);
-  
+
   static Future<T> wrap<T>(
     Future<T> future, {
     Duration? timeout,
@@ -120,24 +118,25 @@ class ErrorHandler {
     if (error is TimeoutException) {
       return 'Request timed out. Please check your connection and try again.';
     }
-    
+
     if (error is NetworkStatus && error == NetworkStatus.offline) {
       return 'No internet connection. Please check your network settings.';
     }
-    
+
     if (error.toString().contains('SocketException')) {
       return 'Cannot connect to server. Please try again later.';
     }
-    
+
     if (error.toString().contains('FormatException')) {
       return 'Invalid data received. Please try again.';
     }
-    
+
     return 'An unexpected error occurred: ${error.toString()}';
   }
 
   static void showError(String message, {VoidCallback? onRetry}) {
     // This will be shown via overlay or snackbar
-    print('Error: $message');
+    // TODO: Replace with proper logging framework
+    // print('Error: $message');
   }
 }

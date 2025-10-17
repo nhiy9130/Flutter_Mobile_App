@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../features/auth/auth_state.dart';
 import '../../core/widgets/section_header.dart';
 import '../../core/widgets/quick_action_card.dart';
 import '../../core/widgets/info_card.dart';
@@ -28,10 +27,7 @@ class TeacherCoursesScreen extends ConsumerWidget {
         padding: const EdgeInsets.all(16),
         children: [
           // Quick Actions for Teachers
-          const SectionHeader(
-            title: 'Hành động nhanh',
-            icon: Icons.flash_on,
-          ),
+          const SectionHeader(title: 'Hành động nhanh', icon: Icons.flash_on),
           const SizedBox(height: 12),
           _buildTeacherQuickActions(context),
           const SizedBox(height: 24),
@@ -46,19 +42,13 @@ class TeacherCoursesScreen extends ConsumerWidget {
           const SizedBox(height: 24),
 
           // Draft Courses
-          const SectionHeader(
-            title: 'Khóa học nháp',
-            icon: Icons.drafts,
-          ),
+          const SectionHeader(title: 'Khóa học nháp', icon: Icons.drafts),
           const SizedBox(height: 12),
           _buildDraftCourses(context),
           const SizedBox(height: 24),
 
           // Recent Activities
-          const SectionHeader(
-            title: 'Hoạt động gần đây',
-            icon: Icons.history,
-          ),
+          const SectionHeader(title: 'Hoạt động gần đây', icon: Icons.history),
           const SizedBox(height: 12),
           _buildRecentActivities(context),
         ],
@@ -125,24 +115,26 @@ class TeacherCoursesScreen extends ConsumerWidget {
         'nextClass': '2024-10-15 14:00',
       },
       {
-        'id': 'course-2', 
+        'id': 'course-2',
         'title': 'Advanced Mobile Development',
         'code': 'AMD201',
         'students': 28,
-        'status': 'active', 
+        'status': 'active',
         'progress': 0.4,
         'nextClass': '2024-10-16 10:00',
       },
     ];
 
     return Column(
-      children: courses.map((course) => _buildCourseCard(context, course)).toList(),
+      children: courses
+          .map((course) => _buildCourseCard(context, course))
+          .toList(),
     );
   }
 
   Widget _buildCourseCard(BuildContext context, Map<String, dynamic> course) {
     final theme = Theme.of(context);
-    
+
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       child: InkWell(
@@ -156,9 +148,12 @@ class TeacherCoursesScreen extends ConsumerWidget {
               Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
-                      color: theme.colorScheme.primary.withOpacity(0.1),
+                      color: theme.colorScheme.primary.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
@@ -172,9 +167,12 @@ class TeacherCoursesScreen extends ConsumerWidget {
                   ),
                   const Spacer(),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
-                      color: Colors.green.withOpacity(0.1),
+                      color: Colors.green.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: const Text(
@@ -307,7 +305,7 @@ class TeacherCoursesScreen extends ConsumerWidget {
       {
         'type': 'announcement',
         'title': 'Thông báo về deadline bài tập',
-        'course': 'AMD201', 
+        'course': 'AMD201',
         'time': '4 giờ trước',
         'icon': Icons.announcement,
         'color': Colors.orange,
@@ -328,7 +326,7 @@ class TeacherCoursesScreen extends ConsumerWidget {
           leading: Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: (activity['color'] as Color).withOpacity(0.1),
+              color: (activity['color'] as Color).withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(
@@ -403,11 +401,9 @@ class TeacherCoursesScreen extends ConsumerWidget {
   }
 
   void _createQuiz(BuildContext context) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => const QuizCreationScreen(),
-      ),
-    );
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (context) => const QuizCreationScreen()));
   }
 
   void _createAnnouncement(BuildContext context) {

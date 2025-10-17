@@ -27,40 +27,41 @@ class LMSApp extends ConsumerWidget {
         locale: context.locale,
         supportedLocales: context.supportedLocales,
         localizationsDelegates: context.localizationDelegates,
-      builder: (context, child) {
-        // Ensure auth state initialized (demo)
-        ref.read(authProvider.notifier).initializeDemo();
-        // Demo banner (similar to FE banner)
-        final isDemo = AppConfig.of(context).demoMode;
-        return Stack(
-          children: [
-            if (child != null) child,
-            if (isDemo)
-              Positioned(
-                right: 12,
-                bottom: 12,
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    color: Colors.deepPurple,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                    child: Text(
-                      'Demo Mode',
-                      style: TextStyle(color: Colors.white, fontSize: 12),
+        builder: (context, child) {
+          // Ensure auth state initialized (demo)
+          ref.read(authProvider.notifier).initializeDemo();
+          // Demo banner (similar to FE banner)
+          final isDemo = AppConfig.of(context).demoMode;
+          return Stack(
+            children: [
+              if (child != null) child,
+              if (isDemo)
+                Positioned(
+                  right: 12,
+                  bottom: 12,
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: Colors.deepPurple,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 6,
+                      ),
+                      child: Text(
+                        'Demo Mode',
+                        style: TextStyle(color: Colors.white, fontSize: 12),
+                      ),
                     ),
                   ),
                 ),
-              ),
-            // Floating AI chatbot - Now inside MaterialApp context
-            const ChatbotFloating(),
-          ],
-        );
-      },
+              // Floating AI chatbot - Now inside MaterialApp context
+              const ChatbotFloating(),
+            ],
+          );
+        },
       ),
     );
   }
 }
-
-

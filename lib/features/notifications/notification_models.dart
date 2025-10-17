@@ -33,6 +33,3 @@ class NotificationPrefs {
   final bool enableBrowser;
   final Map<String, bool> categories;
 }
-
-
-

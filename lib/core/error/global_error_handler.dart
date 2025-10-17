@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 /// Global error handler để bắt và xử lý các lỗi overflow
 class GlobalErrorHandler {
@@ -23,7 +22,7 @@ class GlobalErrorHandler {
 
   static bool _isRenderOverflowError(FlutterErrorDetails details) {
     return details.exception.toString().contains('RenderFlex overflowed') ||
-           details.exception.toString().contains('overflow');
+        details.exception.toString().contains('overflow');
   }
 
   static void _handleRenderOverflowError(FlutterErrorDetails details) {
@@ -31,10 +30,10 @@ class GlobalErrorHandler {
     debugPrint('Error: ${details.exception}');
     debugPrint('Location: ${details.context}');
     debugPrint('Stack: ${details.stack}');
-    
+
     // Log overflow error for debugging
     _logOverflowError(details);
-    
+
     // In debug mode, still show the error
     if (kDebugMode) {
       FlutterError.dumpErrorToConsole(details);
@@ -44,12 +43,12 @@ class GlobalErrorHandler {
   static void _handleGenericFlutterError(FlutterErrorDetails details) {
     debugPrint('🔴 FLUTTER ERROR:');
     debugPrint('Error: ${details.exception}');
-    
+
     // Handle Material widget errors
     if (details.exception.toString().contains('Material widget')) {
       debugPrint('💡 SUGGESTION: Wrap your widget with Material or Scaffold');
     }
-    
+
     if (kDebugMode) {
       FlutterError.dumpErrorToConsole(details);
     }
@@ -62,31 +61,41 @@ class GlobalErrorHandler {
 
   static void _logOverflowError(FlutterErrorDetails details) {
     final errorMessage = details.exception.toString();
-    
+
     // Extract overflow pixels if available
     final RegExp pixelRegex = RegExp(r'(\d+(?:\.\d+)?)\s*pixels');
     final match = pixelRegex.firstMatch(errorMessage);
-    
+
     if (match != null) {
       final pixels = match.group(1);
       debugPrint('📏 Overflow amount: $pixels pixels');
-      
+
       // Provide specific suggestions based on overflow amount
       final overflowAmount = double.tryParse(pixels ?? '0') ?? 0;
       if (overflowAmount > 1000) {
-        debugPrint('💡 LARGE OVERFLOW DETECTED: Consider using SingleChildScrollView or fixing layout constraints');
+        debugPrint(
+          '💡 LARGE OVERFLOW DETECTED: Consider using SingleChildScrollView or fixing layout constraints',
+        );
       } else if (overflowAmount > 100) {
-        debugPrint('💡 MODERATE OVERFLOW: Consider using Flexible/Expanded widgets or reducing content size');
+        debugPrint(
+          '💡 MODERATE OVERFLOW: Consider using Flexible/Expanded widgets or reducing content size',
+        );
       } else {
-        debugPrint('💡 SMALL OVERFLOW: Minor padding/margin adjustments may fix this');
+        debugPrint(
+          '💡 SMALL OVERFLOW: Minor padding/margin adjustments may fix this',
+        );
       }
     }
-    
+
     // Detect overflow direction
     if (errorMessage.contains('bottom')) {
-      debugPrint('📍 VERTICAL OVERFLOW: Check Column height and children constraints');
+      debugPrint(
+        '📍 VERTICAL OVERFLOW: Check Column height and children constraints',
+      );
     } else if (errorMessage.contains('right')) {
-      debugPrint('📍 HORIZONTAL OVERFLOW: Check Row width and children constraints');
+      debugPrint(
+        '📍 HORIZONTAL OVERFLOW: Check Row width and children constraints',
+      );
     }
   }
 }
@@ -111,11 +120,7 @@ class CustomErrorWidget extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.error_outline,
-              size: 48,
-              color: Colors.red.shade700,
-            ),
+            Icon(Icons.error_outline, size: 48, color: Colors.red.shade700),
             const SizedBox(height: 16),
             Text(
               'Oops! Something went wrong',
@@ -128,9 +133,7 @@ class CustomErrorWidget extends StatelessWidget {
             const SizedBox(height: 8),
             Text(
               'We encountered an unexpected error',
-              style: TextStyle(
-                color: Colors.red.shade600,
-              ),
+              style: TextStyle(color: Colors.red.shade600),
             ),
             if (showDetails) ...[
               const SizedBox(height: 16),
@@ -142,10 +145,7 @@ class CustomErrorWidget extends StatelessWidget {
                 ),
                 child: Text(
                   error.exception.toString(),
-                  style: const TextStyle(
-                    fontSize: 12,
-                    fontFamily: 'monospace',
-                  ),
+                  style: const TextStyle(fontSize: 12, fontFamily: 'monospace'),
                 ),
               ),
             ],
@@ -156,20 +156,13 @@ class CustomErrorWidget extends StatelessWidget {
   }
 
   static Widget builder(FlutterErrorDetails details) {
-    return CustomErrorWidget(
-      error: details,
-      showDetails: kDebugMode,
-    );
+    return CustomErrorWidget(error: details, showDetails: kDebugMode);
   }
 }
 
 /// Wrapper widget để bảo vệ khỏi các lỗi overflow và Material
 class ErrorBoundary extends StatelessWidget {
-  const ErrorBoundary({
-    super.key,
-    required this.child,
-    this.fallback,
-  });
+  const ErrorBoundary({super.key, required this.child, this.fallback});
 
   final Widget child;
   final Widget? fallback;
@@ -179,16 +172,10 @@ class ErrorBoundary extends StatelessWidget {
     return Builder(
       builder: (context) {
         try {
-          return Material(
-            type: MaterialType.transparency,
-            child: child,
-          );
+          return Material(type: MaterialType.transparency, child: child);
         } catch (e) {
           debugPrint('ErrorBoundary caught error: $e');
-          return fallback ?? 
-            const Center(
-              child: Text('Something went wrong'),
-            );
+          return fallback ?? const Center(child: Text('Something went wrong'));
         }
       },
     );
@@ -198,9 +185,6 @@ class ErrorBoundary extends StatelessWidget {
 /// Extension để thêm error boundary cho bất kỳ widget nào
 extension WidgetErrorBoundary on Widget {
   Widget withErrorBoundary({Widget? fallback}) {
-    return ErrorBoundary(
-      fallback: fallback,
-      child: this,
-    );
+    return ErrorBoundary(fallback: fallback, child: this);
   }
 }

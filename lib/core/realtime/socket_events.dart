@@ -1,5 +1,6 @@
 /// Socket.IO Event Definitions for Real-time Features
 /// This file defines all events and payloads for socket communication
+library;
 
 /// ============================================
 /// CHAT EVENTS
@@ -36,11 +37,11 @@ class ChatJoinPayload {
   final String role;
 
   Map<String, dynamic> toJson() => {
-        'courseId': courseId,
-        'userId': userId,
-        'userName': userName,
-        'role': role,
-      };
+    'courseId': courseId,
+    'userId': userId,
+    'userName': userName,
+    'role': role,
+  };
 
   factory ChatJoinPayload.fromJson(Map<String, dynamic> json) {
     return ChatJoinPayload(
@@ -75,15 +76,15 @@ class ChatMessagePayload {
   final DateTime? timestamp;
 
   Map<String, dynamic> toJson() => {
-        'courseId': courseId,
-        'userId': userId,
-        'userName': userName,
-        'message': message,
-        if (attachmentPath != null) 'attachmentPath': attachmentPath,
-        if (attachmentName != null) 'attachmentName': attachmentName,
-        if (attachmentSize != null) 'attachmentSize': attachmentSize,
-        'timestamp': (timestamp ?? DateTime.now()).toIso8601String(),
-      };
+    'courseId': courseId,
+    'userId': userId,
+    'userName': userName,
+    'message': message,
+    if (attachmentPath != null) 'attachmentPath': attachmentPath,
+    if (attachmentName != null) 'attachmentName': attachmentName,
+    if (attachmentSize != null) 'attachmentSize': attachmentSize,
+    'timestamp': (timestamp ?? DateTime.now()).toIso8601String(),
+  };
 
   factory ChatMessagePayload.fromJson(Map<String, dynamic> json) {
     return ChatMessagePayload(
@@ -94,7 +95,9 @@ class ChatMessagePayload {
       attachmentPath: json['attachmentPath'] as String?,
       attachmentName: json['attachmentName'] as String?,
       attachmentSize: json['attachmentSize'] as int?,
-      timestamp: json['timestamp'] != null ? DateTime.parse(json['timestamp'] as String) : null,
+      timestamp: json['timestamp'] != null
+          ? DateTime.parse(json['timestamp'] as String)
+          : null,
     );
   }
 }
@@ -114,11 +117,11 @@ class ChatTypingPayload {
   final bool isTyping;
 
   Map<String, dynamic> toJson() => {
-        'courseId': courseId,
-        'userId': userId,
-        'userName': userName,
-        'isTyping': isTyping,
-      };
+    'courseId': courseId,
+    'userId': userId,
+    'userName': userName,
+    'isTyping': isTyping,
+  };
 
   factory ChatTypingPayload.fromJson(Map<String, dynamic> json) {
     return ChatTypingPayload(
@@ -152,7 +155,8 @@ class LivestreamEvents {
   static const String receiveOffer = 'livestream:receive-offer';
   static const String receiveAnswer = 'livestream:receive-answer';
   static const String receiveIceCandidate = 'livestream:receive-ice-candidate';
-  static const String participantMediaChanged = 'livestream:participant-media-changed';
+  static const String participantMediaChanged =
+      'livestream:participant-media-changed';
 }
 
 /// Livestream join payload
@@ -170,11 +174,11 @@ class LivestreamJoinPayload {
   final String role;
 
   Map<String, dynamic> toJson() => {
-        'roomId': roomId,
-        'userId': userId,
-        'userName': userName,
-        'role': role,
-      };
+    'roomId': roomId,
+    'userId': userId,
+    'userName': userName,
+    'role': role,
+  };
 
   factory LivestreamJoinPayload.fromJson(Map<String, dynamic> json) {
     return LivestreamJoinPayload(
@@ -203,12 +207,12 @@ class WebRTCSignalPayload {
   final String type; // 'offer' | 'answer'
 
   Map<String, dynamic> toJson() => {
-        'roomId': roomId,
-        'fromUserId': fromUserId,
-        'toUserId': toUserId,
-        'sdp': sdp,
-        'type': type,
-      };
+    'roomId': roomId,
+    'fromUserId': fromUserId,
+    'toUserId': toUserId,
+    'sdp': sdp,
+    'type': type,
+  };
 
   factory WebRTCSignalPayload.fromJson(Map<String, dynamic> json) {
     return WebRTCSignalPayload(
@@ -240,13 +244,13 @@ class IceCandidatePayload {
   final int? sdpMLineIndex;
 
   Map<String, dynamic> toJson() => {
-        'roomId': roomId,
-        'fromUserId': fromUserId,
-        'toUserId': toUserId,
-        'candidate': candidate,
-        'sdpMid': sdpMid,
-        'sdpMLineIndex': sdpMLineIndex,
-      };
+    'roomId': roomId,
+    'fromUserId': fromUserId,
+    'toUserId': toUserId,
+    'candidate': candidate,
+    'sdpMid': sdpMid,
+    'sdpMLineIndex': sdpMLineIndex,
+  };
 
   factory IceCandidatePayload.fromJson(Map<String, dynamic> json) {
     return IceCandidatePayload(
@@ -294,11 +298,11 @@ class QuizJoinPayload {
   final String userName;
 
   Map<String, dynamic> toJson() => {
-        'quizId': quizId,
-        'courseId': courseId,
-        'userId': userId,
-        'userName': userName,
-      };
+    'quizId': quizId,
+    'courseId': courseId,
+    'userId': userId,
+    'userName': userName,
+  };
 
   factory QuizJoinPayload.fromJson(Map<String, dynamic> json) {
     return QuizJoinPayload(
@@ -327,12 +331,12 @@ class QuizAnswerPayload {
   final int timeSpent; // seconds
 
   Map<String, dynamic> toJson() => {
-        'quizId': quizId,
-        'questionId': questionId,
-        'userId': userId,
-        'answer': answer,
-        'timeSpent': timeSpent,
-      };
+    'quizId': quizId,
+    'questionId': questionId,
+    'userId': userId,
+    'answer': answer,
+    'timeSpent': timeSpent,
+  };
 
   factory QuizAnswerPayload.fromJson(Map<String, dynamic> json) {
     return QuizAnswerPayload(
@@ -372,19 +376,20 @@ class NotificationPayload {
   final int userId;
   final String title;
   final String body;
-  final String type; // 'chat' | 'quiz' | 'livestream' | 'announcement' | 'grade'
+  final String
+  type; // 'chat' | 'quiz' | 'livestream' | 'announcement' | 'grade'
   final Map<String, dynamic>? data;
   final String priority; // 'low' | 'normal' | 'high'
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'userId': userId,
-        'title': title,
-        'body': body,
-        'type': type,
-        if (data != null) 'data': data,
-        'priority': priority,
-      };
+    'id': id,
+    'userId': userId,
+    'title': title,
+    'body': body,
+    'type': type,
+    if (data != null) 'data': data,
+    'priority': priority,
+  };
 
   factory NotificationPayload.fromJson(Map<String, dynamic> json) {
     return NotificationPayload(

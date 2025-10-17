@@ -27,9 +27,7 @@ class SimpleBarChart extends StatelessWidget {
     if (data.isEmpty) {
       return SizedBox(
         height: height,
-        child: const Center(
-          child: Text('Không có dữ liệu'),
-        ),
+        child: const Center(child: Text('Không có dữ liệu')),
       );
     }
 
@@ -41,10 +39,7 @@ class SimpleBarChart extends StatelessWidget {
         if (title != null) ...[
           Padding(
             padding: const EdgeInsets.only(bottom: AppSpacing.md),
-            child: Text(
-              title!,
-              style: AppTypography.h6,
-            ),
+            child: Text(title!, style: AppTypography.h6),
           ),
         ],
         SizedBox(
@@ -91,7 +86,9 @@ class SimpleBarChart extends StatelessWidget {
                             end: Alignment.topCenter,
                             colors: [
                               item.color ?? primaryColor,
-                              (item.color ?? primaryColor).withOpacity(0.7),
+                              (item.color ?? primaryColor).withValues(
+                                alpha: 0.7,
+                              ),
                             ],
                           ),
                         ),
@@ -155,10 +152,7 @@ class _SimpleLineChartState extends State<SimpleLineChart>
       duration: const Duration(milliseconds: 1500),
       vsync: this,
     );
-    _animation = CurvedAnimation(
-      parent: _controller,
-      curve: Curves.easeInOut,
-    );
+    _animation = CurvedAnimation(parent: _controller, curve: Curves.easeInOut);
 
     if (widget.animated) {
       _controller.forward();
@@ -176,9 +170,7 @@ class _SimpleLineChartState extends State<SimpleLineChart>
     if (widget.data.isEmpty) {
       return SizedBox(
         height: widget.height,
-        child: const Center(
-          child: Text('Không có dữ liệu'),
-        ),
+        child: const Center(child: Text('Không có dữ liệu')),
       );
     }
 
@@ -188,10 +180,7 @@ class _SimpleLineChartState extends State<SimpleLineChart>
         if (widget.title != null) ...[
           Padding(
             padding: const EdgeInsets.only(bottom: AppSpacing.md),
-            child: Text(
-              widget.title!,
-              style: AppTypography.h6,
-            ),
+            child: Text(widget.title!, style: AppTypography.h6),
           ),
         ],
         SizedBox(
@@ -271,9 +260,7 @@ class _SimplePieChartState extends State<SimplePieChart>
   @override
   Widget build(BuildContext context) {
     if (widget.data.isEmpty) {
-      return const Center(
-        child: Text('Không có dữ liệu'),
-      );
+      return const Center(child: Text('Không có dữ liệu'));
     }
 
     final total = widget.data.fold<double>(0, (sum, item) => sum + item.value);
@@ -283,10 +270,7 @@ class _SimplePieChartState extends State<SimplePieChart>
         if (widget.title != null) ...[
           Padding(
             padding: const EdgeInsets.only(bottom: AppSpacing.md),
-            child: Text(
-              widget.title!,
-              style: AppTypography.h6,
-            ),
+            child: Text(widget.title!, style: AppTypography.h6),
           ),
         ],
         Row(
@@ -306,13 +290,15 @@ class _SimplePieChartState extends State<SimplePieChart>
               },
             ),
             const SizedBox(width: AppSpacing.lg),
-            
+
             // Legend
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: widget.data.map((item) {
-                  final percentage = (item.value / total * 100).toStringAsFixed(1);
+                  final percentage = (item.value / total * 100).toStringAsFixed(
+                    1,
+                  );
                   return Padding(
                     padding: const EdgeInsets.only(bottom: AppSpacing.sm),
                     child: Row(
@@ -399,16 +385,12 @@ class LineChartPainter extends CustomPainter {
     // Draw grid
     if (showGrid) {
       final gridPaint = Paint()
-        ..color = AppColors.grey300.withOpacity(0.3)
+        ..color = AppColors.grey300.withValues(alpha: 0.3)
         ..strokeWidth = 1;
 
       for (int i = 0; i <= 4; i++) {
         final y = size.height * i / 4;
-        canvas.drawLine(
-          Offset(0, y),
-          Offset(size.width, y),
-          gridPaint,
-        );
+        canvas.drawLine(Offset(0, y), Offset(size.width, y), gridPaint);
       }
     }
 
@@ -416,7 +398,8 @@ class LineChartPainter extends CustomPainter {
     final points = <Offset>[];
     for (int i = 0; i < data.length; i++) {
       final x = size.width * i / (data.length - 1);
-      final normalizedValue = (data[i].value - minValue) / (maxValue - minValue);
+      final normalizedValue =
+          (data[i].value - minValue) / (maxValue - minValue);
       final y = size.height * (1 - normalizedValue);
       points.add(Offset(x, y));
     }
@@ -435,7 +418,11 @@ class LineChartPainter extends CustomPainter {
         final progress = (points.length * animationValue) - animatedLength;
         final currentPoint = points[animatedLength - 1];
         final nextPoint = points[animatedLength];
-        final interpolatedPoint = Offset.lerp(currentPoint, nextPoint, progress)!;
+        final interpolatedPoint = Offset.lerp(
+          currentPoint,
+          nextPoint,
+          progress,
+        )!;
         path.lineTo(interpolatedPoint.dx, interpolatedPoint.dy);
       }
 
@@ -450,7 +437,13 @@ class LineChartPainter extends CustomPainter {
 
       for (int i = 0; i < animatedLength; i++) {
         canvas.drawCircle(points[i], 4, dotPaint);
-        canvas.drawCircle(points[i], 4, Paint()..color = Colors.white..style = PaintingStyle.fill);
+        canvas.drawCircle(
+          points[i],
+          4,
+          Paint()
+            ..color = Colors.white
+            ..style = PaintingStyle.fill,
+        );
         canvas.drawCircle(points[i], 2, dotPaint);
       }
     }
@@ -553,14 +546,10 @@ class StatChartCard extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(AppSpacing.sm),
                     decoration: BoxDecoration(
-                      color: color.withOpacity(0.1),
+                      color: color.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(AppRadius.sm),
                     ),
-                    child: Icon(
-                      icon,
-                      color: color,
-                      size: AppSizes.iconMd,
-                    ),
+                    child: Icon(icon, color: color, size: AppSizes.iconMd),
                   ),
                   const SizedBox(width: AppSpacing.md),
                 ],
@@ -623,8 +612,4 @@ class StatChartCard extends StatelessWidget {
   }
 }
 
-enum ChartType {
-  line,
-  bar,
-  pie,
-}
+enum ChartType { line, bar, pie }

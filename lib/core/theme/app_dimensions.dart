@@ -29,23 +29,23 @@ class AppSpacing {
   // Screen padding
   static const double screenHorizontal = md; // 16px
   static const double screenVertical = lg; // 24px
-  
+
   // Card padding
   static const double cardPadding = md; // 16px
   static const double cardPaddingLarge = lg; // 24px
-  
+
   // List item spacing
   static const double listItemVertical = sm; // 8px
   static const double listItemHorizontal = md; // 16px
-  
+
   // Button spacing
   static const double buttonHorizontal = lg; // 24px
   static const double buttonVertical = smMd; // 12px
-  
+
   // Form spacing
   static const double formFieldSpacing = md; // 16px
   static const double formSectionSpacing = xl; // 32px
-  
+
   // Section spacing
   static const double sectionSpacing = lg; // 24px
   static const double sectionHeaderSpacing = sm; // 8px
@@ -85,7 +85,7 @@ class AppElevation {
 class AppShadows {
   static List<BoxShadow> get sm => [
     BoxShadow(
-      color: Colors.black.withOpacity(0.1),
+      color: Colors.black.withValues(alpha: 0.1),
       offset: const Offset(0, 1),
       blurRadius: 2,
       spreadRadius: 0,
@@ -94,13 +94,13 @@ class AppShadows {
 
   static List<BoxShadow> get md => [
     BoxShadow(
-      color: Colors.black.withOpacity(0.1),
+      color: Colors.black.withValues(alpha: 0.1),
       offset: const Offset(0, 4),
       blurRadius: 6,
       spreadRadius: -1,
     ),
     BoxShadow(
-      color: Colors.black.withOpacity(0.06),
+      color: Colors.black.withValues(alpha: 0.06),
       offset: const Offset(0, 2),
       blurRadius: 4,
       spreadRadius: -1,
@@ -109,13 +109,13 @@ class AppShadows {
 
   static List<BoxShadow> get lg => [
     BoxShadow(
-      color: Colors.black.withOpacity(0.1),
+      color: Colors.black.withValues(alpha: 0.1),
       offset: const Offset(0, 10),
       blurRadius: 15,
       spreadRadius: -3,
     ),
     BoxShadow(
-      color: Colors.black.withOpacity(0.05),
+      color: Colors.black.withValues(alpha: 0.05),
       offset: const Offset(0, 4),
       blurRadius: 6,
       spreadRadius: -2,
@@ -124,13 +124,13 @@ class AppShadows {
 
   static List<BoxShadow> get xl => [
     BoxShadow(
-      color: Colors.black.withOpacity(0.1),
+      color: Colors.black.withValues(alpha: 0.1),
       offset: const Offset(0, 20),
       blurRadius: 25,
       spreadRadius: -5,
     ),
     BoxShadow(
-      color: Colors.black.withOpacity(0.04),
+      color: Colors.black.withValues(alpha: 0.04),
       offset: const Offset(0, 10),
       blurRadius: 10,
       spreadRadius: -5,

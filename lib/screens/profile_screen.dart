@@ -37,7 +37,7 @@ class ProfileScreen extends ConsumerWidget {
           // Profile Header
           Card(
             elevation: 0,
-            color: theme.colorScheme.primary.withOpacity(0.1),
+            color: theme.colorScheme.primary.withValues(alpha: 0.1),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(16),
             ),
@@ -100,7 +100,10 @@ class ProfileScreen extends ConsumerWidget {
                   ),
                   const SizedBox(height: 4),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
                     decoration: BoxDecoration(
                       color: _getRoleColor(user.role),
                       borderRadius: BorderRadius.circular(20),
@@ -132,7 +135,7 @@ class ProfileScreen extends ConsumerWidget {
             leading: Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: Colors.blue.withOpacity(0.1),
+                color: Colors.blue.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: const Icon(Icons.email_outlined, color: Colors.blue),
@@ -145,7 +148,7 @@ class ProfileScreen extends ConsumerWidget {
             leading: Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: Colors.purple.withOpacity(0.1),
+                color: Colors.purple.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: const Icon(Icons.badge_outlined, color: Colors.purple),
@@ -167,7 +170,7 @@ class ProfileScreen extends ConsumerWidget {
             leading: Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: Colors.orange.withOpacity(0.1),
+                color: Colors.orange.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: const Icon(Icons.settings_outlined, color: Colors.orange),
@@ -182,7 +185,7 @@ class ProfileScreen extends ConsumerWidget {
             leading: Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: Colors.green.withOpacity(0.1),
+                color: Colors.green.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: const Icon(Icons.lock_outline, color: Colors.green),
@@ -199,7 +202,7 @@ class ProfileScreen extends ConsumerWidget {
             leading: Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: Colors.teal.withOpacity(0.1),
+                color: Colors.teal.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: const Icon(Icons.help_outline, color: Colors.teal),
@@ -236,14 +239,18 @@ class ProfileScreen extends ConsumerWidget {
                   Text(
                     'LMS Mobile v0.1.0',
                     style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.textTheme.bodySmall?.color?.withOpacity(0.5),
+                      color: theme.textTheme.bodySmall?.color?.withValues(
+                        alpha: 0.5,
+                      ),
                     ),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     'Made with ❤️ using Flutter',
                     style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.textTheme.bodySmall?.color?.withOpacity(0.5),
+                      color: theme.textTheme.bodySmall?.color?.withValues(
+                        alpha: 0.5,
+                      ),
                     ),
                   ),
                 ],
@@ -306,9 +313,7 @@ class ProfileScreen extends ConsumerWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: const Text('Đăng xuất'),
         content: const Text('Bạn có chắc chắn muốn đăng xuất không?'),
         actions: [

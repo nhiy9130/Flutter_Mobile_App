@@ -1,10 +1,7 @@
 import 'package:dio/dio.dart';
 
 class DioClient {
-  DioClient({
-    required String baseUrl,
-    int timeoutMs = 10000,
-  }) {
+  DioClient({required String baseUrl, int timeoutMs = 10000}) {
     _dio = Dio(
       BaseOptions(
         baseUrl: baseUrl,
@@ -34,6 +31,3 @@ class DioClient {
 
   Dio get dio => _dio;
 }
-
-
-

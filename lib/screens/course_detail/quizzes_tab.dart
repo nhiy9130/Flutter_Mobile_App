@@ -38,7 +38,10 @@ class _QuizzesTabViewState extends State<QuizzesTabView> {
               child: const Text('Start Live Quiz (Demo)'),
             ),
           ] else ...[
-            Text('Question ${session.currentIndex + 1}/${session.questions.length}', style: Theme.of(context).textTheme.titleMedium),
+            Text(
+              'Question ${session.currentIndex + 1}/${session.questions.length}',
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
             const SizedBox(height: 8),
             Text(session.questions[session.currentIndex].question),
             const SizedBox(height: 8),
@@ -65,8 +68,8 @@ class _QuizzesTabViewState extends State<QuizzesTabView> {
                   child: const Text('End'),
                 ),
               ],
-            )
-          ]
+            ),
+          ],
         ],
       ),
     );
@@ -91,6 +94,3 @@ class _QuizzesTabViewState extends State<QuizzesTabView> {
     });
   }
 }
-
-
-

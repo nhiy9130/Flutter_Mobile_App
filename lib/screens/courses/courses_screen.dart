@@ -4,7 +4,6 @@ import '../../features/auth/auth_state.dart';
 import '../../features/courses/courses_service.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/widgets/widgets.dart';
-import '../../core/widgets/course_card.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_dimensions.dart';
 import '../../core/theme/app_typography.dart';
@@ -27,7 +26,10 @@ class _CoursesScreenState extends ConsumerState<CoursesScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: widget.myCoursesOnly ? 3 : 4, vsync: this);
+    _tabController = TabController(
+      length: widget.myCoursesOnly ? 3 : 4,
+      vsync: this,
+    );
   }
 
   @override
@@ -40,7 +42,7 @@ class _CoursesScreenState extends ConsumerState<CoursesScreen>
   @override
   Widget build(BuildContext context) {
     final auth = ref.watch(authProvider);
-    
+
     return Scaffold(
       body: NestedScrollView(
         headerSliverBuilder: (context, innerBoxIsScrolled) {
@@ -62,7 +64,7 @@ class _CoursesScreenState extends ConsumerState<CoursesScreen>
                   _buildCoursesTab(auth, CourseFilter.all),
                   _buildCoursesTab(auth, CourseFilter.recommended),
                   _buildCoursesTab(auth, CourseFilter.trending),
-                  _buildCoursesTab(auth, CourseFilter.new_courses),
+                  _buildCoursesTab(auth, CourseFilter.newCourses),
                 ],
         ),
       ),
@@ -109,14 +111,14 @@ class _CoursesScreenState extends ConsumerState<CoursesScreen>
             children: [
               Icon(
                 Icons.school,
-                color: AppColors.white.withOpacity(0.9),
+                color: AppColors.white.withValues(alpha: 0.9),
                 size: AppSizes.iconLg,
               ),
               const SizedBox(width: AppSpacing.sm),
               Text(
                 '15 khóa học đang theo học',
                 style: AppTypography.bodyMedium.copyWith(
-                  color: AppColors.white.withOpacity(0.9),
+                  color: AppColors.white.withValues(alpha: 0.9),
                 ),
               ),
             ],
@@ -140,14 +142,14 @@ class _CoursesScreenState extends ConsumerState<CoursesScreen>
           Text(
             'Hơn 1000+ khóa học',
             style: AppTypography.bodyLarge.copyWith(
-              color: AppColors.white.withOpacity(0.9),
+              color: AppColors.white.withValues(alpha: 0.9),
             ),
           ),
           const SizedBox(height: AppSpacing.xs),
           Text(
             'Học từ các chuyên gia hàng đầu',
             style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.white.withOpacity(0.8),
+              color: AppColors.white.withValues(alpha: 0.8),
             ),
           ),
         ],
@@ -181,7 +183,7 @@ class _CoursesScreenState extends ConsumerState<CoursesScreen>
               },
             ),
             const SizedBox(height: AppSpacing.md),
-            
+
             // Category Filter
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
@@ -258,40 +260,44 @@ class _CoursesScreenState extends ConsumerState<CoursesScreen>
 
   Widget _buildCoursesTab(AuthState auth, CourseFilter filter) {
     final future = _getFuture(auth, filter);
-    
+
     return FutureBuilder(
       future: future,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return _buildLoadingState();
         }
-        
+
         if (snapshot.hasError) {
           return _buildErrorState(snapshot.error.toString());
         }
-        
+
         final courses = snapshot.data ?? [];
-        
+
         if (courses.isEmpty) {
           return _buildEmptyState(filter);
         }
-        
+
         // Filter courses based on search and category
         final filteredCourses = courses.where((course) {
-          final matchesSearch = _searchQuery.isEmpty ||
+          final matchesSearch =
+              _searchQuery.isEmpty ||
               course.title.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-              course.description.toLowerCase().contains(_searchQuery.toLowerCase());
-          
-          final matchesCategory = _selectedCategory == 'all' ||
+              course.description.toLowerCase().contains(
+                _searchQuery.toLowerCase(),
+              );
+
+          final matchesCategory =
+              _selectedCategory == 'all' ||
               course.category.toLowerCase() == _selectedCategory.toLowerCase();
-          
+
           return matchesSearch && matchesCategory;
         }).toList();
-        
+
         if (filteredCourses.isEmpty && _searchQuery.isNotEmpty) {
           return _buildSearchEmptyState();
         }
-        
+
         return ListView.builder(
           padding: const EdgeInsets.all(AppSpacing.screenHorizontal),
           itemCount: filteredCourses.length,
@@ -315,7 +321,7 @@ class _CoursesScreenState extends ConsumerState<CoursesScreen>
       case CourseFilter.all:
       case CourseFilter.recommended:
       case CourseFilter.trending:
-      case CourseFilter.new_courses:
+      case CourseFilter.newCourses:
         return coursesService.getAllCourses();
     }
   }
@@ -340,10 +346,7 @@ class _CoursesScreenState extends ConsumerState<CoursesScreen>
           padding: const EdgeInsets.only(bottom: AppSpacing.md),
           child: ShimmerLoading(
             child: CustomCard(
-              child: Container(
-                height: 120,
-                color: AppColors.grey200,
-              ),
+              child: Container(height: 120, color: AppColors.grey200),
             ),
           ),
         );
@@ -355,7 +358,7 @@ class _CoursesScreenState extends ConsumerState<CoursesScreen>
     String title = 'Không có khóa học';
     String subtitle = 'Hiện tại chưa có khóa học nào.';
     IconData icon = Icons.school_outlined;
-    
+
     switch (filter) {
       case CourseFilter.enrolled:
         title = 'Chưa đăng ký khóa học nào';
@@ -373,7 +376,7 @@ class _CoursesScreenState extends ConsumerState<CoursesScreen>
       default:
         break;
     }
-    
+
     return EmptyState(
       icon: icon,
       title: title,
@@ -412,16 +415,11 @@ class _CoursesScreenState extends ConsumerState<CoursesScreen>
             color: AppColors.error,
           ),
           const SizedBox(height: AppSpacing.md),
-          Text(
-            'Có lỗi xảy ra',
-            style: AppTypography.h6,
-          ),
+          Text('Có lỗi xảy ra', style: AppTypography.h6),
           const SizedBox(height: AppSpacing.sm),
           Text(
             error,
-            style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.grey600,
-            ),
+            style: AppTypography.bodyMedium.copyWith(color: AppColors.grey600),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: AppSpacing.lg),
@@ -440,7 +438,7 @@ class _CoursesScreenState extends ConsumerState<CoursesScreen>
     if (!widget.myCoursesOnly || auth.user?.role != 'instructor') {
       return null;
     }
-    
+
     return FloatingActionButton.extended(
       onPressed: () {
         // TODO: Navigate to create course
@@ -460,7 +458,7 @@ enum CourseFilter {
   completed,
   recommended,
   trending,
-  new_courses,
+  newCourses,
 }
 
 class _SliverTabBarDelegate extends SliverPersistentHeaderDelegate {
@@ -490,5 +488,3 @@ class _SliverTabBarDelegate extends SliverPersistentHeaderDelegate {
     return false;
   }
 }
-
-

@@ -26,9 +26,7 @@ class StatCard extends StatelessWidget {
 
     return Card(
       elevation: 1,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Container(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -41,21 +39,22 @@ class StatCard extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: cardColor.withOpacity(0.15),
+                      color: cardColor.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: Icon(
-                      icon,
-                      color: cardColor,
-                      size: 20,
-                    ),
+                    child: Icon(icon, color: cardColor, size: 20),
                   ),
                   const Spacer(),
                   if (trend != null)
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 6,
+                        vertical: 2,
+                      ),
                       decoration: BoxDecoration(
-                        color: trendUp ? Colors.green.withOpacity(0.1) : Colors.red.withOpacity(0.1),
+                        color: trendUp
+                            ? Colors.green.withValues(alpha: 0.1)
+                            : Colors.red.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Row(
@@ -98,7 +97,9 @@ class StatCard extends StatelessWidget {
               child: Text(
                 label,
                 style: theme.textTheme.bodySmall?.copyWith(
-                  color: theme.textTheme.bodySmall?.color?.withOpacity(0.6),
+                  color: theme.textTheme.bodySmall?.color?.withValues(
+                    alpha: 0.6,
+                  ),
                 ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,

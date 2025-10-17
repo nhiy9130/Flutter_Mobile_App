@@ -26,9 +26,7 @@ class InfoCard extends StatelessWidget {
 
     return Card(
       elevation: 1,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       color: bgColor,
       child: InkWell(
         onTap: onTap,
@@ -37,10 +35,7 @@ class InfoCard extends StatelessWidget {
           padding: const EdgeInsets.all(16),
           child: Row(
             children: [
-              if (leading != null) ...[
-                leading!,
-                const SizedBox(width: 16),
-              ],
+              if (leading != null) ...[leading!, const SizedBox(width: 16)],
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -56,17 +51,16 @@ class InfoCard extends StatelessWidget {
                       Text(
                         subtitle!,
                         style: theme.textTheme.bodySmall?.copyWith(
-                          color: theme.textTheme.bodySmall?.color?.withOpacity(0.7),
+                          color: theme.textTheme.bodySmall?.color?.withValues(
+                            alpha: 0.7,
+                          ),
                         ),
                       ),
                     ],
                   ],
                 ),
               ),
-              if (trailing != null) ...[
-                const SizedBox(width: 16),
-                trailing!,
-              ],
+              if (trailing != null) ...[const SizedBox(width: 16), trailing!],
             ],
           ),
         ),

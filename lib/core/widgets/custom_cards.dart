@@ -31,29 +31,25 @@ class CustomCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final effectiveRadius = borderRadius ?? BorderRadius.circular(AppRadius.card);
-    
+    final effectiveRadius =
+        borderRadius ?? BorderRadius.circular(AppRadius.card);
+
     Widget cardChild = Container(
       padding: padding ?? const EdgeInsets.all(AppSpacing.cardPadding),
       decoration: BoxDecoration(
         gradient: gradient,
         color: gradient == null ? (backgroundColor ?? AppColors.white) : null,
         borderRadius: effectiveRadius,
-        border: borderColor != null
-            ? Border.all(color: borderColor!)
-            : null,
-        boxShadow: shadows ?? (elevation != null && elevation! > 0
-            ? AppShadows.md
-            : null),
+        border: borderColor != null ? Border.all(color: borderColor!) : null,
+        boxShadow:
+            shadows ??
+            (elevation != null && elevation! > 0 ? AppShadows.md : null),
       ),
       child: child,
     );
 
     if (margin != null) {
-      cardChild = Container(
-        margin: margin,
-        child: cardChild,
-      );
+      cardChild = Container(margin: margin, child: cardChild);
     }
 
     if (onTap != null) {
@@ -104,7 +100,7 @@ class InfoCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(AppSpacing.sm),
               decoration: BoxDecoration(
-                color: (iconColor ?? AppColors.primary).withOpacity(0.1),
+                color: (iconColor ?? AppColors.primary).withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(AppRadius.md),
               ),
               child: Icon(
@@ -120,10 +116,7 @@ class InfoCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                  title,
-                  style: AppTypography.h6,
-                ),
+                Text(title, style: AppTypography.h6),
                 if (subtitle != null) ...[
                   const SizedBox(height: AppSpacing.xs),
                   Text(
@@ -135,10 +128,7 @@ class InfoCard extends StatelessWidget {
                 ],
                 if (description != null) ...[
                   const SizedBox(height: AppSpacing.sm),
-                  Text(
-                    description!,
-                    style: AppTypography.bodyMedium,
-                  ),
+                  Text(description!, style: AppTypography.bodyMedium),
                 ],
               ],
             ),
@@ -196,11 +186,7 @@ class StatCard extends StatelessWidget {
                 ),
               ),
               if (icon != null)
-                Icon(
-                  icon,
-                  size: AppSizes.iconMd,
-                  color: AppColors.grey500,
-                ),
+                Icon(icon, size: AppSizes.iconMd, color: AppColors.grey500),
             ],
           ),
           const SizedBox(height: AppSpacing.sm),
@@ -231,18 +217,12 @@ class StatCard extends StatelessWidget {
                   if (subtitle != null) ...[
                     const SizedBox(width: AppSpacing.sm),
                     Expanded(
-                      child: Text(
-                        subtitle!,
-                        style: AppTypography.caption,
-                      ),
+                      child: Text(subtitle!, style: AppTypography.caption),
                     ),
                   ],
                 ] else if (subtitle != null)
                   Expanded(
-                    child: Text(
-                      subtitle!,
-                      style: AppTypography.caption,
-                    ),
+                    child: Text(subtitle!, style: AppTypography.caption),
                   ),
               ],
             ),
@@ -275,11 +255,7 @@ class StatCard extends StatelessWidget {
   }
 }
 
-enum TrendDirection {
-  up,
-  down,
-  neutral,
-}
+enum TrendDirection { up, down, neutral }
 
 class ActionCard extends StatelessWidget {
   const ActionCard({
@@ -314,7 +290,9 @@ class ActionCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(AppSpacing.smMd),
               decoration: BoxDecoration(
-                color: iconBackgroundColor ?? AppColors.primary.withOpacity(0.1),
+                color:
+                    iconBackgroundColor ??
+                    AppColors.primary.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(AppRadius.lg),
               ),
               child: Icon(
@@ -330,10 +308,7 @@ class ActionCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                  title,
-                  style: AppTypography.labelLarge,
-                ),
+                Text(title, style: AppTypography.labelLarge),
                 if (subtitle != null) ...[
                   const SizedBox(height: AppSpacing.xs2),
                   Text(
@@ -346,11 +321,12 @@ class ActionCard extends StatelessWidget {
               ],
             ),
           ),
-          trailing ?? const Icon(
-            Icons.arrow_forward_ios,
-            size: AppSizes.iconSm,
-            color: AppColors.grey400,
-          ),
+          trailing ??
+              const Icon(
+                Icons.arrow_forward_ios,
+                size: AppSizes.iconSm,
+                color: AppColors.grey400,
+              ),
         ],
       ),
     );
@@ -389,12 +365,7 @@ class ProgressCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Expanded(
-                child: Text(
-                  title,
-                  style: AppTypography.labelLarge,
-                ),
-              ),
+              Expanded(child: Text(title, style: AppTypography.labelLarge)),
               if (showPercentage)
                 Text(
                   '${(progress * 100).toInt()}%',
@@ -408,9 +379,7 @@ class ProgressCard extends StatelessWidget {
             const SizedBox(height: AppSpacing.xs),
             Text(
               subtitle!,
-              style: AppTypography.bodySmall.copyWith(
-                color: AppColors.grey600,
-              ),
+              style: AppTypography.bodySmall.copyWith(color: AppColors.grey600),
             ),
           ],
           const SizedBox(height: AppSpacing.md),

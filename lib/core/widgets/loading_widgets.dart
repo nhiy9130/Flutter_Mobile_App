@@ -144,17 +144,17 @@ class EmptyState extends StatelessWidget {
             const SizedBox(height: 16),
             Text(
               title,
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 8),
             Text(
               message,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Colors.grey.shade600,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.copyWith(color: Colors.grey.shade600),
               textAlign: TextAlign.center,
             ),
             if (action != null && actionLabel != null) ...[
@@ -174,11 +174,7 @@ class EmptyState extends StatelessWidget {
 
 // Error State Widget
 class ErrorState extends StatelessWidget {
-  const ErrorState({
-    super.key,
-    required this.message,
-    this.onRetry,
-  });
+  const ErrorState({super.key, required this.message, this.onRetry});
 
   final String message;
   final VoidCallback? onRetry;
@@ -195,17 +191,17 @@ class ErrorState extends StatelessWidget {
             const SizedBox(height: 16),
             Text(
               'Oops! Something went wrong',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 8),
             Text(
               message,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Colors.grey.shade600,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.copyWith(color: Colors.grey.shade600),
               textAlign: TextAlign.center,
             ),
             if (onRetry != null) ...[
@@ -260,14 +256,20 @@ class NetworkErrorOverlay extends StatelessWidget {
                 const Expanded(
                   child: Text(
                     'No internet connection',
-                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500),
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ),
                 TextButton(
                   onPressed: onRetry,
                   child: const Text(
                     'RETRY',
-                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ],
@@ -281,11 +283,7 @@ class NetworkErrorOverlay extends StatelessWidget {
 
 // Loading Overlay
 class LoadingOverlay extends StatelessWidget {
-  const LoadingOverlay({
-    super.key,
-    required this.isLoading,
-    this.message,
-  });
+  const LoadingOverlay({super.key, required this.isLoading, this.message});
 
   final bool isLoading;
   final String? message;

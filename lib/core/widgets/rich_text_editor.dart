@@ -49,10 +49,7 @@ class _SimpleRichTextEditorState extends State<SimpleRichTextEditor> {
   @override
   Widget build(BuildContext context) {
     return Column(
-      children: [
-        if (!widget.readOnly) _buildToolbar(),
-        _buildEditor(),
-      ],
+      children: [if (!widget.readOnly) _buildToolbar(), _buildEditor()],
     );
   }
 
@@ -92,11 +89,11 @@ class _SimpleRichTextEditorState extends State<SimpleRichTextEditor> {
             onPressed: () => setState(() => _isUnderline = !_isUnderline),
             tooltip: 'Gạch chân',
           ),
-          
+
           const SizedBox(width: AppSpacing.sm),
           Container(width: 1, height: 24, color: AppColors.grey300),
           const SizedBox(width: AppSpacing.sm),
-          
+
           // Text alignment
           _buildToolbarButton(
             icon: Icons.format_align_left,
@@ -116,11 +113,11 @@ class _SimpleRichTextEditorState extends State<SimpleRichTextEditor> {
             onPressed: () => setState(() => _textAlign = TextAlign.right),
             tooltip: 'Căn phải',
           ),
-          
+
           const SizedBox(width: AppSpacing.sm),
           Container(width: 1, height: 24, color: AppColors.grey300),
           const SizedBox(width: AppSpacing.sm),
-          
+
           // Lists
           _buildToolbarButton(
             icon: Icons.format_list_bulleted,
@@ -132,11 +129,11 @@ class _SimpleRichTextEditorState extends State<SimpleRichTextEditor> {
             onPressed: () => _insertText('1. '),
             tooltip: 'Danh sách số',
           ),
-          
+
           const SizedBox(width: AppSpacing.sm),
           Container(width: 1, height: 24, color: AppColors.grey300),
           const SizedBox(width: AppSpacing.sm),
-          
+
           // Other formatting
           _buildToolbarButton(
             icon: Icons.link,
@@ -168,7 +165,7 @@ class _SimpleRichTextEditorState extends State<SimpleRichTextEditor> {
           padding: const EdgeInsets.all(AppSpacing.xs),
           decoration: BoxDecoration(
             color: isActive
-                ? AppColors.primary.withOpacity(0.1)
+                ? AppColors.primary.withValues(alpha: 0.1)
                 : Colors.transparent,
             borderRadius: BorderRadius.circular(AppRadius.xs),
           ),
@@ -204,7 +201,9 @@ class _SimpleRichTextEditorState extends State<SimpleRichTextEditor> {
         style: TextStyle(
           fontWeight: _isBold ? FontWeight.bold : FontWeight.normal,
           fontStyle: _isItalic ? FontStyle.italic : FontStyle.normal,
-          decoration: _isUnderline ? TextDecoration.underline : TextDecoration.none,
+          decoration: _isUnderline
+              ? TextDecoration.underline
+              : TextDecoration.none,
         ),
         decoration: InputDecoration(
           hintText: widget.placeholder ?? 'Nhập nội dung...',
@@ -219,16 +218,17 @@ class _SimpleRichTextEditorState extends State<SimpleRichTextEditor> {
   void _insertText(String text) {
     final cursorPosition = _controller.selection.start;
     final currentText = _controller.text;
-    
-    final newText = currentText.substring(0, cursorPosition) +
+
+    final newText =
+        currentText.substring(0, cursorPosition) +
         text +
         currentText.substring(cursorPosition);
-    
+
     _controller.text = newText;
     _controller.selection = TextSelection.fromPosition(
       TextPosition(offset: cursorPosition + text.length),
     );
-    
+
     widget.onTextChanged?.call(newText);
   }
 
@@ -392,11 +392,7 @@ class RichTextViewer extends StatelessWidget {
   final String content;
   final TextStyle? style;
 
-  const RichTextViewer({
-    super.key,
-    required this.content,
-    this.style,
-  });
+  const RichTextViewer({super.key, required this.content, this.style});
 
   @override
   Widget build(BuildContext context) {
@@ -431,22 +427,12 @@ class RichTextViewer extends StatelessWidget {
   Widget _parseLineToWidget(BuildContext context, String line) {
     // Handle headers
     if (line.startsWith('# ')) {
-      return Text(
-        line.substring(2),
-        style: AppTypography.h4,
-      );
+      return Text(line.substring(2), style: AppTypography.h4);
     } else if (line.startsWith('## ')) {
-      return Text(
-        line.substring(3),
-        style: AppTypography.h5,
-      );
+      return Text(line.substring(3), style: AppTypography.h5);
     } else if (line.startsWith('### ')) {
-      return Text(
-        line.substring(4),
-        style: AppTypography.h6,
-      );
+      return Text(line.substring(4), style: AppTypography.h6);
     }
-    
     // Handle lists
     else if (line.startsWith('• ') || line.startsWith('- ')) {
       return Padding(
@@ -496,7 +482,7 @@ class RichTextViewer extends StatelessWidget {
         );
       }
     }
-    
+
     // Handle links and images in text
     return _buildRichText(context, line);
   }
@@ -505,57 +491,63 @@ class RichTextViewer extends StatelessWidget {
     final spans = <InlineSpan>[];
     final linkRegex = RegExp(r'\[([^\]]+)\]\(([^)]+)\)');
     final imageRegex = RegExp(r'!\[([^\]]*)\]\(([^)]+)\)');
-    
+
     int lastIndex = 0;
-    
+
     // Find all matches
     final allMatches = <RegExpMatch>[];
     allMatches.addAll(linkRegex.allMatches(text));
     allMatches.addAll(imageRegex.allMatches(text));
     allMatches.sort((a, b) => a.start.compareTo(b.start));
-    
+
     for (final match in allMatches) {
       // Add text before the match
       if (match.start > lastIndex) {
-        spans.add(TextSpan(
-          text: text.substring(lastIndex, match.start),
-          style: style ?? AppTypography.bodyMedium,
-        ));
+        spans.add(
+          TextSpan(
+            text: text.substring(lastIndex, match.start),
+            style: style ?? AppTypography.bodyMedium,
+          ),
+        );
       }
-      
+
       // Add the match
       if (match.pattern == linkRegex) {
-        spans.add(TextSpan(
-          text: match.group(1),
-          style: AppTypography.bodyMedium.copyWith(
-            color: AppColors.primary,
-            decoration: TextDecoration.underline,
+        spans.add(
+          TextSpan(
+            text: match.group(1),
+            style: AppTypography.bodyMedium.copyWith(
+              color: AppColors.primary,
+              decoration: TextDecoration.underline,
+            ),
           ),
-        ));
+        );
       } else if (match.pattern == imageRegex) {
-        spans.add(TextSpan(
-          text: '[Hình ảnh: ${match.group(1)}]',
-          style: AppTypography.bodyMedium.copyWith(
-            color: AppColors.secondary,
-            fontStyle: FontStyle.italic,
+        spans.add(
+          TextSpan(
+            text: '[Hình ảnh: ${match.group(1)}]',
+            style: AppTypography.bodyMedium.copyWith(
+              color: AppColors.secondary,
+              fontStyle: FontStyle.italic,
+            ),
           ),
-        ));
+        );
       }
-      
+
       lastIndex = match.end;
     }
-    
+
     // Add remaining text
     if (lastIndex < text.length) {
-      spans.add(TextSpan(
-        text: text.substring(lastIndex),
-        style: style ?? AppTypography.bodyMedium,
-      ));
+      spans.add(
+        TextSpan(
+          text: text.substring(lastIndex),
+          style: style ?? AppTypography.bodyMedium,
+        ),
+      );
     }
-    
-    return RichText(
-      text: TextSpan(children: spans),
-    );
+
+    return RichText(text: TextSpan(children: spans));
   }
 }
 
@@ -604,10 +596,7 @@ class _MarkdownEditorState extends State<MarkdownEditor>
           child: widget.showPreview
               ? TabBarView(
                   controller: _tabController,
-                  children: [
-                    _buildEditor(),
-                    _buildPreview(),
-                  ],
+                  children: [_buildEditor(), _buildPreview()],
                 )
               : _buildEditor(),
         ),
@@ -655,7 +644,8 @@ class _MarkdownEditorState extends State<MarkdownEditor>
         maxLines: null,
         expands: true,
         decoration: const InputDecoration(
-          hintText: 'Nhập nội dung Markdown...\n\n'
+          hintText:
+              'Nhập nội dung Markdown...\n\n'
               '# Tiêu đề lớn\n'
               '## Tiêu đề nhỏ\n'
               '**Đậm** *Nghiêng*\n'
@@ -671,9 +661,7 @@ class _MarkdownEditorState extends State<MarkdownEditor>
 
   Widget _buildPreview() {
     return SingleChildScrollView(
-      child: RichTextViewer(
-        content: _controller.text,
-      ),
+      child: RichTextViewer(content: _controller.text),
     );
   }
 }

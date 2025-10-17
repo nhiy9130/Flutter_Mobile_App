@@ -16,20 +16,28 @@ class FileService {
 
   Future<List<CourseFile>> getFilesByCourse(String courseId) async {
     final box = Hive.box<Map>(_boxName);
-    final items = box.values
-        .map((e) => _fromMap(Map<String, dynamic>.from(e)))
-        .where((f) => f.courseId == courseId)
-        .toList()
-      ..sort((a, b) => b.uploadedAt.compareTo(a.uploadedAt));
+    final items =
+        box.values
+            .map((e) => _fromMap(Map<String, dynamic>.from(e)))
+            .where((f) => f.courseId == courseId)
+            .toList()
+          ..sort((a, b) => b.uploadedAt.compareTo(a.uploadedAt));
     return items;
   }
 
-  Future<List<CourseFile>> searchFiles(String courseId, {String? term, String? category}) async {
+  Future<List<CourseFile>> searchFiles(
+    String courseId, {
+    String? term,
+    String? category,
+  }) async {
     final all = await getFilesByCourse(courseId);
     return all.where((f) {
-      final okTerm = term == null || term.isEmpty ||
+      final okTerm =
+          term == null ||
+          term.isEmpty ||
           f.originalName.toLowerCase().contains(term.toLowerCase());
-      final okCat = category == null || category == 'all' || f.category == category;
+      final okCat =
+          category == null || category == 'all' || f.category == category;
       return okTerm && okCat;
     }).toList();
   }
@@ -43,13 +51,17 @@ class FileService {
     return null;
   }
 
-  Future<CourseFile?> pickAndUpload(String courseId, {String category = 'document'}) async {
+  Future<CourseFile?> pickAndUpload(
+    String courseId, {
+    String category = 'document',
+  }) async {
     final result = await FilePicker.platform.pickFiles();
     if (result == null) return null;
     final file = result.files.single;
 
     final tmpDir = await getApplicationDocumentsDirectory();
-    final destPath = '${tmpDir.path}/${DateTime.now().millisecondsSinceEpoch}_${file.name}';
+    final destPath =
+        '${tmpDir.path}/${DateTime.now().millisecondsSinceEpoch}_${file.name}';
     if (file.path != null) {
       await File(file.path!).copy(destPath);
     } else if (file.bytes != null) {
@@ -62,12 +74,16 @@ class FileService {
       id: 'file-${DateTime.now().millisecondsSinceEpoch}',
       courseId: courseId,
       originalName: file.name,
-      mimeType: file.extension != null ? _mimeFromExt(file.extension!) : 'application/octet-stream',
+      mimeType: file.extension != null
+          ? _mimeFromExt(file.extension!)
+          : 'application/octet-stream',
       size: file.size,
       uploadedAt: DateTime.now(),
       category: category,
       localPath: destPath,
-      previewable: _isPreviewable(file.extension != null ? _mimeFromExt(file.extension!) : ''),
+      previewable: _isPreviewable(
+        file.extension != null ? _mimeFromExt(file.extension!) : '',
+      ),
     );
     await _save(cf);
     return cf;
@@ -135,32 +151,30 @@ class FileService {
   }
 
   Map<String, dynamic> _toMap(CourseFile f) => {
-        'id': f.id,
-        'courseId': f.courseId,
-        'originalName': f.originalName,
-        'mimeType': f.mimeType,
-        'size': f.size,
-        'uploadedAt': f.uploadedAt.toIso8601String(),
-        'category': f.category,
-        'localPath': f.localPath,
-        'previewable': f.previewable,
-        'downloadCount': f.downloadCount,
-      };
+    'id': f.id,
+    'courseId': f.courseId,
+    'originalName': f.originalName,
+    'mimeType': f.mimeType,
+    'size': f.size,
+    'uploadedAt': f.uploadedAt.toIso8601String(),
+    'category': f.category,
+    'localPath': f.localPath,
+    'previewable': f.previewable,
+    'downloadCount': f.downloadCount,
+  };
 
   CourseFile _fromMap(Map<String, dynamic> m) => CourseFile(
-        id: m['id'] as String,
-        courseId: m['courseId'] as String,
-        originalName: m['originalName'] as String,
-        mimeType: m['mimeType'] as String,
-        size: m['size'] as int,
-        uploadedAt: DateTime.parse(m['uploadedAt'] as String),
-        category: m['category'] as String,
-        localPath: m['localPath'] as String?,
-        previewable: m['previewable'] as bool? ?? false,
-        downloadCount: m['downloadCount'] as int? ?? 0,
-      );
+    id: m['id'] as String,
+    courseId: m['courseId'] as String,
+    originalName: m['originalName'] as String,
+    mimeType: m['mimeType'] as String,
+    size: m['size'] as int,
+    uploadedAt: DateTime.parse(m['uploadedAt'] as String),
+    category: m['category'] as String,
+    localPath: m['localPath'] as String?,
+    previewable: m['previewable'] as bool? ?? false,
+    downloadCount: m['downloadCount'] as int? ?? 0,
+  );
 }
 
 final fileService = FileService();
-
-

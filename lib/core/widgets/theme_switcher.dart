@@ -94,10 +94,7 @@ class ThemeToggleButton extends ConsumerWidget {
         icon: AnimatedSwitcher(
           duration: const Duration(milliseconds: 300),
           transitionBuilder: (child, animation) {
-            return RotationTransition(
-              turns: animation,
-              child: child,
-            );
+            return RotationTransition(turns: animation, child: child);
           },
           child: Icon(
             isDark ? Icons.light_mode : Icons.dark_mode,
@@ -134,21 +131,20 @@ class ThemeSettingsCard extends ConsumerWidget {
                   size: AppSizes.iconMd,
                 ),
                 const SizedBox(width: AppSpacing.sm),
-                Text(
-                  'Giao diện',
-                  style: AppTypography.h6,
-                ),
+                Text('Giao diện', style: AppTypography.h6),
               ],
             ),
             const SizedBox(height: AppSpacing.md),
             Text(
               'Chọn chế độ hiển thị phù hợp với bạn',
               style: AppTypography.bodyMedium.copyWith(
-                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                color: Theme.of(
+                  context,
+                ).colorScheme.onSurface.withValues(alpha: 0.7),
               ),
             ),
             const SizedBox(height: AppSpacing.lg),
-            
+
             // Theme Options
             _buildThemeOption(
               context,
@@ -208,11 +204,11 @@ class ThemeSettingsCard extends ConsumerWidget {
           border: Border.all(
             color: isSelected
                 ? AppColors.primary
-                : Theme.of(context).colorScheme.outline.withOpacity(0.2),
+                : Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
             width: isSelected ? 2 : 1,
           ),
           color: isSelected
-              ? AppColors.primary.withOpacity(0.05)
+              ? AppColors.primary.withValues(alpha: 0.05)
               : Colors.transparent,
         ),
         child: Row(
@@ -221,7 +217,7 @@ class ThemeSettingsCard extends ConsumerWidget {
               padding: const EdgeInsets.all(AppSpacing.sm),
               decoration: BoxDecoration(
                 color: isSelected
-                    ? AppColors.primary.withOpacity(0.1)
+                    ? AppColors.primary.withValues(alpha: 0.1)
                     : Theme.of(context).colorScheme.surface,
                 borderRadius: BorderRadius.circular(AppRadius.sm),
               ),
@@ -229,7 +225,9 @@ class ThemeSettingsCard extends ConsumerWidget {
                 icon,
                 color: isSelected
                     ? AppColors.primary
-                    : Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                    : Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withValues(alpha: 0.6),
                 size: AppSizes.iconMd,
               ),
             ),
@@ -241,7 +239,9 @@ class ThemeSettingsCard extends ConsumerWidget {
                   Text(
                     title,
                     style: AppTypography.bodyLarge.copyWith(
-                      fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                      fontWeight: isSelected
+                          ? FontWeight.w600
+                          : FontWeight.w500,
                       color: isSelected ? AppColors.primary : null,
                     ),
                   ),
@@ -249,7 +249,9 @@ class ThemeSettingsCard extends ConsumerWidget {
                   Text(
                     subtitle,
                     style: AppTypography.bodySmall.copyWith(
-                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withValues(alpha: 0.6),
                     ),
                   ),
                 ],
@@ -283,7 +285,8 @@ class ThemePreviewCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final isDarkPreview = previewMode == ThemeMode.dark ||
+    final isDarkPreview =
+        previewMode == ThemeMode.dark ||
         (previewMode == ThemeMode.system &&
             MediaQuery.of(context).platformBrightness == Brightness.dark);
 
@@ -306,7 +309,9 @@ class ThemePreviewCard extends ConsumerWidget {
             Container(
               height: 40,
               decoration: BoxDecoration(
-                color: isDarkPreview ? AppColors.darkSurface : AppColors.grey100,
+                color: isDarkPreview
+                    ? AppColors.darkSurface
+                    : AppColors.grey100,
                 borderRadius: BorderRadius.circular(AppRadius.sm),
               ),
               child: Row(
@@ -316,7 +321,7 @@ class ThemePreviewCard extends ConsumerWidget {
                     width: 20,
                     height: 20,
                     decoration: BoxDecoration(
-                      color: AppColors.primary.withOpacity(0.7),
+                      color: AppColors.primary.withValues(alpha: 0.7),
                       shape: BoxShape.circle,
                     ),
                   ),
@@ -325,8 +330,11 @@ class ThemePreviewCard extends ConsumerWidget {
                     child: Container(
                       height: 8,
                       decoration: BoxDecoration(
-                        color: (isDarkPreview ? AppColors.white : AppColors.grey600)
-                            .withOpacity(0.3),
+                        color:
+                            (isDarkPreview
+                                    ? AppColors.white
+                                    : AppColors.grey600)
+                                .withValues(alpha: 0.3),
                         borderRadius: BorderRadius.circular(4),
                       ),
                     ),
@@ -336,7 +344,7 @@ class ThemePreviewCard extends ConsumerWidget {
               ),
             ),
             const SizedBox(height: AppSpacing.sm),
-            
+
             // Simulated content
             Container(
               height: 60,
@@ -346,7 +354,9 @@ class ThemePreviewCard extends ConsumerWidget {
                 borderRadius: BorderRadius.circular(AppRadius.sm),
                 boxShadow: [
                   BoxShadow(
-                    color: AppColors.shadow.withOpacity(isDarkPreview ? 0.3 : 0.1),
+                    color: AppColors.shadow.withValues(
+                      alpha: isDarkPreview ? 0.3 : 0.1,
+                    ),
                     blurRadius: 4,
                     offset: const Offset(0, 2),
                   ),
@@ -358,7 +368,7 @@ class ThemePreviewCard extends ConsumerWidget {
                     width: 32,
                     height: 32,
                     decoration: BoxDecoration(
-                      color: AppColors.secondary.withOpacity(0.7),
+                      color: AppColors.secondary.withValues(alpha: 0.7),
                       borderRadius: BorderRadius.circular(AppRadius.sm),
                     ),
                   ),
@@ -371,8 +381,11 @@ class ThemePreviewCard extends ConsumerWidget {
                           height: 8,
                           width: double.infinity,
                           decoration: BoxDecoration(
-                            color: (isDarkPreview ? AppColors.white : AppColors.grey700)
-                                .withOpacity(0.8),
+                            color:
+                                (isDarkPreview
+                                        ? AppColors.white
+                                        : AppColors.grey700)
+                                    .withValues(alpha: 0.8),
                             borderRadius: BorderRadius.circular(4),
                           ),
                         ),
@@ -381,8 +394,11 @@ class ThemePreviewCard extends ConsumerWidget {
                           height: 6,
                           width: 80,
                           decoration: BoxDecoration(
-                            color: (isDarkPreview ? AppColors.white : AppColors.grey600)
-                                .withOpacity(0.5),
+                            color:
+                                (isDarkPreview
+                                        ? AppColors.white
+                                        : AppColors.grey600)
+                                    .withValues(alpha: 0.5),
                             borderRadius: BorderRadius.circular(3),
                           ),
                         ),
@@ -392,7 +408,7 @@ class ThemePreviewCard extends ConsumerWidget {
                 ],
               ),
             ),
-            
+
             if (isSelected) ...[
               const SizedBox(height: AppSpacing.sm),
               Icon(

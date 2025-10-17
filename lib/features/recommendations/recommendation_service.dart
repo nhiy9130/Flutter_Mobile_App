@@ -13,11 +13,15 @@ class Recommendation {
   final Course course;
   final String reason;
   final double confidence; // 0..1
-  final String category; // similar_users | content_based | trending | completion_pattern
+  final String
+  category; // similar_users | content_based | trending | completion_pattern
 }
 
 class RecommendationService {
-  Future<List<Recommendation>> getRecommendations(int userId, {int limit = 3}) async {
+  Future<List<Recommendation>> getRecommendations(
+    int userId, {
+    int limit = 3,
+  }) async {
     await Future.delayed(const Duration(milliseconds: 200));
     final demoCourses = _demoCourses();
     return [
@@ -46,37 +50,34 @@ class RecommendationService {
   }
 
   List<Course> _demoCourses() => const [
-        Course(
-          id: '1',
-          title: 'Introduction to React Development',
-          description: 'Learn React fundamentals: components, hooks, state.',
-          code: 'CS101',
-          instructorName: 'Dr. John Smith',
-          thumbnailUrl: null,
-          enrollmentCount: 23,
-        ),
-        Course(
-          id: '2',
-          title: 'Advanced JavaScript Concepts',
-          description: 'Closures, prototypes, async programming, ES6+.',
-          code: 'CS201',
-          instructorName: 'Prof. Sarah Wilson',
-          thumbnailUrl: null,
-          enrollmentCount: 18,
-        ),
-        Course(
-          id: '3',
-          title: 'Full-Stack Web Development',
-          description: 'Frontend + Backend with Node.js, React, DBs.',
-          code: 'CS301',
-          instructorName: 'Dr. John Smith',
-          thumbnailUrl: null,
-          enrollmentCount: 35,
-        ),
-      ];
+    Course(
+      id: '1',
+      title: 'Introduction to React Development',
+      description: 'Learn React fundamentals: components, hooks, state.',
+      code: 'CS101',
+      instructorName: 'Dr. John Smith',
+      thumbnailUrl: null,
+      enrollmentCount: 23,
+    ),
+    Course(
+      id: '2',
+      title: 'Advanced JavaScript Concepts',
+      description: 'Closures, prototypes, async programming, ES6+.',
+      code: 'CS201',
+      instructorName: 'Prof. Sarah Wilson',
+      thumbnailUrl: null,
+      enrollmentCount: 18,
+    ),
+    Course(
+      id: '3',
+      title: 'Full-Stack Web Development',
+      description: 'Frontend + Backend with Node.js, React, DBs.',
+      code: 'CS301',
+      instructorName: 'Dr. John Smith',
+      thumbnailUrl: null,
+      enrollmentCount: 35,
+    ),
+  ];
 }
 
 final recommendationService = RecommendationService();
-
-
-

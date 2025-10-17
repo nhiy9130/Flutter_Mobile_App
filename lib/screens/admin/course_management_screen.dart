@@ -5,10 +5,11 @@ class CourseManagementScreen extends ConsumerStatefulWidget {
   const CourseManagementScreen({super.key});
 
   @override
-  ConsumerState<CourseManagementScreen> createState() => _CourseManagementScreenState();
+  ConsumerState<CourseManagementScreen> createState() =>
+      _CourseManagementScreenState();
 }
 
-class _CourseManagementScreenState extends ConsumerState<CourseManagementScreen> 
+class _CourseManagementScreenState extends ConsumerState<CourseManagementScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   final _searchController = TextEditingController();
@@ -31,18 +32,12 @@ class _CourseManagementScreenState extends ConsumerState<CourseManagementScreen>
           ),
           PopupMenuButton(
             itemBuilder: (context) => [
-              const PopupMenuItem(
-                value: 'export',
-                child: Text('Xuất báo cáo'),
-              ),
+              const PopupMenuItem(value: 'export', child: Text('Xuất báo cáo')),
               const PopupMenuItem(
                 value: 'categories',
                 child: Text('Quản lý danh mục'),
               ),
-              const PopupMenuItem(
-                value: 'settings',
-                child: Text('Cài đặt'),
-              ),
+              const PopupMenuItem(value: 'settings', child: Text('Cài đặt')),
             ],
             onSelected: (value) => _handleMenuAction(context, value.toString()),
           ),
@@ -72,9 +67,7 @@ class _CourseManagementScreenState extends ConsumerState<CourseManagementScreen>
       builder: (context, constraints) {
         return SingleChildScrollView(
           child: ConstrainedBox(
-            constraints: BoxConstraints(
-              minHeight: constraints.maxHeight,
-            ),
+            constraints: BoxConstraints(minHeight: constraints.maxHeight),
             child: IntrinsicHeight(
               child: Column(
                 children: [
@@ -110,9 +103,7 @@ class _CourseManagementScreenState extends ConsumerState<CourseManagementScreen>
                   ),
                   const SizedBox(height: 16),
                   // Course List
-                  Expanded(
-                    child: _buildCourses(status),
-                  ),
+                  Expanded(child: _buildCourses(status)),
                 ],
               ),
             ),
@@ -124,7 +115,7 @@ class _CourseManagementScreenState extends ConsumerState<CourseManagementScreen>
 
   Widget _buildStatsRow(String status) {
     final stats = _getStatsForStatus(status);
-    
+
     return Row(
       children: stats.entries.map((entry) {
         return Expanded(
@@ -157,23 +148,11 @@ class _CourseManagementScreenState extends ConsumerState<CourseManagementScreen>
   Map<String, int> _getStatsForStatus(String status) {
     switch (status) {
       case 'active':
-        return {
-          'Tổng cộng': 156,
-          'Miễn phí': 45,
-          'Trả phí': 111,
-        };
+        return {'Tổng cộng': 156, 'Miễn phí': 45, 'Trả phí': 111};
       case 'pending':
-        return {
-          'Chờ duyệt': 12,
-          'Cần sửa': 5,
-          'Mới tạo': 7,
-        };
+        return {'Chờ duyệt': 12, 'Cần sửa': 5, 'Mới tạo': 7};
       case 'suspended':
-        return {
-          'Tạm dừng': 8,
-          'Vi phạm': 3,
-          'Hết hạn': 5,
-        };
+        return {'Tạm dừng': 8, 'Vi phạm': 3, 'Hết hạn': 5};
       default:
         return {};
     }
@@ -264,7 +243,7 @@ class _CourseManagementScreenState extends ConsumerState<CourseManagementScreen>
               width: 60,
               height: 60,
               decoration: BoxDecoration(
-                color: theme.colorScheme.primary.withOpacity(0.1),
+                color: theme.colorScheme.primary.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Center(
@@ -310,7 +289,12 @@ class _CourseManagementScreenState extends ConsumerState<CourseManagementScreen>
             // Actions
             PopupMenuButton(
               itemBuilder: (context) => _buildCourseActions(status),
-              onSelected: (value) => _handleCourseAction(context, course['id'], value.toString(), status),
+              onSelected: (value) => _handleCourseAction(
+                context,
+                course['id'],
+                value.toString(),
+                status,
+              ),
             ),
           ],
         ),
@@ -318,7 +302,11 @@ class _CourseManagementScreenState extends ConsumerState<CourseManagementScreen>
     );
   }
 
-  Widget _buildCourseStats(Map<String, dynamic> course, String status, ThemeData theme) {
+  Widget _buildCourseStats(
+    Map<String, dynamic> course,
+    String status,
+    ThemeData theme,
+  ) {
     switch (status) {
       case 'active':
         return Row(
@@ -421,8 +409,10 @@ class _CourseManagementScreenState extends ConsumerState<CourseManagementScreen>
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Thông báo'),
-        content: const Text('Chỉ giáo viên mới có thể tạo khóa học. '
-            'Bạn có thể duyệt và quản lý các khóa học đã được tạo.'),
+        content: const Text(
+          'Chỉ giáo viên mới có thể tạo khóa học. '
+          'Bạn có thể duyệt và quản lý các khóa học đã được tạo.',
+        ),
         actions: [
           ElevatedButton(
             onPressed: () => Navigator.of(context).pop(),
@@ -445,19 +435,24 @@ class _CourseManagementScreenState extends ConsumerState<CourseManagementScreen>
         );
         break;
       case 'categories':
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Mở quản lý danh mục...')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Mở quản lý danh mục...')));
         break;
       case 'settings':
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Mở cài đặt khóa học...')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Mở cài đặt khóa học...')));
         break;
     }
   }
 
-  void _handleCourseAction(BuildContext context, String courseId, String action, String status) {
+  void _handleCourseAction(
+    BuildContext context,
+    String courseId,
+    String action,
+    String status,
+  ) {
     switch (action) {
       case 'view':
         // TODO: Navigate to course detail
@@ -480,9 +475,9 @@ class _CourseManagementScreenState extends ConsumerState<CourseManagementScreen>
         _showSuspendDialog(context, courseId);
         break;
       case 'restore':
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Đã khôi phục khóa học')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Đã khôi phục khóa học')));
         break;
       case 'delete':
         _showDeleteDialog(context, courseId);
@@ -598,8 +593,10 @@ class _CourseManagementScreenState extends ConsumerState<CourseManagementScreen>
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Xóa khóa học'),
-        content: const Text('Bạn có chắc chắn muốn xóa khóa học này? '
-            'Hành động này không thể hoàn tác.'),
+        content: const Text(
+          'Bạn có chắc chắn muốn xóa khóa học này? '
+          'Hành động này không thể hoàn tác.',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
@@ -608,9 +605,9 @@ class _CourseManagementScreenState extends ConsumerState<CourseManagementScreen>
           ElevatedButton(
             onPressed: () {
               Navigator.of(context).pop();
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Đã xóa khóa học')),
-              );
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(const SnackBar(content: Text('Đã xóa khóa học')));
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
             child: const Text('Xóa'),

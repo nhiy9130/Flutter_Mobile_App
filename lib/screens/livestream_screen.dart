@@ -54,14 +54,14 @@ class _LiveStreamScreenState extends State<LiveStreamScreen> {
               child: Container(
                 color: Colors.black12,
                 alignment: Alignment.center,
-                child: Text(started ? 'Local stream started (demo)' : 'Not streaming'),
+                child: Text(
+                  started ? 'Local stream started (demo)' : 'Not streaming',
+                ),
               ),
-            )
+            ),
           ],
         ),
       ),
     );
   }
 }
-
-

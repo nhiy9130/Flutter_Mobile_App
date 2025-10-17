@@ -57,22 +57,26 @@ class QuizAttempt {
   double? maxScore;
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'quizId': quizId,
-        'courseId': courseId,
-        'userId': userId,
-        'startTime': startTime.toIso8601String(),
-        'endTime': endTime?.toIso8601String(),
-        'answers': answers.map((a) => {
-          'questionId': a.questionId,
-          'answer': a.answer,
-          'timeSpent': a.timeSpent,
-          'isCorrect': a.isCorrect,
-          'score': a.score,
-        }).toList(),
-        'totalScore': totalScore,
-        'maxScore': maxScore,
-      };
+    'id': id,
+    'quizId': quizId,
+    'courseId': courseId,
+    'userId': userId,
+    'startTime': startTime.toIso8601String(),
+    'endTime': endTime?.toIso8601String(),
+    'answers': answers
+        .map(
+          (a) => {
+            'questionId': a.questionId,
+            'answer': a.answer,
+            'timeSpent': a.timeSpent,
+            'isCorrect': a.isCorrect,
+            'score': a.score,
+          },
+        )
+        .toList(),
+    'totalScore': totalScore,
+    'maxScore': maxScore,
+  };
 
   factory QuizAttempt.fromJson(Map<String, dynamic> json) {
     return QuizAttempt(
@@ -81,14 +85,22 @@ class QuizAttempt {
       courseId: json['courseId'] as String,
       userId: json['userId'] as int,
       startTime: DateTime.parse(json['startTime'] as String),
-      endTime: json['endTime'] != null ? DateTime.parse(json['endTime'] as String) : null,
-      answers: (json['answers'] as List?)?.map((a) => QuizAnswer(
-        questionId: a['questionId'],
-        answer: a['answer'],
-        timeSpent: a['timeSpent'],
-        isCorrect: a['isCorrect'],
-        score: a['score'],
-      )).toList() ?? [],
+      endTime: json['endTime'] != null
+          ? DateTime.parse(json['endTime'] as String)
+          : null,
+      answers:
+          (json['answers'] as List?)
+              ?.map(
+                (a) => QuizAnswer(
+                  questionId: a['questionId'],
+                  answer: a['answer'],
+                  timeSpent: a['timeSpent'],
+                  isCorrect: a['isCorrect'],
+                  score: a['score'],
+                ),
+              )
+              .toList() ??
+          [],
       totalScore: json['totalScore'] as double?,
       maxScore: json['maxScore'] as double?,
     );
@@ -96,18 +108,22 @@ class QuizAttempt {
 }
 
 class QuizSession {
-  QuizSession({required this.quizId, required this.courseId, required this.questions, required this.userId})
-      : currentIndex = 0,
-        isActive = true,
-        timeRemaining = questions.isNotEmpty ? questions.first.timeLimitSec : 0,
-        attempt = QuizAttempt(
-          id: 'attempt-${DateTime.now().millisecondsSinceEpoch}',
-          quizId: quizId,
-          courseId: courseId,
-          userId: userId,
-          startTime: DateTime.now(),
-        );
-        
+  QuizSession({
+    required this.quizId,
+    required this.courseId,
+    required this.questions,
+    required this.userId,
+  }) : currentIndex = 0,
+       isActive = true,
+       timeRemaining = questions.isNotEmpty ? questions.first.timeLimitSec : 0,
+       attempt = QuizAttempt(
+         id: 'attempt-${DateTime.now().millisecondsSinceEpoch}',
+         quizId: quizId,
+         courseId: courseId,
+         userId: userId,
+         startTime: DateTime.now(),
+       );
+
   final String quizId;
   final String courseId;
   final int userId;
@@ -154,7 +170,8 @@ class QuizService {
       ),
       const QuizQuestion(
         id: 'q2',
-        question: 'React Hooks are functions that let you use state in functional components?',
+        question:
+            'React Hooks are functions that let you use state in functional components?',
         type: 'truefalse',
         options: ['True', 'False'],
         correctAnswer: 'True',
@@ -179,7 +196,12 @@ class QuizService {
         points: 5,
       ),
     ];
-    _session = QuizSession(quizId: 'quiz-${DateTime.now().millisecondsSinceEpoch}', courseId: courseId, questions: questions, userId: userId);
+    _session = QuizSession(
+      quizId: 'quiz-${DateTime.now().millisecondsSinceEpoch}',
+      courseId: courseId,
+      questions: questions,
+      userId: userId,
+    );
     return _session!;
   }
 
@@ -187,7 +209,7 @@ class QuizService {
 
   void submitAnswer(String answer, int timeSpent) {
     if (_session == null) return;
-    
+
     final currentQ = _session!.currentQuestion;
     final quizAnswer = QuizAnswer(
       questionId: currentQ.id,
@@ -211,14 +233,18 @@ class QuizService {
     switch (question.type) {
       case 'multiple':
       case 'truefalse':
-        answer.isCorrect = answer.answer.toLowerCase() == question.correctAnswer!.toLowerCase();
+        answer.isCorrect =
+            answer.answer.toLowerCase() ==
+            question.correctAnswer!.toLowerCase();
         answer.score = answer.isCorrect! ? question.points.toDouble() : 0.0;
         break;
       case 'short':
         // Simple contains check for short answer
         final normalizedAnswer = answer.answer.toLowerCase().trim();
         final normalizedCorrect = question.correctAnswer!.toLowerCase().trim();
-        answer.isCorrect = normalizedAnswer.contains(normalizedCorrect) || normalizedCorrect.contains(normalizedAnswer);
+        answer.isCorrect =
+            normalizedAnswer.contains(normalizedCorrect) ||
+            normalizedCorrect.contains(normalizedAnswer);
         answer.score = answer.isCorrect! ? question.points.toDouble() : 0.0;
         break;
       default:
@@ -231,7 +257,8 @@ class QuizService {
     if (_session == null) return false;
     if (_session!.currentIndex < _session!.questions.length - 1) {
       _session!.currentIndex++;
-      _session!.timeRemaining = _session!.questions[_session!.currentIndex].timeLimitSec;
+      _session!.timeRemaining =
+          _session!.questions[_session!.currentIndex].timeLimitSec;
       return true;
     }
     end();
@@ -240,7 +267,7 @@ class QuizService {
 
   Future<QuizAttempt> end() async {
     if (_session == null) throw Exception('No active session');
-    
+
     _session!.isActive = false;
     _session!.attempt.endTime = DateTime.now();
 
@@ -258,7 +285,7 @@ class QuizService {
 
     // Save to Hive
     await _saveAttempt(_session!.attempt);
-    
+
     return _session!.attempt;
   }
 
@@ -267,7 +294,8 @@ class QuizService {
       final box = await Hive.openBox<Map>('quiz_attempts');
       await box.add(attempt.toJson());
     } catch (e) {
-      print('Error saving attempt: $e');
+      // TODO: Replace with proper logging framework
+      // print('Error saving attempt: $e');
     }
   }
 
@@ -281,7 +309,8 @@ class QuizService {
       attempts.sort((a, b) => b.startTime.compareTo(a.startTime));
       return attempts;
     } catch (e) {
-      print('Error loading attempts: $e');
+      // TODO: Replace with proper logging framework
+      // print('Error loading attempts: $e');
       return [];
     }
   }
@@ -319,7 +348,8 @@ class QuizService {
         completionRate: 100.0, // Mock: assume all completed
       );
     } catch (e) {
-      print('Error calculating statistics: $e');
+      // TODO: Replace with proper logging framework
+      // print('Error calculating statistics: $e');
       return QuizStatistics(
         courseId: courseId,
         totalAttempts: 0,
@@ -333,5 +363,3 @@ class QuizService {
 }
 
 final quizService = QuizService();
-
-

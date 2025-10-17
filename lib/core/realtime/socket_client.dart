@@ -25,6 +25,3 @@ class SocketClient {
   void off(String event, [SocketCallback? cb]) => _socket.off(event, cb);
   void emit(String event, dynamic data) => _socket.emit(event, data);
 }
-
-
-

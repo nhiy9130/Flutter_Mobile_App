@@ -13,11 +13,7 @@ enum ButtonVariant {
   warning,
 }
 
-enum ButtonSize {
-  small,
-  medium,
-  large,
-}
+enum ButtonSize { small, medium, large }
 
 class CustomButton extends StatelessWidget {
   const CustomButton({
@@ -46,7 +42,7 @@ class CustomButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final effectiveOnPressed = isEnabled && !isLoading ? onPressed : null;
-    
+
     return SizedBox(
       width: isExpanded ? double.infinity : null,
       height: _getHeight(),
@@ -80,11 +76,7 @@ class CustomButton extends StatelessWidget {
       return textWidget;
     }
 
-    final iconWidget = Icon(
-      icon,
-      size: _getIconSize(),
-      color: _getTextColor(),
-    );
+    final iconWidget = Icon(icon, size: _getIconSize(), color: _getTextColor());
 
     if (iconPosition == IconPosition.leading) {
       return Row(
@@ -109,7 +101,7 @@ class CustomButton extends StatelessWidget {
 
   ButtonStyle _getButtonStyle(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    
+
     return ElevatedButton.styleFrom(
       backgroundColor: _getBackgroundColor(colorScheme),
       foregroundColor: _getTextColor(),
@@ -125,11 +117,11 @@ class CustomButton extends StatelessWidget {
       ),
       minimumSize: Size(0, _getHeight()),
     ).copyWith(
-      overlayColor: MaterialStateProperty.resolveWith((states) {
-        if (states.contains(MaterialState.pressed)) {
+      overlayColor: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.pressed)) {
           return _getPressedOverlayColor();
         }
-        if (states.contains(MaterialState.hovered)) {
+        if (states.contains(WidgetState.hovered)) {
           return _getHoveredOverlayColor();
         }
         return null;
@@ -139,7 +131,7 @@ class CustomButton extends StatelessWidget {
 
   Color _getBackgroundColor(ColorScheme colorScheme) {
     if (!isEnabled) return AppColors.grey200;
-    
+
     switch (variant) {
       case ButtonVariant.primary:
         return AppColors.primary;
@@ -160,7 +152,7 @@ class CustomButton extends StatelessWidget {
 
   Color _getTextColor() {
     if (!isEnabled) return AppColors.grey400;
-    
+
     switch (variant) {
       case ButtonVariant.primary:
       case ButtonVariant.secondary:
@@ -204,9 +196,9 @@ class CustomButton extends StatelessWidget {
     switch (variant) {
       case ButtonVariant.outline:
       case ButtonVariant.ghost:
-        return AppColors.primary.withOpacity(0.1);
+        return AppColors.primary.withValues(alpha: 0.1);
       default:
-        return Colors.black.withOpacity(0.1);
+        return Colors.black.withValues(alpha: 0.1);
     }
   }
 
@@ -214,9 +206,9 @@ class CustomButton extends StatelessWidget {
     switch (variant) {
       case ButtonVariant.outline:
       case ButtonVariant.ghost:
-        return AppColors.primary.withOpacity(0.05);
+        return AppColors.primary.withValues(alpha: 0.05);
       default:
-        return Colors.black.withOpacity(0.05);
+        return Colors.black.withValues(alpha: 0.05);
     }
   }
 
@@ -287,7 +279,4 @@ class CustomButton extends StatelessWidget {
   }
 }
 
-enum IconPosition {
-  leading,
-  trailing,
-}
+enum IconPosition { leading, trailing }

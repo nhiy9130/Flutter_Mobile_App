@@ -13,13 +13,11 @@ class AdminDashboardScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final auth = ref.watch(authProvider);
-    
+
     return Scaffold(
       body: NestedScrollView(
         headerSliverBuilder: (context, innerBoxIsScrolled) {
-          return [
-            _buildSliverAppBar(context, auth),
-          ];
+          return [_buildSliverAppBar(context, auth)];
         },
         body: RefreshIndicator(
           onRefresh: () async {
@@ -33,23 +31,23 @@ class AdminDashboardScreen extends ConsumerWidget {
                 // Quick Stats
                 _buildQuickStats(),
                 const SizedBox(height: AppSpacing.lg),
-                
+
                 // Quick Actions
                 _buildQuickActions(context),
                 const SizedBox(height: AppSpacing.lg),
-                
+
                 // Recent Activity
                 _buildRecentActivity(),
                 const SizedBox(height: AppSpacing.lg),
-                
+
                 // System Overview
                 _buildSystemOverview(),
                 const SizedBox(height: AppSpacing.lg),
-                
+
                 // User Management
                 _buildUserManagement(context),
                 const SizedBox(height: AppSpacing.lg),
-                
+
                 // Course Management
                 _buildCourseManagement(context),
               ],
@@ -71,9 +69,7 @@ class AdminDashboardScreen extends ConsumerWidget {
           style: AppTypography.h5.copyWith(color: AppColors.white),
         ),
         background: Container(
-          decoration: BoxDecoration(
-            gradient: AppColors.adminGradient,
-          ),
+          decoration: BoxDecoration(gradient: AppColors.adminGradient),
           child: Padding(
             padding: const EdgeInsets.only(
               left: AppSpacing.screenHorizontal,
@@ -88,7 +84,7 @@ class AdminDashboardScreen extends ConsumerWidget {
                   children: [
                     CircleAvatar(
                       radius: 24,
-                      backgroundColor: AppColors.white.withOpacity(0.2),
+                      backgroundColor: AppColors.white.withValues(alpha: 0.2),
                       child: Icon(
                         Icons.admin_panel_settings,
                         color: AppColors.white,
@@ -102,13 +98,13 @@ class AdminDashboardScreen extends ConsumerWidget {
                         Text(
                           'Chào mừng, ${auth.user?.fullName}',
                           style: AppTypography.bodyLarge.copyWith(
-                            color: AppColors.white.withOpacity(0.9),
+                            color: AppColors.white.withValues(alpha: 0.9),
                           ),
                         ),
                         Text(
                           'Quản trị hệ thống LMS',
                           style: AppTypography.bodyMedium.copyWith(
-                            color: AppColors.white.withOpacity(0.8),
+                            color: AppColors.white.withValues(alpha: 0.8),
                           ),
                         ),
                       ],
@@ -127,10 +123,7 @@ class AdminDashboardScreen extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Tổng quan hệ thống',
-          style: AppTypography.h6,
-        ),
+        Text('Tổng quan hệ thống', style: AppTypography.h6),
         const SizedBox(height: AppSpacing.md),
         Row(
           children: [
@@ -201,14 +194,10 @@ class AdminDashboardScreen extends ConsumerWidget {
                 Container(
                   padding: const EdgeInsets.all(AppSpacing.sm),
                   decoration: BoxDecoration(
-                    color: color.withOpacity(0.1),
+                    color: color.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(AppRadius.md),
                   ),
-                  child: Icon(
-                    icon,
-                    color: color,
-                    size: AppSizes.iconMd,
-                  ),
+                  child: Icon(icon, color: color, size: AppSizes.iconMd),
                 ),
                 const Spacer(),
                 Icon(
@@ -221,23 +210,17 @@ class AdminDashboardScreen extends ConsumerWidget {
             const SizedBox(height: AppSpacing.md),
             Text(
               title,
-              style: AppTypography.bodySmall.copyWith(
-                color: AppColors.grey600,
-              ),
+              style: AppTypography.bodySmall.copyWith(color: AppColors.grey600),
             ),
             const SizedBox(height: AppSpacing.xs),
             Text(
               value,
-              style: AppTypography.h5.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
+              style: AppTypography.h5.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: AppSpacing.xs),
             Text(
               subtitle,
-              style: AppTypography.bodySmall.copyWith(
-                color: AppColors.success,
-              ),
+              style: AppTypography.bodySmall.copyWith(color: AppColors.success),
             ),
           ],
         ),
@@ -249,10 +232,7 @@ class AdminDashboardScreen extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Thao tác nhanh',
-          style: AppTypography.h6,
-        ),
+        Text('Thao tác nhanh', style: AppTypography.h6),
         const SizedBox(height: AppSpacing.md),
         GridView.count(
           shrinkWrap: true,
@@ -308,14 +288,10 @@ class AdminDashboardScreen extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.all(AppSpacing.md),
               decoration: BoxDecoration(
-                color: color.withOpacity(0.1),
+                color: color.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(AppRadius.lg),
               ),
-              child: Icon(
-                icon,
-                color: color,
-                size: AppSizes.iconLg,
-              ),
+              child: Icon(icon, color: color, size: AppSizes.iconLg),
             ),
             const SizedBox(height: AppSpacing.sm),
             Text(
@@ -338,10 +314,7 @@ class AdminDashboardScreen extends ConsumerWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              'Hoạt động gần đây',
-              style: AppTypography.h6,
-            ),
+            Text('Hoạt động gần đây', style: AppTypography.h6),
             TextButton(
               onPressed: () {},
               child: Text(
@@ -409,14 +382,10 @@ class AdminDashboardScreen extends ConsumerWidget {
           Container(
             padding: const EdgeInsets.all(AppSpacing.sm),
             decoration: BoxDecoration(
-              color: iconColor.withOpacity(0.1),
+              color: iconColor.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(AppRadius.sm),
             ),
-            child: Icon(
-              icon,
-              color: iconColor,
-              size: AppSizes.iconSm,
-            ),
+            child: Icon(icon, color: iconColor, size: AppSizes.iconSm),
           ),
           const SizedBox(width: AppSpacing.md),
           Expanded(
@@ -441,9 +410,7 @@ class AdminDashboardScreen extends ConsumerWidget {
           ),
           Text(
             time,
-            style: AppTypography.bodySmall.copyWith(
-              color: AppColors.grey500,
-            ),
+            style: AppTypography.bodySmall.copyWith(color: AppColors.grey500),
           ),
         ],
       ),
@@ -454,10 +421,7 @@ class AdminDashboardScreen extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Tình trạng hệ thống',
-          style: AppTypography.h6,
-        ),
+        Text('Tình trạng hệ thống', style: AppTypography.h6),
         const SizedBox(height: AppSpacing.md),
         Row(
           children: [
@@ -525,11 +489,7 @@ class AdminDashboardScreen extends ConsumerWidget {
           children: [
             Row(
               children: [
-                Icon(
-                  icon,
-                  color: statusColor,
-                  size: AppSizes.iconMd,
-                ),
+                Icon(icon, color: statusColor, size: AppSizes.iconMd),
                 const Spacer(),
                 Container(
                   padding: const EdgeInsets.symmetric(
@@ -537,7 +497,7 @@ class AdminDashboardScreen extends ConsumerWidget {
                     vertical: AppSpacing.xs,
                   ),
                   decoration: BoxDecoration(
-                    color: statusColor.withOpacity(0.1),
+                    color: statusColor.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(AppRadius.sm),
                   ),
                   child: Text(
@@ -560,9 +520,7 @@ class AdminDashboardScreen extends ConsumerWidget {
             const SizedBox(height: AppSpacing.xs),
             Text(
               detail,
-              style: AppTypography.bodySmall.copyWith(
-                color: AppColors.grey600,
-              ),
+              style: AppTypography.bodySmall.copyWith(color: AppColors.grey600),
             ),
           ],
         ),
@@ -577,10 +535,7 @@ class AdminDashboardScreen extends ConsumerWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              'Quản lý người dùng',
-              style: AppTypography.h6,
-            ),
+            Text('Quản lý người dùng', style: AppTypography.h6),
             TextButton.icon(
               onPressed: () => context.go('/admin/users'),
               icon: const Icon(Icons.arrow_forward),
@@ -613,29 +568,20 @@ class AdminDashboardScreen extends ConsumerWidget {
         Container(
           padding: const EdgeInsets.all(AppSpacing.sm),
           decoration: BoxDecoration(
-            color: color.withOpacity(0.1),
+            color: color.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(AppRadius.sm),
           ),
-          child: Icon(
-            Icons.person,
-            color: color,
-            size: AppSizes.iconSm,
-          ),
+          child: Icon(Icons.person, color: color, size: AppSizes.iconSm),
         ),
         const SizedBox(width: AppSpacing.md),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                role,
-                style: AppTypography.bodyMedium,
-              ),
+              Text(role, style: AppTypography.bodyMedium),
               Text(
                 count,
-                style: AppTypography.h6.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
+                style: AppTypography.h6.copyWith(fontWeight: FontWeight.bold),
               ),
             ],
           ),
@@ -646,7 +592,7 @@ class AdminDashboardScreen extends ConsumerWidget {
             vertical: AppSpacing.xs,
           ),
           decoration: BoxDecoration(
-            color: AppColors.success.withOpacity(0.1),
+            color: AppColors.success.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(AppRadius.sm),
           ),
           child: Text(
@@ -668,10 +614,7 @@ class AdminDashboardScreen extends ConsumerWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              'Quản lý khóa học',
-              style: AppTypography.h6,
-            ),
+            Text('Quản lý khóa học', style: AppTypography.h6),
             TextButton.icon(
               onPressed: () => context.go('/admin/courses'),
               icon: const Icon(Icons.arrow_forward),
@@ -721,18 +664,9 @@ class AdminDashboardScreen extends ConsumerWidget {
   ) {
     return Row(
       children: [
-        Icon(
-          icon,
-          color: color,
-          size: AppSizes.iconMd,
-        ),
+        Icon(icon, color: color, size: AppSizes.iconMd),
         const SizedBox(width: AppSpacing.md),
-        Expanded(
-          child: Text(
-            status,
-            style: AppTypography.bodyMedium,
-          ),
-        ),
+        Expanded(child: Text(status, style: AppTypography.bodyMedium)),
         Text(
           count,
           style: AppTypography.h6.copyWith(

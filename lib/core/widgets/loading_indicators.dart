@@ -2,18 +2,9 @@ import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_dimensions.dart';
 
-enum LoadingType {
-  circular,
-  linear,
-  dots,
-  pulse,
-}
+enum LoadingType { circular, linear, dots, pulse }
 
-enum LoadingSize {
-  small,
-  medium,
-  large,
-}
+enum LoadingSize { small, medium, large }
 
 class LoadingIndicator extends StatelessWidget {
   const LoadingIndicator({
@@ -32,7 +23,7 @@ class LoadingIndicator extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final effectiveColor = color ?? AppColors.primary;
-    
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -41,9 +32,9 @@ class LoadingIndicator extends StatelessWidget {
           const SizedBox(height: AppSpacing.md),
           Text(
             message!,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: AppColors.grey600,
-            ),
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(color: AppColors.grey600),
             textAlign: TextAlign.center,
           ),
         ],
@@ -62,27 +53,21 @@ class LoadingIndicator extends StatelessWidget {
             valueColor: AlwaysStoppedAnimation<Color>(color),
           ),
         );
-      
+
       case LoadingType.linear:
         return SizedBox(
           width: _getLinearWidth(),
           child: LinearProgressIndicator(
             valueColor: AlwaysStoppedAnimation<Color>(color),
-            backgroundColor: color.withOpacity(0.2),
+            backgroundColor: color.withValues(alpha: 0.2),
           ),
         );
-      
+
       case LoadingType.dots:
-        return _DotsLoadingIndicator(
-          color: color,
-          size: _getDotSize(),
-        );
-      
+        return _DotsLoadingIndicator(color: color, size: _getDotSize());
+
       case LoadingType.pulse:
-        return _PulseLoadingIndicator(
-          color: color,
-          size: _getSize(),
-        );
+        return _PulseLoadingIndicator(color: color, size: _getSize());
     }
   }
 
@@ -132,10 +117,7 @@ class LoadingIndicator extends StatelessWidget {
 }
 
 class _DotsLoadingIndicator extends StatefulWidget {
-  const _DotsLoadingIndicator({
-    required this.color,
-    required this.size,
-  });
+  const _DotsLoadingIndicator({required this.color, required this.size});
 
   final Color color;
   final double size;
@@ -207,10 +189,7 @@ class _DotsLoadingIndicatorState extends State<_DotsLoadingIndicator>
 }
 
 class _PulseLoadingIndicator extends StatefulWidget {
-  const _PulseLoadingIndicator({
-    required this.color,
-    required this.size,
-  });
+  const _PulseLoadingIndicator({required this.color, required this.size});
 
   final Color color;
   final double size;
@@ -234,17 +213,11 @@ class _PulseLoadingIndicatorState extends State<_PulseLoadingIndicator>
     )..repeat(reverse: true);
 
     _scaleAnimation = Tween<double>(begin: 0.8, end: 1.2).animate(
-      CurvedAnimation(
-        parent: _animationController,
-        curve: Curves.easeInOut,
-      ),
+      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
     );
 
     _opacityAnimation = Tween<double>(begin: 0.5, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _animationController,
-        curve: Curves.easeInOut,
-      ),
+      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
     );
   }
 
@@ -300,9 +273,10 @@ class LoadingOverlay extends StatelessWidget {
         child,
         if (isLoading)
           Container(
-            color: backgroundColor ?? Colors.black.withOpacity(0.5),
+            color: backgroundColor ?? Colors.black.withValues(alpha: 0.5),
             child: Center(
-              child: loadingWidget ??
+              child:
+                  loadingWidget ??
                   const LoadingIndicator(
                     type: LoadingType.circular,
                     size: LoadingSize.large,
@@ -348,10 +322,7 @@ class _ShimmerLoadingState extends State<ShimmerLoading>
     )..repeat();
 
     _animation = Tween<double>(begin: -1.0, end: 2.0).animate(
-      CurvedAnimation(
-        parent: _animationController,
-        curve: Curves.easeInOut,
-      ),
+      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
     );
   }
 

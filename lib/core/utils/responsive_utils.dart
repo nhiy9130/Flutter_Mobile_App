@@ -14,7 +14,8 @@ class ResponsiveUtils {
 
   static bool isTablet(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
-    return width >= ResponsiveBreakpoints.mobile && width < ResponsiveBreakpoints.desktop;
+    return width >= ResponsiveBreakpoints.mobile &&
+        width < ResponsiveBreakpoints.desktop;
   }
 
   static bool isDesktop(BuildContext context) {
@@ -22,7 +23,8 @@ class ResponsiveUtils {
   }
 
   static bool isLargeDesktop(BuildContext context) {
-    return MediaQuery.of(context).size.width >= ResponsiveBreakpoints.largeDesktop;
+    return MediaQuery.of(context).size.width >=
+        ResponsiveBreakpoints.largeDesktop;
   }
 
   static double getScreenWidth(BuildContext context) {
@@ -90,17 +92,14 @@ class ResponsiveWidget extends StatelessWidget {
 }
 
 class ResponsiveBuilder extends StatelessWidget {
-  const ResponsiveBuilder({
-    super.key,
-    required this.builder,
-  });
+  const ResponsiveBuilder({super.key, required this.builder});
 
   final Widget Function(BuildContext context, DeviceType deviceType) builder;
 
   @override
   Widget build(BuildContext context) {
     DeviceType deviceType;
-    
+
     if (ResponsiveUtils.isMobile(context)) {
       deviceType = DeviceType.mobile;
     } else if (ResponsiveUtils.isTablet(context)) {
@@ -113,11 +112,7 @@ class ResponsiveBuilder extends StatelessWidget {
   }
 }
 
-enum DeviceType {
-  mobile,
-  tablet,
-  desktop,
-}
+enum DeviceType { mobile, tablet, desktop }
 
 class AdaptiveGridView extends StatelessWidget {
   const AdaptiveGridView({
@@ -142,7 +137,7 @@ class AdaptiveGridView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     int columns;
-    
+
     if (ResponsiveUtils.isMobile(context)) {
       columns = mobileColumns;
     } else if (ResponsiveUtils.isTablet(context)) {
@@ -186,7 +181,7 @@ class ResponsiveText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     TextStyle? style;
-    
+
     if (ResponsiveUtils.isDesktop(context) && desktopStyle != null) {
       style = desktopStyle;
     } else if (ResponsiveUtils.isTablet(context) && tabletStyle != null) {

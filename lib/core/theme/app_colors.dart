@@ -99,10 +99,10 @@ class AppColors {
   );
 
   // Shadow Colors
-  static Color shadow = Colors.black.withOpacity(0.1);
-  static Color shadowLight = Colors.black.withOpacity(0.05);
-  static Color shadowMedium = Colors.black.withOpacity(0.15);
-  static Color shadowDark = Colors.black.withOpacity(0.25);
+  static Color shadow = Colors.black.withValues(alpha: 0.1);
+  static Color shadowLight = Colors.black.withValues(alpha: 0.05);
+  static Color shadowMedium = Colors.black.withValues(alpha: 0.15);
+  static Color shadowDark = Colors.black.withValues(alpha: 0.25);
 
   // Shimmer Colors
   static const Color shimmerBase = grey200;

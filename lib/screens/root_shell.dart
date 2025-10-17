@@ -9,10 +9,18 @@ class RootShell extends ConsumerWidget {
   final Widget child;
 
   int _indexForLocation(String location) {
-    if (location.startsWith('/dashboard')) return 0;
-    if (location.startsWith('/courses') || location.startsWith('/my-courses')) return 1;
-    if (location.startsWith('/notifications')) return 2;
-    if (location.startsWith('/profile')) return 3;
+    if (location.startsWith('/dashboard')) {
+      return 0;
+    }
+    if (location.startsWith('/courses') || location.startsWith('/my-courses')) {
+      return 1;
+    }
+    if (location.startsWith('/notifications')) {
+      return 2;
+    }
+    if (location.startsWith('/profile')) {
+      return 3;
+    }
     return 0;
   }
 
@@ -20,9 +28,9 @@ class RootShell extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final unread = ref.watch(notificationProvider).unreadCount;
     final user = ref.watch(authProvider).user;
-    final loc = GoRouter.of(context).routeInformationProvider.value.location;
+    final loc = GoRouter.of(context).routeInformationProvider.value.uri.path;
     final idx = _indexForLocation(loc);
-    
+
     return Scaffold(
       body: child,
       bottomNavigationBar: NavigationBar(
@@ -33,9 +41,12 @@ class RootShell extends ConsumerWidget {
     );
   }
 
-  List<NavigationDestination> _buildNavigationDestinations(int unread, dynamic user) {
+  List<NavigationDestination> _buildNavigationDestinations(
+    int unread,
+    dynamic user,
+  ) {
     final role = user?.role ?? 'student';
-    
+
     List<NavigationDestination> destinations = [
       NavigationDestination(
         icon: const Icon(Icons.dashboard_outlined),
@@ -76,7 +87,7 @@ class RootShell extends ConsumerWidget {
           ),
         ]);
         break;
-        
+
       case 'instructor':
         destinations.addAll([
           const NavigationDestination(
@@ -108,7 +119,7 @@ class RootShell extends ConsumerWidget {
           ),
         ]);
         break;
-        
+
       case 'admin':
         destinations.addAll([
           const NavigationDestination(
@@ -141,7 +152,7 @@ class RootShell extends ConsumerWidget {
         ]);
         break;
     }
-    
+
     return destinations;
   }
 
@@ -182,7 +193,7 @@ class RootShell extends ConsumerWidget {
 
   void _onDestinationSelected(BuildContext context, int index, dynamic user) {
     final role = user?.role ?? 'student';
-    
+
     switch (index) {
       case 0:
         context.go('/dashboard');
@@ -208,5 +219,3 @@ class RootShell extends ConsumerWidget {
     }
   }
 }
-
-

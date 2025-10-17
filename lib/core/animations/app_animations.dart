@@ -53,13 +53,11 @@ class _FadeInAnimationState extends State<FadeInAnimation>
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
-      duration: widget.duration,
-      vsync: this,
-    );
-    _animation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: widget.curve),
-    );
+    _controller = AnimationController(duration: widget.duration, vsync: this);
+    _animation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: widget.curve));
 
     if (widget.autoStart) {
       _startAnimation();
@@ -86,10 +84,7 @@ class _FadeInAnimationState extends State<FadeInAnimation>
     return AnimatedBuilder(
       animation: _animation,
       builder: (context, child) {
-        return Opacity(
-          opacity: _animation.value,
-          child: widget.child,
-        );
+        return Opacity(opacity: _animation.value, child: widget.child);
       },
     );
   }
@@ -128,10 +123,7 @@ class _SlideInAnimationState extends State<SlideInAnimation>
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
-      duration: widget.duration,
-      vsync: this,
-    );
+    _controller = AnimationController(duration: widget.duration, vsync: this);
     _slideAnimation = Tween<Offset>(
       begin: widget.begin,
       end: widget.end,
@@ -162,10 +154,7 @@ class _SlideInAnimationState extends State<SlideInAnimation>
     return AnimatedBuilder(
       animation: _slideAnimation,
       builder: (context, child) {
-        return SlideTransition(
-          position: _slideAnimation,
-          child: widget.child,
-        );
+        return SlideTransition(position: _slideAnimation, child: widget.child);
       },
     );
   }
@@ -204,10 +193,7 @@ class _ScaleAnimationState extends State<ScaleAnimation>
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
-      duration: widget.duration,
-      vsync: this,
-    );
+    _controller = AnimationController(duration: widget.duration, vsync: this);
     _scaleAnimation = Tween<double>(
       begin: widget.begin,
       end: widget.end,
@@ -279,14 +265,12 @@ class _FadeSlideAnimationState extends State<FadeSlideAnimation>
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
-      duration: widget.duration,
-      vsync: this,
-    );
+    _controller = AnimationController(duration: widget.duration, vsync: this);
 
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: widget.curve),
-    );
+    _fadeAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: widget.curve));
 
     _slideAnimation = Tween<Offset>(
       begin: widget.slideBegin,
@@ -320,10 +304,7 @@ class _FadeSlideAnimationState extends State<FadeSlideAnimation>
       builder: (context, child) {
         return SlideTransition(
           position: _slideAnimation,
-          child: FadeTransition(
-            opacity: _fadeAnimation,
-            child: widget.child,
-          ),
+          child: FadeTransition(opacity: _fadeAnimation, child: widget.child),
         );
       },
     );
@@ -360,7 +341,9 @@ class _StaggeredAnimationState extends State<StaggeredAnimation> {
         final child = entry.value;
 
         return FadeSlideAnimation(
-          delay: Duration(milliseconds: index * widget.staggerDelay.inMilliseconds),
+          delay: Duration(
+            milliseconds: index * widget.staggerDelay.inMilliseconds,
+          ),
           duration: widget.duration,
           curve: widget.curve,
           slideBegin: widget.direction == Axis.vertical
@@ -405,7 +388,10 @@ class _AnimatedListBuilderState extends State<AnimatedListBuilder> {
       itemBuilder: (context, index) {
         return FadeSlideAnimation(
           delay: Duration(
-            milliseconds: (index * widget.staggerDelay.inMilliseconds).clamp(0, 1000),
+            milliseconds: (index * widget.staggerDelay.inMilliseconds).clamp(
+              0,
+              1000,
+            ),
           ),
           duration: widget.animationDuration,
           curve: widget.curve,
@@ -446,14 +432,15 @@ class _AnimatedHoverCardState extends State<AnimatedHoverCard>
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
-      duration: widget.duration,
-      vsync: this,
-    );
-    _scaleAnimation = Tween<double>(begin: 1.0, end: widget.hoverScale)
-        .animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
-    _elevationAnimation = Tween<double>(begin: 2.0, end: widget.hoverElevation)
-        .animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
+    _controller = AnimationController(duration: widget.duration, vsync: this);
+    _scaleAnimation = Tween<double>(
+      begin: 1.0,
+      end: widget.hoverScale,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
+    _elevationAnimation = Tween<double>(
+      begin: 2.0,
+      end: widget.hoverElevation,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
   }
 
   @override
@@ -518,10 +505,7 @@ class _LoadingDotsAnimationState extends State<LoadingDotsAnimation>
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
-      duration: widget.duration,
-      vsync: this,
-    );
+    _controller = AnimationController(duration: widget.duration, vsync: this);
     _controller.repeat();
   }
 
@@ -541,7 +525,9 @@ class _LoadingDotsAnimationState extends State<LoadingDotsAnimation>
           builder: (context, child) {
             final delay = index * 0.2;
             final animationValue = (_controller.value - delay).clamp(0.0, 1.0);
-            final scale = 0.5 + (0.5 * (1 - (animationValue - 0.5).abs() * 2).clamp(0.0, 1.0));
+            final scale =
+                0.5 +
+                (0.5 * (1 - (animationValue - 0.5).abs() * 2).clamp(0.0, 1.0));
 
             return Transform.scale(
               scale: scale,
@@ -585,52 +571,34 @@ class PageTransitionBuilder {
         break;
     }
 
-    final slideAnimation = Tween<Offset>(
-      begin: begin,
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: animation,
-      curve: AppAnimations.materialCurve,
-    ));
+    final slideAnimation = Tween<Offset>(begin: begin, end: Offset.zero)
+        .animate(
+          CurvedAnimation(
+            parent: animation,
+            curve: AppAnimations.materialCurve,
+          ),
+        );
 
-    return SlideTransition(
-      position: slideAnimation,
-      child: child,
-    );
+    return SlideTransition(position: slideAnimation, child: child);
   }
 
   static Widget fadeTransition({
     required Widget child,
     required Animation<double> animation,
   }) {
-    return FadeTransition(
-      opacity: animation,
-      child: child,
-    );
+    return FadeTransition(opacity: animation, child: child);
   }
 
   static Widget scaleTransition({
     required Widget child,
     required Animation<double> animation,
   }) {
-    final scaleAnimation = Tween<double>(
-      begin: 0.8,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: animation,
-      curve: AppAnimations.elasticOut,
-    ));
-
-    return ScaleTransition(
-      scale: scaleAnimation,
-      child: child,
+    final scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(
+      CurvedAnimation(parent: animation, curve: AppAnimations.elasticOut),
     );
+
+    return ScaleTransition(scale: scaleAnimation, child: child);
   }
 }
 
-enum SlideDirection {
-  leftToRight,
-  rightToLeft,
-  topToBottom,
-  bottomToTop,
-}
+enum SlideDirection { leftToRight, rightToLeft, topToBottom, bottomToTop }

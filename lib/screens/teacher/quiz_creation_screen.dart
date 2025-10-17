@@ -1,3 +1,4 @@
+// ignore_for_file: deprecated_member_use
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/widgets/section_header.dart';
@@ -32,10 +33,7 @@ class _QuizCreationScreenState extends ConsumerState<QuizCreationScreen> {
       appBar: AppBar(
         title: const Text('Tạo Quiz'),
         actions: [
-          TextButton(
-            onPressed: _saveAsDraft,
-            child: const Text('Lưu nháp'),
-          ),
+          TextButton(onPressed: _saveAsDraft, child: const Text('Lưu nháp')),
           ElevatedButton(
             onPressed: _publishQuiz,
             child: const Text('Xuất bản'),
@@ -65,10 +63,7 @@ class _QuizCreationScreenState extends ConsumerState<QuizCreationScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SectionHeader(
-              title: 'Thông tin quiz',
-              icon: Icons.quiz,
-            ),
+            const SectionHeader(title: 'Thông tin quiz', icon: Icons.quiz),
             const SizedBox(height: 16),
             TextField(
               controller: _titleController,
@@ -102,7 +97,7 @@ class _QuizCreationScreenState extends ConsumerState<QuizCreationScreen> {
                 const SizedBox(width: 16),
                 Expanded(
                   child: DropdownButtonFormField<int>(
-                    value: _maxAttempts,
+                    initialValue: _maxAttempts,
                     decoration: const InputDecoration(
                       labelText: 'Số lần làm tối đa',
                     ),
@@ -165,7 +160,7 @@ class _QuizCreationScreenState extends ConsumerState<QuizCreationScreen> {
             final index = entry.key;
             final question = entry.value;
             return _buildQuestionCard(question, index);
-          }).toList(),
+          }),
       ],
     );
   }
@@ -177,24 +172,20 @@ class _QuizCreationScreenState extends ConsumerState<QuizCreationScreen> {
         child: Center(
           child: Column(
             children: [
-              Icon(
-                Icons.quiz_outlined,
-                size: 64,
-                color: Colors.grey.shade400,
-              ),
+              Icon(Icons.quiz_outlined, size: 64, color: Colors.grey.shade400),
               const SizedBox(height: 16),
               Text(
                 'Chưa có câu hỏi nào',
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  color: Colors.grey.shade600,
-                ),
+                style: Theme.of(
+                  context,
+                ).textTheme.titleMedium?.copyWith(color: Colors.grey.shade600),
               ),
               const SizedBox(height: 8),
               Text(
                 'Thêm câu hỏi đầu tiên để bắt đầu tạo quiz',
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Colors.grey.shade600,
-                ),
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyMedium?.copyWith(color: Colors.grey.shade600),
               ),
               const SizedBox(height: 16),
               ElevatedButton.icon(
@@ -213,9 +204,7 @@ class _QuizCreationScreenState extends ConsumerState<QuizCreationScreen> {
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
       child: ExpansionTile(
-        leading: CircleAvatar(
-          child: Text('${index + 1}'),
-        ),
+        leading: CircleAvatar(child: Text('${index + 1}')),
         title: Text(
           question.title.isEmpty ? 'Câu hỏi ${index + 1}' : question.title,
           maxLines: 2,
@@ -224,18 +213,9 @@ class _QuizCreationScreenState extends ConsumerState<QuizCreationScreen> {
         subtitle: Text(_getQuestionTypeText(question.type)),
         trailing: PopupMenuButton(
           itemBuilder: (context) => [
-            const PopupMenuItem(
-              value: 'edit',
-              child: Text('Chỉnh sửa'),
-            ),
-            const PopupMenuItem(
-              value: 'duplicate',
-              child: Text('Nhân bản'),
-            ),
-            const PopupMenuItem(
-              value: 'delete',
-              child: Text('Xóa'),
-            ),
+            const PopupMenuItem(value: 'edit', child: Text('Chỉnh sửa')),
+            const PopupMenuItem(value: 'duplicate', child: Text('Nhân bản')),
+            const PopupMenuItem(value: 'delete', child: Text('Xóa')),
           ],
           onSelected: (value) => _handleQuestionAction(value.toString(), index),
         ),
@@ -281,7 +261,7 @@ class _QuizCreationScreenState extends ConsumerState<QuizCreationScreen> {
                         ],
                       ),
                     );
-                  }).toList(),
+                  }),
                 ],
                 const SizedBox(height: 12),
                 Row(
@@ -340,8 +320,8 @@ class _QuizCreationScreenState extends ConsumerState<QuizCreationScreen> {
       options: type == QuestionType.trueFalse
           ? ['Đúng', 'Sai']
           : (type == QuestionType.shortAnswer || type == QuestionType.essay)
-              ? []
-              : [''],
+          ? []
+          : [''],
       correctAnswers: [],
       points: 1,
       timeLimit: 0,
@@ -392,9 +372,9 @@ class _QuizCreationScreenState extends ConsumerState<QuizCreationScreen> {
 
   void _saveAsDraft() {
     // TODO: Save quiz as draft
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Đã lưu nháp quiz')),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Đã lưu nháp quiz')));
   }
 
   void _publishQuiz() {
@@ -493,7 +473,7 @@ class QuestionTypeSelector extends StatelessWidget {
     return Card(
       child: ListTile(
         leading: CircleAvatar(
-          backgroundColor: color.withOpacity(0.1),
+          backgroundColor: color.withValues(alpha: 0.1),
           child: Icon(icon, color: color),
         ),
         title: Text(title),
@@ -607,10 +587,7 @@ class _QuestionEditorDialogState extends State<QuestionEditorDialog> {
           onPressed: () => Navigator.of(context).pop(),
           child: const Text('Hủy'),
         ),
-        ElevatedButton(
-          onPressed: _saveQuestion,
-          child: const Text('Lưu'),
-        ),
+        ElevatedButton(onPressed: _saveQuestion, child: const Text('Lưu')),
       ],
     );
   }
@@ -624,24 +601,27 @@ class _QuestionEditorDialogState extends State<QuestionEditorDialog> {
     return _optionControllers.asMap().entries.map((entry) {
       final index = entry.key;
       final controller = entry.value;
-      
+
       return Padding(
         padding: const EdgeInsets.only(bottom: 8),
         child: Row(
           children: [
             if (widget.question.type == QuestionType.singleChoice)
-              Radio<int>(
-                value: index,
-                groupValue: _correctAnswers.indexWhere((correct) => correct),
-                onChanged: (value) {
+              GestureDetector(
+                onTap: () {
                   setState(() {
                     _correctAnswers.fillRange(0, _correctAnswers.length, false);
-                    _correctAnswers[value!] = true;
+                    _correctAnswers[index] = true;
                   });
                 },
+                child: Radio<int>(
+                  value: index,
+                  groupValue: _correctAnswers.indexWhere((correct) => correct),
+                  onChanged: (_) {},
+                ),
               )
-            else if (widget.question.type == QuestionType.multipleChoice || 
-                     widget.question.type == QuestionType.trueFalse)
+            else if (widget.question.type == QuestionType.multipleChoice ||
+                widget.question.type == QuestionType.trueFalse)
               Checkbox(
                 value: _correctAnswers[index],
                 onChanged: (value) {
@@ -653,9 +633,7 @@ class _QuestionEditorDialogState extends State<QuestionEditorDialog> {
             Expanded(
               child: TextField(
                 controller: controller,
-                decoration: InputDecoration(
-                  hintText: 'Lựa chọn ${index + 1}',
-                ),
+                decoration: InputDecoration(hintText: 'Lựa chọn ${index + 1}'),
               ),
             ),
             if (widget.question.type != QuestionType.trueFalse)

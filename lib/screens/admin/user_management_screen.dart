@@ -5,10 +5,11 @@ class UserManagementScreen extends ConsumerStatefulWidget {
   const UserManagementScreen({super.key});
 
   @override
-  ConsumerState<UserManagementScreen> createState() => _UserManagementScreenState();
+  ConsumerState<UserManagementScreen> createState() =>
+      _UserManagementScreenState();
 }
 
-class _UserManagementScreenState extends ConsumerState<UserManagementScreen> 
+class _UserManagementScreenState extends ConsumerState<UserManagementScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   final _searchController = TextEditingController();
@@ -35,14 +36,8 @@ class _UserManagementScreenState extends ConsumerState<UserManagementScreen>
                 value: 'export',
                 child: Text('Xuất danh sách'),
               ),
-              const PopupMenuItem(
-                value: 'import',
-                child: Text('Nhập từ file'),
-              ),
-              const PopupMenuItem(
-                value: 'settings',
-                child: Text('Cài đặt'),
-              ),
+              const PopupMenuItem(value: 'import', child: Text('Nhập từ file')),
+              const PopupMenuItem(value: 'settings', child: Text('Cài đặt')),
             ],
             onSelected: (value) => _handleMenuAction(context, value.toString()),
           ),
@@ -99,16 +94,14 @@ class _UserManagementScreenState extends ConsumerState<UserManagementScreen>
         ),
         const SizedBox(height: 16),
         // User List
-        Expanded(
-          child: _buildUsers(userType),
-        ),
+        Expanded(child: _buildUsers(userType)),
       ],
     );
   }
 
   Widget _buildStatsRow(String userType) {
     final stats = _getStatsForUserType(userType);
-    
+
     return Row(
       children: stats.entries.map((entry) {
         return Expanded(
@@ -141,23 +134,11 @@ class _UserManagementScreenState extends ConsumerState<UserManagementScreen>
   Map<String, int> _getStatsForUserType(String userType) {
     switch (userType) {
       case 'student':
-        return {
-          'Tổng cộng': 1045,
-          'Hoạt động': 892,
-          'Mới': 15,
-        };
+        return {'Tổng cộng': 1045, 'Hoạt động': 892, 'Mới': 15};
       case 'instructor':
-        return {
-          'Tổng cộng': 67,
-          'Hoạt động': 58,
-          'Chờ duyệt': 3,
-        };
+        return {'Tổng cộng': 67, 'Hoạt động': 58, 'Chờ duyệt': 3};
       case 'admin':
-        return {
-          'Tổng cộng': 5,
-          'Hoạt động': 5,
-          'Offline': 0,
-        };
+        return {'Tổng cộng': 5, 'Hoạt động': 5, 'Offline': 0};
       default:
         return {};
     }
@@ -299,9 +280,14 @@ class _UserManagementScreenState extends ConsumerState<UserManagementScreen>
                         ),
                       ),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
                         decoration: BoxDecoration(
-                          color: isActive ? Colors.green.withOpacity(0.1) : Colors.grey.withOpacity(0.1),
+                          color: isActive
+                              ? Colors.green.withValues(alpha: 0.1)
+                              : Colors.grey.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
@@ -362,14 +348,8 @@ class _UserManagementScreenState extends ConsumerState<UserManagementScreen>
             ),
             PopupMenuButton(
               itemBuilder: (context) => [
-                const PopupMenuItem(
-                  value: 'view',
-                  child: Text('Xem chi tiết'),
-                ),
-                const PopupMenuItem(
-                  value: 'edit',
-                  child: Text('Chỉnh sửa'),
-                ),
+                const PopupMenuItem(value: 'view', child: Text('Xem chi tiết')),
+                const PopupMenuItem(value: 'edit', child: Text('Chỉnh sửa')),
                 PopupMenuItem(
                   value: isActive ? 'deactivate' : 'activate',
                   child: Text(isActive ? 'Vô hiệu hóa' : 'Kích hoạt'),
@@ -378,12 +358,10 @@ class _UserManagementScreenState extends ConsumerState<UserManagementScreen>
                   value: 'reset_password',
                   child: Text('Đặt lại mật khẩu'),
                 ),
-                const PopupMenuItem(
-                  value: 'delete',
-                  child: Text('Xóa'),
-                ),
+                const PopupMenuItem(value: 'delete', child: Text('Xóa')),
               ],
-              onSelected: (value) => _handleUserAction(context, user['id'], value.toString()),
+              onSelected: (value) =>
+                  _handleUserAction(context, user['id'], value.toString()),
             ),
           ],
         ),
@@ -415,12 +393,13 @@ class _UserManagementScreenState extends ConsumerState<UserManagementScreen>
               ),
               const SizedBox(height: 16),
               DropdownButtonFormField(
-                decoration: const InputDecoration(
-                  labelText: 'Vai trò *',
-                ),
+                decoration: const InputDecoration(labelText: 'Vai trò *'),
                 items: const [
                   DropdownMenuItem(value: 'student', child: Text('Sinh viên')),
-                  DropdownMenuItem(value: 'instructor', child: Text('Giáo viên')),
+                  DropdownMenuItem(
+                    value: 'instructor',
+                    child: Text('Giáo viên'),
+                  ),
                   DropdownMenuItem(value: 'admin', child: Text('Quản trị')),
                 ],
                 onChanged: (value) {},
@@ -445,7 +424,9 @@ class _UserManagementScreenState extends ConsumerState<UserManagementScreen>
             onPressed: () {
               Navigator.of(context).pop();
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Đã tạo tài khoản mới thành công!')),
+                const SnackBar(
+                  content: Text('Đã tạo tài khoản mới thành công!'),
+                ),
               );
             },
             child: const Text('Tạo'),
@@ -468,7 +449,9 @@ class _UserManagementScreenState extends ConsumerState<UserManagementScreen>
         break;
       case 'import':
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Tính năng nhập file sẽ được cập nhật sớm')),
+          const SnackBar(
+            content: Text('Tính năng nhập file sẽ được cập nhật sớm'),
+          ),
         );
         break;
       case 'settings':
@@ -490,7 +473,11 @@ class _UserManagementScreenState extends ConsumerState<UserManagementScreen>
       case 'activate':
       case 'deactivate':
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Đã ${action == 'activate' ? 'kích hoạt' : 'vô hiệu hóa'} tài khoản')),
+          SnackBar(
+            content: Text(
+              'Đã ${action == 'activate' ? 'kích hoạt' : 'vô hiệu hóa'} tài khoản',
+            ),
+          ),
         );
         break;
       case 'reset_password':
@@ -507,8 +494,10 @@ class _UserManagementScreenState extends ConsumerState<UserManagementScreen>
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Đặt lại mật khẩu'),
-        content: const Text('Bạn có chắc chắn muốn đặt lại mật khẩu cho người dùng này? '
-            'Mật khẩu mới sẽ được gửi qua email.'),
+        content: const Text(
+          'Bạn có chắc chắn muốn đặt lại mật khẩu cho người dùng này? '
+          'Mật khẩu mới sẽ được gửi qua email.',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
@@ -533,8 +522,10 @@ class _UserManagementScreenState extends ConsumerState<UserManagementScreen>
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Xóa người dùng'),
-        content: const Text('Bạn có chắc chắn muốn xóa người dùng này? '
-            'Hành động này không thể hoàn tác.'),
+        content: const Text(
+          'Bạn có chắc chắn muốn xóa người dùng này? '
+          'Hành động này không thể hoàn tác.',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),

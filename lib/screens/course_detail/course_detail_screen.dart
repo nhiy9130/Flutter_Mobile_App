@@ -2,9 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../features/courses/courses_service.dart';
 import '../../features/auth/auth_state.dart';
-import '../../core/widgets/quick_action_card.dart';
-import '../../core/widgets/progress_card.dart';
-import '../../core/widgets/section_header.dart';
 import 'files_tab.dart';
 import 'chat_tab.dart';
 import 'quizzes_tab.dart';
@@ -36,7 +33,7 @@ class _CourseDetailScreenState extends ConsumerState<CourseDetailScreen>
       builder: (context, snapshot) {
         final course = snapshot.data;
         final title = course?.title ?? 'Course ${widget.courseId}';
-        
+
         return Scaffold(
           body: NestedScrollView(
             headerSliverBuilder: (context, innerBoxIsScrolled) {
@@ -79,7 +76,7 @@ class _CourseDetailScreenState extends ConsumerState<CourseDetailScreen>
                               height: 150,
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                color: Colors.white.withOpacity(0.1),
+                                color: Colors.white.withValues(alpha: 0.1),
                               ),
                             ),
                           ),
@@ -91,7 +88,7 @@ class _CourseDetailScreenState extends ConsumerState<CourseDetailScreen>
                               height: 100,
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                color: Colors.white.withOpacity(0.1),
+                                color: Colors.white.withValues(alpha: 0.1),
                               ),
                             ),
                           ),
@@ -140,7 +137,11 @@ class _CourseDetailScreenState extends ConsumerState<CourseDetailScreen>
             body: TabBarView(
               controller: _tabController,
               children: [
-                _OverviewTab(courseId: widget.courseId, course: course, user: user),
+                _OverviewTab(
+                  courseId: widget.courseId,
+                  course: course,
+                  user: user,
+                ),
                 const _ContentTab(),
                 FilesTabView(courseId: widget.courseId),
                 QuizzesTabView(courseId: widget.courseId),
@@ -160,7 +161,11 @@ class _TabBarDelegate extends SliverPersistentHeaderDelegate {
   _TabBarDelegate(this.tabBar);
 
   @override
-  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
+  Widget build(
+    BuildContext context,
+    double shrinkOffset,
+    bool overlapsContent,
+  ) {
     return Container(
       color: Theme.of(context).scaffoldBackgroundColor,
       child: tabBar,
@@ -187,7 +192,7 @@ class _OverviewTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
@@ -200,19 +205,34 @@ class _OverviewTab extends StatelessWidget {
         const SizedBox(height: 24),
 
         // Quick Actions
-        Text('Truy cập nhanh', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+        Text(
+          'Truy cập nhanh',
+          style: theme.textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         const SizedBox(height: 12),
         _buildQuickActions(context),
         const SizedBox(height: 24),
 
         // Course Description
-        Text('Mô tả khóa học', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+        Text(
+          'Mô tả khóa học',
+          style: theme.textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         const SizedBox(height: 12),
         _buildDescription(context),
         const SizedBox(height: 24),
 
         // Instructor Info
-        Text('Thông tin giảng viên', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+        Text(
+          'Thông tin giảng viên',
+          style: theme.textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         const SizedBox(height: 12),
         _buildInstructorInfo(context),
       ],
@@ -231,7 +251,7 @@ class _OverviewTab extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: theme.colorScheme.primary.withOpacity(0.1),
+                color: theme.colorScheme.primary.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(
@@ -298,9 +318,9 @@ class _OverviewTab extends StatelessWidget {
                 ),
                 Text(
                   '12/15 bài học',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Colors.grey.shade600,
-                  ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodyMedium?.copyWith(color: Colors.grey.shade600),
                 ),
               ],
             ),
@@ -386,7 +406,7 @@ class _OverviewTab extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.1),
+                  color: color.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(icon, color: color, size: 20),
@@ -410,8 +430,8 @@ class _OverviewTab extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Text(
-          course?.description ?? 
-          'Học Flutter từ cơ bản đến nâng cao. Khóa học bao gồm các chủ đề như widgets, state management, navigation, và nhiều hơn nữa. Phù hợp cho người mới bắt đầu và có kinh nghiệm.',
+          course?.description ??
+              'Học Flutter từ cơ bản đến nâng cao. Khóa học bao gồm các chủ đề như widgets, state management, navigation, và nhiều hơn nữa. Phù hợp cho người mới bắt đầu và có kinh nghiệm.',
           style: Theme.of(context).textTheme.bodyMedium,
         ),
       ),
@@ -488,8 +508,3 @@ class _ContentTab extends StatelessWidget {
     return const Center(child: Text('Course content list'));
   }
 }
-
-
-
-
-

@@ -17,8 +17,14 @@ class NotificationsPrefsScreen extends ConsumerWidget {
           SwitchListTile(
             title: const Text('Enable sound'),
             value: state.prefs.enableSound,
-            onChanged: (v) => ref.read(notificationProvider.notifier).updatePrefs(
-                  NotificationPrefs(enableSound: v, enableBrowser: state.prefs.enableBrowser, categories: cats),
+            onChanged: (v) => ref
+                .read(notificationProvider.notifier)
+                .updatePrefs(
+                  NotificationPrefs(
+                    enableSound: v,
+                    enableBrowser: state.prefs.enableBrowser,
+                    categories: cats,
+                  ),
                 ),
           ),
           const Divider(),
@@ -27,8 +33,14 @@ class NotificationsPrefsScreen extends ConsumerWidget {
             SwitchListTile(
               title: Text(entry.key),
               value: entry.value,
-              onChanged: (v) => ref.read(notificationProvider.notifier).updatePrefs(
-                    NotificationPrefs(enableSound: state.prefs.enableSound, enableBrowser: state.prefs.enableBrowser, categories: {...cats, entry.key: v}),
+              onChanged: (v) => ref
+                  .read(notificationProvider.notifier)
+                  .updatePrefs(
+                    NotificationPrefs(
+                      enableSound: state.prefs.enableSound,
+                      enableBrowser: state.prefs.enableBrowser,
+                      categories: {...cats, entry.key: v},
+                    ),
                   ),
             ),
           const Divider(),
@@ -37,16 +49,15 @@ class NotificationsPrefsScreen extends ConsumerWidget {
             child: ElevatedButton(
               onPressed: () async {
                 // Request permissions if needed (platform-specific)
-                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Xin quyền thông báo (demo)')));
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Xin quyền thông báo (demo)')),
+                );
               },
               child: const Text('Xin quyền thông báo'),
             ),
-          )
+          ),
         ],
       ),
     );
   }
 }
-
-
-

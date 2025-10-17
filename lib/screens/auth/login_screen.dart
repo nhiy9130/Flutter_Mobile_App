@@ -47,19 +47,19 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 const SizedBox(height: AppSpacing.xl2),
                 _buildHeader(),
                 const SizedBox(height: AppSpacing.xl2),
-                
+
                 // Demo Info Card
                 _buildDemoInfoCard(),
                 const SizedBox(height: AppSpacing.xl),
-                
+
                 // Login Form
                 _buildLoginForm(),
                 const SizedBox(height: AppSpacing.xl),
-                
+
                 // Quick Login Section
                 _buildQuickLoginSection(),
                 const SizedBox(height: AppSpacing.xl),
-                
+
                 // Footer Links
                 _buildFooterLinks(),
               ],
@@ -110,16 +110,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           ],
         ),
         const SizedBox(height: AppSpacing.lg),
-        Text(
-          tr('auth.login.title'),
-          style: AppTypography.h1,
-        ),
+        Text(tr('auth.login.title'), style: AppTypography.h1),
         const SizedBox(height: AppSpacing.sm),
         Text(
           'Chào mừng bạn quay trở lại! Đăng nhập để tiếp tục học tập.',
-          style: AppTypography.bodyLarge.copyWith(
-            color: AppColors.grey600,
-          ),
+          style: AppTypography.bodyLarge.copyWith(color: AppColors.grey600),
         ),
       ],
     );
@@ -128,7 +123,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   Widget _buildDemoInfoCard() {
     return CustomCard(
       backgroundColor: AppColors.infoContainer,
-      borderColor: AppColors.info.withOpacity(0.3),
+      borderColor: AppColors.info.withValues(alpha: 0.3),
       child: Row(
         children: [
           Icon(
@@ -229,10 +224,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     onChanged: (value) {},
                     visualDensity: VisualDensity.compact,
                   ),
-                  Text(
-                    'Ghi nhớ đăng nhập',
-                    style: AppTypography.bodySmall,
-                  ),
+                  Text('Ghi nhớ đăng nhập', style: AppTypography.bodySmall),
                 ],
               ),
               TextButton(
@@ -316,10 +308,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
-              'Chưa có tài khoản? ',
-              style: AppTypography.bodyMedium,
-            ),
+            Text('Chưa có tài khoản? ', style: AppTypography.bodyMedium),
             TextButton(
               onPressed: () {
                 context.push('/register');
@@ -356,9 +345,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             ),
             Text(
               ' • ',
-              style: AppTypography.bodySmall.copyWith(
-                color: AppColors.grey400,
-              ),
+              style: AppTypography.bodySmall.copyWith(color: AppColors.grey400),
             ),
             TextButton.icon(
               onPressed: () {
@@ -384,13 +371,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   void _handleLogin() async {
     if (!_formKey.currentState!.validate()) return;
-    
+
     setState(() => loading = true);
     try {
-      final ok = await ref.read(authProvider.notifier).login(
-        emailCtrl.text.trim(),
-        passCtrl.text,
-      );
+      final ok = await ref
+          .read(authProvider.notifier)
+          .login(emailCtrl.text.trim(), passCtrl.text);
       if (ok && mounted) {
         context.go('/dashboard');
       }
@@ -413,7 +399,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       subtitle: email,
       icon: icon,
       iconColor: color,
-      iconBackgroundColor: color.withOpacity(0.1),
+      iconBackgroundColor: color.withValues(alpha: 0.1),
       onTap: () {
         emailCtrl.text = email;
         passCtrl.text = password;
@@ -421,14 +407,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       trailing: Container(
         padding: const EdgeInsets.all(AppSpacing.xs),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
+          color: color.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(AppRadius.sm),
         ),
-        child: Icon(
-          Icons.login,
-          size: AppSizes.iconSm,
-          color: color,
-        ),
+        child: Icon(Icons.login, size: AppSizes.iconSm, color: color),
       ),
     );
   }
@@ -460,4 +442,3 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     );
   }
 }
-

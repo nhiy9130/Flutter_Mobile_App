@@ -13,5 +13,3 @@ String? requireAuth(BuildContext context, GoRouterState state) {
     return null;
   }
 }
-
-

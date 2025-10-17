@@ -23,13 +23,11 @@ class QuickActionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final cardColor = color ?? theme.colorScheme.primary;
-    
+
     return Card(
       elevation: 2,
-      shadowColor: cardColor.withOpacity(0.2),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
+      shadowColor: cardColor.withValues(alpha: 0.2),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(16),
@@ -39,8 +37,8 @@ class QuickActionCard extends StatelessWidget {
             borderRadius: BorderRadius.circular(16),
             gradient: LinearGradient(
               colors: [
-                cardColor.withOpacity(0.1),
-                cardColor.withOpacity(0.05),
+                cardColor.withValues(alpha: 0.1),
+                cardColor.withValues(alpha: 0.05),
               ],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
@@ -57,21 +55,20 @@ class QuickActionCard extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: cardColor.withOpacity(0.2),
+                        color: cardColor.withValues(alpha: 0.2),
                         shape: BoxShape.circle,
                       ),
-                      child: Icon(
-                        icon,
-                        size: 28,
-                        color: cardColor,
-                      ),
+                      child: Icon(icon, size: 28, color: cardColor),
                     ),
                     if (badge != null)
                       Positioned(
                         right: -4,
                         top: -4,
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 2,
+                          ),
                           decoration: BoxDecoration(
                             color: Colors.red,
                             borderRadius: BorderRadius.circular(10),
@@ -107,7 +104,9 @@ class QuickActionCard extends StatelessWidget {
                 child: Text(
                   subtitle,
                   style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.textTheme.bodySmall?.color?.withOpacity(0.7),
+                    color: theme.textTheme.bodySmall?.color?.withValues(
+                      alpha: 0.7,
+                    ),
                   ),
                   textAlign: TextAlign.center,
                   maxLines: 2,

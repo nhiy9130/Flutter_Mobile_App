@@ -29,6 +29,3 @@ class AppConfig extends InheritedWidget {
         requestTimeoutMs != oldWidget.requestTimeoutMs;
   }
 }
-
-
-

@@ -33,6 +33,3 @@ class LearningAnalyticsService {
 }
 
 final learningAnalyticsService = LearningAnalyticsService();
-
-
-

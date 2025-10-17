@@ -3,17 +3,21 @@ import 'package:permission_handler/permission_handler.dart';
 import 'dart:io';
 
 class LocalNotificationService {
-  static final LocalNotificationService _instance = LocalNotificationService._internal();
+  static final LocalNotificationService _instance =
+      LocalNotificationService._internal();
   factory LocalNotificationService() => _instance;
   LocalNotificationService._internal();
 
-  final FlutterLocalNotificationsPlugin _notifications = FlutterLocalNotificationsPlugin();
+  final FlutterLocalNotificationsPlugin _notifications =
+      FlutterLocalNotificationsPlugin();
   bool _isInitialized = false;
 
   Future<void> initialize() async {
     if (_isInitialized) return;
 
-    const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
+    const androidSettings = AndroidInitializationSettings(
+      '@mipmap/ic_launcher',
+    );
     const iosSettings = DarwinInitializationSettings(
       requestAlertPermission: true,
       requestBadgePermission: true,
@@ -40,12 +44,10 @@ class LocalNotificationService {
       return status.isGranted;
     } else if (Platform.isIOS) {
       final result = await _notifications
-          .resolvePlatformSpecificImplementation<IOSFlutterLocalNotificationsPlugin>()
-          ?.requestPermissions(
-            alert: true,
-            badge: true,
-            sound: true,
-          );
+          .resolvePlatformSpecificImplementation<
+            IOSFlutterLocalNotificationsPlugin
+          >()
+          ?.requestPermissions(alert: true, badge: true, sound: true);
       return result ?? false;
     }
     return true;
@@ -55,7 +57,8 @@ class LocalNotificationService {
     final payload = response.payload;
     if (payload != null) {
       // Handle navigation based on payload
-      print('Notification tapped: $payload');
+      // TODO: Replace with proper logging framework
+      // print('Notification tapped: $payload');
       // TODO: Navigate to appropriate screen
     }
   }
@@ -156,30 +159,28 @@ class LocalNotificationService {
   }
 }
 
-enum NotificationPriority {
-  low,
-  normal,
-  high,
-}
+enum NotificationPriority { low, normal, high }
 
 // Mapping from Socket events to local notifications
 class NotificationMapper {
-  static Future<void> handleSocketNotification(Map<String, dynamic> data) async {
+  static Future<void> handleSocketNotification(
+    Map<String, dynamic> data,
+  ) async {
     final service = LocalNotificationService();
-    
+
     final type = data['type'] as String?;
     final title = data['title'] as String;
     final body = data['body'] as String;
     final priority = data['priority'] as String? ?? 'normal';
-    
+
     final notificationPriority = priority == 'high'
         ? NotificationPriority.high
         : priority == 'low'
-            ? NotificationPriority.low
-            : NotificationPriority.normal;
+        ? NotificationPriority.low
+        : NotificationPriority.normal;
 
     final id = DateTime.now().millisecondsSinceEpoch % 100000;
-    
+
     await service.showNotification(
       id: id,
       title: title,
@@ -197,7 +198,7 @@ class NotificationMapper {
   }) async {
     final service = LocalNotificationService();
     final id = DateTime.now().millisecondsSinceEpoch % 100000;
-    
+
     await service.scheduleNotification(
       id: id,
       title: title,

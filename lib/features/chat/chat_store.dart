@@ -115,7 +115,15 @@ class ChatNotifier extends StateNotifier<ChatState> {
 
   Timer? _typingDebounce;
 
-  void sendMessage(String courseId, int userId, String userName, String message, {String? attachmentPath, String? attachmentName, int? attachmentSize}) {
+  void sendMessage(
+    String courseId,
+    int userId,
+    String userName,
+    String message, {
+    String? attachmentPath,
+    String? attachmentName,
+    int? attachmentSize,
+  }) {
     final msg = ChatMessage(
       id: 'm-${DateTime.now().millisecondsSinceEpoch}',
       courseId: courseId,
@@ -127,7 +135,9 @@ class ChatNotifier extends StateNotifier<ChatState> {
       attachmentName: attachmentName,
       attachmentSize: attachmentSize,
     );
-    final list = List<ChatMessage>.from(state.messagesByCourse[courseId] ?? const []);
+    final list = List<ChatMessage>.from(
+      state.messagesByCourse[courseId] ?? const [],
+    );
     list.add(msg);
     state = state.copyWith(
       messagesByCourse: {...state.messagesByCourse, courseId: list},
@@ -146,7 +156,9 @@ class ChatNotifier extends StateNotifier<ChatState> {
         message: 'Thanks for your message!',
         timestamp: DateTime.now(),
       );
-      final l2 = List<ChatMessage>.from(state.messagesByCourse[courseId] ?? const []);
+      final l2 = List<ChatMessage>.from(
+        state.messagesByCourse[courseId] ?? const [],
+      );
       l2.add(reply);
       state = state.copyWith(
         messagesByCourse: {...state.messagesByCourse, courseId: l2},
@@ -195,7 +207,7 @@ class ChatNotifier extends StateNotifier<ChatState> {
   String getLastSeenText(int userId) {
     final lastSeen = state.lastSeenMap[userId];
     if (lastSeen == null) return 'Never';
-    
+
     final diff = DateTime.now().difference(lastSeen);
     if (diff.inSeconds < 60) return 'Just now';
     if (diff.inMinutes < 60) return '${diff.inMinutes}m ago';
@@ -203,14 +215,43 @@ class ChatNotifier extends StateNotifier<ChatState> {
     return '${diff.inDays}d ago';
   }
 
-  void simulateOnlineUsers(String courseId, {String currentUserRole = 'student'}) {
+  void simulateOnlineUsers(
+    String courseId, {
+    String currentUserRole = 'student',
+  }) {
     final base = <OnlineUser>[
-      OnlineUser(id: 1, name: 'Dr. John Smith', role: 'instructor', status: 'online', lastSeen: DateTime.now()),
-      OnlineUser(id: 2, name: 'Jane Doe', role: 'student', status: 'online', lastSeen: DateTime.now().subtract(const Duration(minutes: 5))),
-      OnlineUser(id: 3, name: 'Alice Johnson', role: 'student', status: 'away', lastSeen: DateTime.now().subtract(const Duration(hours: 2))),
-      OnlineUser(id: 4, name: 'Bob Wilson', role: 'student', status: 'offline', lastSeen: DateTime.now().subtract(const Duration(days: 1))),
+      OnlineUser(
+        id: 1,
+        name: 'Dr. John Smith',
+        role: 'instructor',
+        status: 'online',
+        lastSeen: DateTime.now(),
+      ),
+      OnlineUser(
+        id: 2,
+        name: 'Jane Doe',
+        role: 'student',
+        status: 'online',
+        lastSeen: DateTime.now().subtract(const Duration(minutes: 5)),
+      ),
+      OnlineUser(
+        id: 3,
+        name: 'Alice Johnson',
+        role: 'student',
+        status: 'away',
+        lastSeen: DateTime.now().subtract(const Duration(hours: 2)),
+      ),
+      OnlineUser(
+        id: 4,
+        name: 'Bob Wilson',
+        role: 'student',
+        status: 'offline',
+        lastSeen: DateTime.now().subtract(const Duration(days: 1)),
+      ),
     ];
-    final list = currentUserRole == 'student' ? base : base.where((u) => u.role == 'student').toList();
+    final list = currentUserRole == 'student'
+        ? base
+        : base.where((u) => u.role == 'student').toList();
     state = state.copyWith(
       onlineUsersByCourse: {...state.onlineUsersByCourse, courseId: list},
     );
@@ -232,6 +273,6 @@ class ChatNotifier extends StateNotifier<ChatState> {
   }
 }
 
-final chatProvider = StateNotifierProvider<ChatNotifier, ChatState>((ref) => ChatNotifier());
-
-
+final chatProvider = StateNotifierProvider<ChatNotifier, ChatState>(
+  (ref) => ChatNotifier(),
+);

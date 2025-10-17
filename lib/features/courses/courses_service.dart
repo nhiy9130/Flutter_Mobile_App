@@ -53,6 +53,3 @@ const List<Course> _demoCourses = [
 ];
 
 final coursesService = CoursesService();
-
-
-

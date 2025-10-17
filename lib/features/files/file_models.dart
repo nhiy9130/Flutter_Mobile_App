@@ -18,11 +18,9 @@ class CourseFile {
   final String mimeType;
   final int size;
   final DateTime uploadedAt;
-  final String category; // lecture | assignment | resource | video | document | image
+  final String
+  category; // lecture | assignment | resource | video | document | image
   final String? localPath;
   final bool previewable;
   final int downloadCount;
 }
-
-
-

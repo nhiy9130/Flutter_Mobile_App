@@ -186,20 +186,22 @@ class SafeContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
-    
+
     // Giới hạn kích thước container
-    final safeWidth = width != null 
+    final safeWidth = width != null
         ? (width! > screenSize.width ? screenSize.width : width!)
         : null;
-    
-    final safeHeight = height != null 
+
+    final safeHeight = height != null
         ? (height! > screenSize.height ? screenSize.height : height!)
         : null;
 
-    final safeConstraints = constraints ?? BoxConstraints(
-      maxWidth: screenSize.width,
-      maxHeight: screenSize.height,
-    );
+    final safeConstraints =
+        constraints ??
+        BoxConstraints(
+          maxWidth: screenSize.width,
+          maxHeight: screenSize.height,
+        );
 
     return Container(
       width: safeWidth,

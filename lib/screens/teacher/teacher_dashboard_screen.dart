@@ -13,13 +13,11 @@ class TeacherDashboardScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final auth = ref.watch(authProvider);
-    
+
     return Scaffold(
       body: NestedScrollView(
         headerSliverBuilder: (context, innerBoxIsScrolled) {
-          return [
-            _buildSliverAppBar(context, auth),
-          ];
+          return [_buildSliverAppBar(context, auth)];
         },
         body: RefreshIndicator(
           onRefresh: () async {
@@ -33,23 +31,23 @@ class TeacherDashboardScreen extends ConsumerWidget {
                 // Quick Stats
                 _buildTeachingStats(),
                 const SizedBox(height: AppSpacing.lg),
-                
+
                 // Quick Actions
                 _buildQuickActions(context),
                 const SizedBox(height: AppSpacing.lg),
-                
+
                 // My Courses
                 _buildMyCourses(context),
                 const SizedBox(height: AppSpacing.lg),
-                
+
                 // Recent Students
                 _buildRecentStudents(),
                 const SizedBox(height: AppSpacing.lg),
-                
+
                 // Pending Reviews
                 _buildPendingReviews(context),
                 const SizedBox(height: AppSpacing.lg),
-                
+
                 // Teaching Performance
                 _buildTeachingPerformance(),
               ],
@@ -80,9 +78,7 @@ class TeacherDashboardScreen extends ConsumerWidget {
           style: AppTypography.h5.copyWith(color: AppColors.white),
         ),
         background: Container(
-          decoration: BoxDecoration(
-            gradient: AppColors.teacherGradient,
-          ),
+          decoration: BoxDecoration(gradient: AppColors.teacherGradient),
           child: Padding(
             padding: const EdgeInsets.only(
               left: AppSpacing.screenHorizontal,
@@ -97,7 +93,7 @@ class TeacherDashboardScreen extends ConsumerWidget {
                   children: [
                     CircleAvatar(
                       radius: 24,
-                      backgroundColor: AppColors.white.withOpacity(0.2),
+                      backgroundColor: AppColors.white.withValues(alpha: 0.2),
                       child: Icon(
                         Icons.school,
                         color: AppColors.white,
@@ -111,13 +107,13 @@ class TeacherDashboardScreen extends ConsumerWidget {
                         Text(
                           'Xin chào, ${auth.user?.fullName}',
                           style: AppTypography.bodyLarge.copyWith(
-                            color: AppColors.white.withOpacity(0.9),
+                            color: AppColors.white.withValues(alpha: 0.9),
                           ),
                         ),
                         Text(
                           'Giảng viên · 5 khóa học',
                           style: AppTypography.bodyMedium.copyWith(
-                            color: AppColors.white.withOpacity(0.8),
+                            color: AppColors.white.withValues(alpha: 0.8),
                           ),
                         ),
                       ],
@@ -136,10 +132,7 @@ class TeacherDashboardScreen extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Thống kê giảng dạy',
-          style: AppTypography.h6,
-        ),
+        Text('Thống kê giảng dạy', style: AppTypography.h6),
         const SizedBox(height: AppSpacing.md),
         Row(
           children: [
@@ -210,14 +203,10 @@ class TeacherDashboardScreen extends ConsumerWidget {
                 Container(
                   padding: const EdgeInsets.all(AppSpacing.sm),
                   decoration: BoxDecoration(
-                    color: color.withOpacity(0.1),
+                    color: color.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(AppRadius.md),
                   ),
-                  child: Icon(
-                    icon,
-                    color: color,
-                    size: AppSizes.iconMd,
-                  ),
+                  child: Icon(icon, color: color, size: AppSizes.iconMd),
                 ),
                 const Spacer(),
                 Icon(
@@ -230,23 +219,17 @@ class TeacherDashboardScreen extends ConsumerWidget {
             const SizedBox(height: AppSpacing.md),
             Text(
               title,
-              style: AppTypography.bodySmall.copyWith(
-                color: AppColors.grey600,
-              ),
+              style: AppTypography.bodySmall.copyWith(color: AppColors.grey600),
             ),
             const SizedBox(height: AppSpacing.xs),
             Text(
               value,
-              style: AppTypography.h5.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
+              style: AppTypography.h5.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: AppSpacing.xs),
             Text(
               subtitle,
-              style: AppTypography.bodySmall.copyWith(
-                color: AppColors.grey600,
-              ),
+              style: AppTypography.bodySmall.copyWith(color: AppColors.grey600),
             ),
           ],
         ),
@@ -258,10 +241,7 @@ class TeacherDashboardScreen extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Thao tác nhanh',
-          style: AppTypography.h6,
-        ),
+        Text('Thao tác nhanh', style: AppTypography.h6),
         const SizedBox(height: AppSpacing.md),
         GridView.count(
           shrinkWrap: true,
@@ -317,14 +297,10 @@ class TeacherDashboardScreen extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.all(AppSpacing.md),
               decoration: BoxDecoration(
-                color: color.withOpacity(0.1),
+                color: color.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(AppRadius.lg),
               ),
-              child: Icon(
-                icon,
-                color: color,
-                size: AppSizes.iconLg,
-              ),
+              child: Icon(icon, color: color, size: AppSizes.iconLg),
             ),
             const SizedBox(height: AppSpacing.sm),
             Text(
@@ -347,10 +323,7 @@ class TeacherDashboardScreen extends ConsumerWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              'Khóa học của tôi',
-              style: AppTypography.h6,
-            ),
+            Text('Khóa học của tôi', style: AppTypography.h6),
             TextButton(
               onPressed: () => context.go('/teacher/courses'),
               child: Text(
@@ -370,9 +343,7 @@ class TeacherDashboardScreen extends ConsumerWidget {
             itemCount: 3,
             itemBuilder: (context, index) {
               return Padding(
-                padding: EdgeInsets.only(
-                  right: index < 2 ? AppSpacing.md : 0,
-                ),
+                padding: EdgeInsets.only(right: index < 2 ? AppSpacing.md : 0),
                 child: _buildCourseCard(index),
               );
             },
@@ -419,7 +390,7 @@ class TeacherDashboardScreen extends ConsumerWidget {
               Container(
                 padding: const EdgeInsets.all(AppSpacing.sm),
                 decoration: BoxDecoration(
-                  color: (course['color'] as Color).withOpacity(0.1),
+                  color: (course['color'] as Color).withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppRadius.sm),
                 ),
                 child: Icon(
@@ -492,7 +463,7 @@ class TeacherDashboardScreen extends ConsumerWidget {
         vertical: 2,
       ),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppRadius.xs),
       ),
       child: Text(
@@ -510,10 +481,7 @@ class TeacherDashboardScreen extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Học viên gần đây',
-          style: AppTypography.h6,
-        ),
+        Text('Học viên gần đây', style: AppTypography.h6),
         const SizedBox(height: AppSpacing.md),
         CustomCard(
           child: Column(
@@ -596,7 +564,7 @@ class TeacherDashboardScreen extends ConsumerWidget {
               vertical: AppSpacing.xs,
             ),
             decoration: BoxDecoration(
-              color: progressColor.withOpacity(0.1),
+              color: progressColor.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(AppRadius.sm),
             ),
             child: Text(
@@ -619,10 +587,7 @@ class TeacherDashboardScreen extends ConsumerWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              'Cần xem xét',
-              style: AppTypography.h6,
-            ),
+            Text('Cần xem xét', style: AppTypography.h6),
             TextButton(
               onPressed: () {},
               child: Text(
@@ -684,14 +649,10 @@ class TeacherDashboardScreen extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.all(AppSpacing.sm),
               decoration: BoxDecoration(
-                color: color.withOpacity(0.1),
+                color: color.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(AppRadius.sm),
               ),
-              child: Icon(
-                icon,
-                color: color,
-                size: AppSizes.iconSm,
-              ),
+              child: Icon(icon, color: color, size: AppSizes.iconSm),
             ),
             const SizedBox(width: AppSpacing.md),
             Expanded(
@@ -729,10 +690,7 @@ class TeacherDashboardScreen extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Hiệu suất giảng dạy',
-          style: AppTypography.h6,
-        ),
+        Text('Hiệu suất giảng dạy', style: AppTypography.h6),
         const SizedBox(height: AppSpacing.md),
         CustomCard(
           child: Padding(
@@ -779,10 +737,7 @@ class TeacherDashboardScreen extends ConsumerWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              title,
-              style: AppTypography.bodyMedium,
-            ),
+            Text(title, style: AppTypography.bodyMedium),
             Text(
               percentage,
               style: AppTypography.bodyMedium.copyWith(

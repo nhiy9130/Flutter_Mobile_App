@@ -46,8 +46,7 @@ class _SimpleCalendarState extends State<SimpleCalendar> {
         _buildHeader(),
         _buildWeekDays(),
         _buildCalendarGrid(),
-        if (widget.showEvents && widget.events != null)
-          _buildEventsList(),
+        if (widget.showEvents && widget.events != null) _buildEventsList(),
       ],
     );
   }
@@ -69,10 +68,7 @@ class _SimpleCalendarState extends State<SimpleCalendar> {
             },
             icon: const Icon(Icons.chevron_left),
           ),
-          Text(
-            _getMonthYearText(_currentMonth),
-            style: AppTypography.h6,
-          ),
+          Text(_getMonthYearText(_currentMonth), style: AppTypography.h6),
           IconButton(
             onPressed: () {
               setState(() {
@@ -91,7 +87,7 @@ class _SimpleCalendarState extends State<SimpleCalendar> {
 
   Widget _buildWeekDays() {
     const weekDays = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
-    
+
     return Container(
       padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
       child: Row(
@@ -113,13 +109,23 @@ class _SimpleCalendarState extends State<SimpleCalendar> {
   }
 
   Widget _buildCalendarGrid() {
-    final firstDayOfMonth = DateTime(_currentMonth.year, _currentMonth.month, 1);
-    final lastDayOfMonth = DateTime(_currentMonth.year, _currentMonth.month + 1, 0);
-    final startDate = firstDayOfMonth.subtract(Duration(days: firstDayOfMonth.weekday % 7));
-    
+    final firstDayOfMonth = DateTime(
+      _currentMonth.year,
+      _currentMonth.month,
+      1,
+    );
+    final lastDayOfMonth = DateTime(
+      _currentMonth.year,
+      _currentMonth.month + 1,
+      0,
+    );
+    final startDate = firstDayOfMonth.subtract(
+      Duration(days: firstDayOfMonth.weekday % 7),
+    );
+
     final weeks = <List<DateTime>>[];
     var currentDate = startDate;
-    
+
     while (currentDate.isBefore(lastDayOfMonth.add(const Duration(days: 7)))) {
       final week = <DateTime>[];
       for (int i = 0; i < 7; i++) {
@@ -127,7 +133,7 @@ class _SimpleCalendarState extends State<SimpleCalendar> {
         currentDate = currentDate.add(const Duration(days: 1));
       }
       weeks.add(week);
-      
+
       if (week.every((date) => date.month != _currentMonth.month)) {
         break;
       }
@@ -137,9 +143,7 @@ class _SimpleCalendarState extends State<SimpleCalendar> {
       children: weeks.map((week) {
         return Row(
           children: week.map((date) {
-            return Expanded(
-              child: _buildDateCell(date),
-            );
+            return Expanded(child: _buildDateCell(date));
           }).toList(),
         );
       }).toList(),
@@ -148,13 +152,16 @@ class _SimpleCalendarState extends State<SimpleCalendar> {
 
   Widget _buildDateCell(DateTime date) {
     final isCurrentMonth = date.month == _currentMonth.month;
-    final isSelected = _selectedDate != null && 
+    final isSelected =
+        _selectedDate != null &&
         date.year == _selectedDate!.year &&
         date.month == _selectedDate!.month &&
         date.day == _selectedDate!.day;
     final isToday = _isToday(date);
-    final isHighlighted = widget.highlightedDates?.any((d) => _isSameDay(d, date)) ?? false;
-    final hasEvents = widget.events?.any((e) => _isSameDay(e.date, date)) ?? false;
+    final isHighlighted =
+        widget.highlightedDates?.any((d) => _isSameDay(d, date)) ?? false;
+    final hasEvents =
+        widget.events?.any((e) => _isSameDay(e.date, date)) ?? false;
 
     return GestureDetector(
       onTap: () {
@@ -184,11 +191,13 @@ class _SimpleCalendarState extends State<SimpleCalendar> {
                   color: isSelected
                       ? AppColors.white
                       : isCurrentMonth
-                          ? isToday
-                              ? AppColors.primary
-                              : Theme.of(context).colorScheme.onSurface
-                          : AppColors.grey400,
-                  fontWeight: isSelected || isToday ? FontWeight.w600 : FontWeight.normal,
+                      ? isToday
+                            ? AppColors.primary
+                            : Theme.of(context).colorScheme.onSurface
+                      : AppColors.grey400,
+                  fontWeight: isSelected || isToday
+                      ? FontWeight.w600
+                      : FontWeight.normal,
                 ),
               ),
             ),
@@ -229,19 +238,19 @@ class _SimpleCalendarState extends State<SimpleCalendar> {
 
   Widget _buildEventsList() {
     if (_selectedDate == null) return const SizedBox.shrink();
-    
-    final eventsForSelectedDate = widget.events?.where(
-      (event) => _isSameDay(event.date, _selectedDate!),
-    ).toList() ?? [];
+
+    final eventsForSelectedDate =
+        widget.events
+            ?.where((event) => _isSameDay(event.date, _selectedDate!))
+            .toList() ??
+        [];
 
     if (eventsForSelectedDate.isEmpty) {
       return Padding(
         padding: const EdgeInsets.all(AppSpacing.md),
         child: Text(
           'Không có sự kiện nào trong ngày này',
-          style: AppTypography.bodyMedium.copyWith(
-            color: AppColors.grey600,
-          ),
+          style: AppTypography.bodyMedium.copyWith(color: AppColors.grey600),
         ),
       );
     }
@@ -264,10 +273,14 @@ class _SimpleCalendarState extends State<SimpleCalendar> {
             ),
             padding: const EdgeInsets.all(AppSpacing.md),
             decoration: BoxDecoration(
-              color: event.color?.withOpacity(0.1) ?? AppColors.primary.withOpacity(0.1),
+              color:
+                  event.color?.withValues(alpha: 0.1) ??
+                  AppColors.primary.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(AppRadius.sm),
               border: Border.all(
-                color: event.color?.withOpacity(0.3) ?? AppColors.primary.withOpacity(0.3),
+                color:
+                    event.color?.withValues(alpha: 0.3) ??
+                    AppColors.primary.withValues(alpha: 0.3),
               ),
             ),
             child: Row(
@@ -315,18 +328,27 @@ class _SimpleCalendarState extends State<SimpleCalendar> {
               ],
             ),
           );
-        }).toList(),
+        }),
       ],
     );
   }
 
   String _getMonthYearText(DateTime date) {
     const months = [
-      'Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4',
-      'Tháng 5', 'Tháng 6', 'Tháng 7', 'Tháng 8',
-      'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'
+      'Tháng 1',
+      'Tháng 2',
+      'Tháng 3',
+      'Tháng 4',
+      'Tháng 5',
+      'Tháng 6',
+      'Tháng 7',
+      'Tháng 8',
+      'Tháng 9',
+      'Tháng 10',
+      'Tháng 11',
+      'Tháng 12',
     ];
-    
+
     return '${months[date.month - 1]} ${date.year}';
   }
 
@@ -401,7 +423,7 @@ class _CompactCalendarState extends State<CompactCalendar> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       height: 300,
       child: Column(
         children: [
@@ -411,11 +433,17 @@ class _CompactCalendarState extends State<CompactCalendar> {
               controller: _pageController,
               onPageChanged: (index) {
                 setState(() {
-                  _currentMonth = DateTime(_currentMonth.year, _currentMonth.month + index - 1000);
+                  _currentMonth = DateTime(
+                    _currentMonth.year,
+                    _currentMonth.month + index - 1000,
+                  );
                 });
               },
               itemBuilder: (context, index) {
-                final month = DateTime(_currentMonth.year, _currentMonth.month + index - 1000);
+                final month = DateTime(
+                  _currentMonth.year,
+                  _currentMonth.month + index - 1000,
+                );
                 return _buildMonthView(month);
               },
             ),
@@ -432,7 +460,7 @@ class _CompactCalendarState extends State<CompactCalendar> {
         vertical: AppSpacing.sm,
       ),
       decoration: BoxDecoration(
-        color: AppColors.primary.withOpacity(0.1),
+        color: AppColors.primary.withValues(alpha: 0.1),
         borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(AppRadius.md),
           topRight: Radius.circular(AppRadius.md),
@@ -474,9 +502,7 @@ class _CompactCalendarState extends State<CompactCalendar> {
       child: Column(
         children: [
           _buildWeekDaysHeader(),
-          Expanded(
-            child: _buildCalendarGridForMonth(month),
-          ),
+          Expanded(child: _buildCalendarGridForMonth(month)),
         ],
       ),
     );
@@ -484,7 +510,7 @@ class _CompactCalendarState extends State<CompactCalendar> {
 
   Widget _buildWeekDaysHeader() {
     const weekDays = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
-    
+
     return Row(
       children: weekDays.map((day) {
         return Expanded(
@@ -504,11 +530,13 @@ class _CompactCalendarState extends State<CompactCalendar> {
 
   Widget _buildCalendarGridForMonth(DateTime month) {
     final firstDayOfMonth = DateTime(month.year, month.month, 1);
-    final startDate = firstDayOfMonth.subtract(Duration(days: firstDayOfMonth.weekday % 7));
-    
+    final startDate = firstDayOfMonth.subtract(
+      Duration(days: firstDayOfMonth.weekday % 7),
+    );
+
     final weeks = <List<DateTime>>[];
     var currentDate = startDate;
-    
+
     while (weeks.length < 6) {
       final week = <DateTime>[];
       for (int i = 0; i < 7; i++) {
@@ -523,9 +551,7 @@ class _CompactCalendarState extends State<CompactCalendar> {
         return Expanded(
           child: Row(
             children: week.map((date) {
-              return Expanded(
-                child: _buildCompactDateCell(date, month),
-              );
+              return Expanded(child: _buildCompactDateCell(date, month));
             }).toList(),
           ),
         );
@@ -535,31 +561,35 @@ class _CompactCalendarState extends State<CompactCalendar> {
 
   Widget _buildCompactDateCell(DateTime date, DateTime month) {
     final isCurrentMonth = date.month == month.month;
-    final isSelected = date.year == _selectedDate.year &&
+    final isSelected =
+        date.year == _selectedDate.year &&
         date.month == _selectedDate.month &&
         date.day == _selectedDate.day;
     final isToday = _isToday(date);
-    final isDisabled = (widget.minDate != null && date.isBefore(widget.minDate!)) ||
+    final isDisabled =
+        (widget.minDate != null && date.isBefore(widget.minDate!)) ||
         (widget.maxDate != null && date.isAfter(widget.maxDate!));
 
     return GestureDetector(
-      onTap: isDisabled ? null : () {
-        setState(() {
-          _selectedDate = date;
-        });
-        widget.onDateSelected?.call(date);
-      },
+      onTap: isDisabled
+          ? null
+          : () {
+              setState(() {
+                _selectedDate = date;
+              });
+              widget.onDateSelected?.call(date);
+            },
       child: Container(
         margin: const EdgeInsets.all(1),
         decoration: BoxDecoration(
-          color: isSelected 
+          color: isSelected
               ? AppColors.primary
               : isToday
-                  ? AppColors.primary.withOpacity(0.1)
-                  : Colors.transparent,
+              ? AppColors.primary.withValues(alpha: 0.1)
+              : Colors.transparent,
           borderRadius: BorderRadius.circular(AppRadius.sm),
           border: isToday && !isSelected
-              ? Border.all(color: AppColors.primary.withOpacity(0.5))
+              ? Border.all(color: AppColors.primary.withValues(alpha: 0.5))
               : null,
         ),
         child: Center(
@@ -569,13 +599,15 @@ class _CompactCalendarState extends State<CompactCalendar> {
               color: isDisabled
                   ? AppColors.grey400
                   : isSelected
-                      ? AppColors.white
-                      : isCurrentMonth
-                          ? isToday
-                              ? AppColors.primary
-                              : Theme.of(context).colorScheme.onSurface
-                          : AppColors.grey400,
-              fontWeight: isSelected || isToday ? FontWeight.w600 : FontWeight.normal,
+                  ? AppColors.white
+                  : isCurrentMonth
+                  ? isToday
+                        ? AppColors.primary
+                        : Theme.of(context).colorScheme.onSurface
+                  : AppColors.grey400,
+              fontWeight: isSelected || isToday
+                  ? FontWeight.w600
+                  : FontWeight.normal,
             ),
           ),
         ),
@@ -585,11 +617,20 @@ class _CompactCalendarState extends State<CompactCalendar> {
 
   String _getMonthYearText(DateTime date) {
     const months = [
-      'Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4',
-      'Tháng 5', 'Tháng 6', 'Tháng 7', 'Tháng 8',
-      'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'
+      'Tháng 1',
+      'Tháng 2',
+      'Tháng 3',
+      'Tháng 4',
+      'Tháng 5',
+      'Tháng 6',
+      'Tháng 7',
+      'Tháng 8',
+      'Tháng 9',
+      'Tháng 10',
+      'Tháng 11',
+      'Tháng 12',
     ];
-    
+
     return '${months[date.month - 1]} ${date.year}';
   }
 
@@ -635,9 +676,7 @@ class _DateRangePickerState extends State<DateRangePicker> {
       children: [
         _buildSelectedRangeDisplay(),
         const SizedBox(height: AppSpacing.md),
-        SimpleCalendar(
-          onDateSelected: _onDateSelected,
-        ),
+        SimpleCalendar(onDateSelected: _onDateSelected),
       ],
     );
   }
@@ -646,21 +685,14 @@ class _DateRangePickerState extends State<DateRangePicker> {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
-        color: AppColors.primary.withOpacity(0.1),
+        color: AppColors.primary.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppRadius.md),
       ),
       child: Row(
         children: [
-          Expanded(
-            child: _buildDateDisplay('Từ ngày', _startDate),
-          ),
-          Icon(
-            Icons.arrow_forward,
-            color: AppColors.primary,
-          ),
-          Expanded(
-            child: _buildDateDisplay('Đến ngày', _endDate),
-          ),
+          Expanded(child: _buildDateDisplay('Từ ngày', _startDate)),
+          Icon(Icons.arrow_forward, color: AppColors.primary),
+          Expanded(child: _buildDateDisplay('Đến ngày', _endDate)),
         ],
       ),
     );
@@ -672,15 +704,11 @@ class _DateRangePickerState extends State<DateRangePicker> {
       children: [
         Text(
           label,
-          style: AppTypography.bodySmall.copyWith(
-            color: AppColors.grey600,
-          ),
+          style: AppTypography.bodySmall.copyWith(color: AppColors.grey600),
         ),
         const SizedBox(height: AppSpacing.xs),
         Text(
-          date != null
-              ? '${date.day}/${date.month}/${date.year}'
-              : 'Chọn ngày',
+          date != null ? '${date.day}/${date.month}/${date.year}' : 'Chọn ngày',
           style: AppTypography.bodyMedium.copyWith(
             fontWeight: FontWeight.w600,
             color: date != null ? AppColors.primary : AppColors.grey500,

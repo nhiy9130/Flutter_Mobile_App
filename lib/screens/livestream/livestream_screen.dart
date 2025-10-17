@@ -5,7 +5,11 @@ import '../../features/livestream/livestream_store.dart';
 import '../../core/webrtc/webrtc_client.dart';
 
 class LivestreamScreen extends ConsumerStatefulWidget {
-  const LivestreamScreen({super.key, required this.courseId, required this.isHost});
+  const LivestreamScreen({
+    super.key,
+    required this.courseId,
+    required this.isHost,
+  });
   final String courseId;
   final bool isHost;
 
@@ -106,7 +110,9 @@ class _LivestreamScreenState extends ConsumerState<LivestreamScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.isHost ? 'Hosting Livestream' : 'Viewing Livestream'),
+        title: Text(
+          widget.isHost ? 'Hosting Livestream' : 'Viewing Livestream',
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.info_outline),
@@ -160,7 +166,7 @@ class _LivestreamScreenState extends ConsumerState<LivestreamScreen> {
               color: Colors.black87,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.3),
+                  color: Colors.black.withValues(alpha: 0.3),
                   blurRadius: 8,
                   offset: const Offset(0, -2),
                 ),
@@ -172,7 +178,9 @@ class _LivestreamScreenState extends ConsumerState<LivestreamScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   _buildControlButton(
-                    icon: state.isVideoEnabled ? Icons.videocam : Icons.videocam_off,
+                    icon: state.isVideoEnabled
+                        ? Icons.videocam
+                        : Icons.videocam_off,
                     label: 'Video',
                     isActive: state.isVideoEnabled,
                     onPressed: () {
@@ -217,7 +225,11 @@ class _LivestreamScreenState extends ConsumerState<LivestreamScreen> {
               : Container(
                   color: Colors.grey.shade800,
                   child: const Center(
-                    child: Icon(Icons.videocam_off, size: 64, color: Colors.white54),
+                    child: Icon(
+                      Icons.videocam_off,
+                      size: 64,
+                      color: Colors.white54,
+                    ),
                   ),
                 ),
           Positioned(
@@ -237,10 +249,15 @@ class _LivestreamScreenState extends ConsumerState<LivestreamScreen> {
                   const SizedBox(width: 4),
                   const Text(
                     'You',
-                    style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w500),
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                   const Spacer(),
-                  if (!state.isAudioEnabled) const Icon(Icons.mic_off, size: 14, color: Colors.red),
+                  if (!state.isAudioEnabled)
+                    const Icon(Icons.mic_off, size: 14, color: Colors.red),
                 ],
               ),
             ),
@@ -260,14 +277,18 @@ class _LivestreamScreenState extends ConsumerState<LivestreamScreen> {
             color: Colors.grey.shade800,
             child: participant.videoEnabled
                 ? participant.stream != null
-                    ? RTCVideoView(
-                        RTCVideoRenderer()..srcObject = participant.stream,
-                      )
-                    : const Center(
-                        child: CircularProgressIndicator(color: Colors.white),
-                      )
+                      ? RTCVideoView(
+                          RTCVideoRenderer()..srcObject = participant.stream,
+                        )
+                      : const Center(
+                          child: CircularProgressIndicator(color: Colors.white),
+                        )
                 : const Center(
-                    child: Icon(Icons.videocam_off, size: 64, color: Colors.white54),
+                    child: Icon(
+                      Icons.videocam_off,
+                      size: 64,
+                      color: Colors.white54,
+                    ),
                   ),
           ),
           Positioned(
@@ -284,7 +305,9 @@ class _LivestreamScreenState extends ConsumerState<LivestreamScreen> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Icon(
-                    participant.role == 'instructor' ? Icons.school : Icons.person,
+                    participant.role == 'instructor'
+                        ? Icons.school
+                        : Icons.person,
                     size: 16,
                     color: Colors.white,
                   ),
@@ -292,12 +315,17 @@ class _LivestreamScreenState extends ConsumerState<LivestreamScreen> {
                   Flexible(
                     child: Text(
                       participant.userName,
-                      style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w500),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                      ),
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
                   const Spacer(),
-                  if (!participant.audioEnabled) const Icon(Icons.mic_off, size: 14, color: Colors.red),
+                  if (!participant.audioEnabled)
+                    const Icon(Icons.mic_off, size: 14, color: Colors.red),
                 ],
               ),
             ),
@@ -327,17 +355,16 @@ class _LivestreamScreenState extends ConsumerState<LivestreamScreen> {
               padding: const EdgeInsets.all(16),
               child: Icon(
                 icon,
-                color: color != null ? Colors.white : (isActive ? Colors.black87 : Colors.white),
+                color: color != null
+                    ? Colors.white
+                    : (isActive ? Colors.black87 : Colors.white),
                 size: 28,
               ),
             ),
           ),
         ),
         const SizedBox(height: 4),
-        Text(
-          label,
-          style: const TextStyle(color: Colors.white, fontSize: 12),
-        ),
+        Text(label, style: const TextStyle(color: Colors.white, fontSize: 12)),
       ],
     );
   }

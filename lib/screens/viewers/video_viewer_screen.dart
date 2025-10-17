@@ -42,13 +42,17 @@ class _VideoViewerScreenState extends State<VideoViewerScreen> {
       floatingActionButton: ready
           ? FloatingActionButton(
               onPressed: () {
-                setState(() => controller.value.isPlaying ? controller.pause() : controller.play());
+                setState(
+                  () => controller.value.isPlaying
+                      ? controller.pause()
+                      : controller.play(),
+                );
               },
-              child: Icon(controller.value.isPlaying ? Icons.pause : Icons.play_arrow),
+              child: Icon(
+                controller.value.isPlaying ? Icons.pause : Icons.play_arrow,
+              ),
             )
           : null,
     );
   }
 }
-
-

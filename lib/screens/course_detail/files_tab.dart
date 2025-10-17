@@ -53,7 +53,10 @@ class _FilesTabViewState extends State<FilesTabView> {
           padding: const EdgeInsets.all(8),
           child: Row(
             children: [
-              ElevatedButton(onPressed: _upload, child: const Text('Upload File')),
+              ElevatedButton(
+                onPressed: _upload,
+                child: const Text('Upload File'),
+              ),
               const SizedBox(width: 8),
               Text('Files (${files.length})'),
             ],
@@ -65,14 +68,24 @@ class _FilesTabViewState extends State<FilesTabView> {
             children: [
               Expanded(
                 child: TextField(
-                  decoration: const InputDecoration(prefixIcon: Icon(Icons.search), hintText: 'Search files...'),
+                  decoration: const InputDecoration(
+                    prefixIcon: Icon(Icons.search),
+                    hintText: 'Search files...',
+                  ),
                   onChanged: (v) async {
                     term = v;
                     _debounce?.cancel();
-                    _debounce = Timer(const Duration(milliseconds: 300), () async {
-                      files = await fileService.searchFiles(widget.courseId, term: term, category: category);
-                      if (mounted) setState(() {});
-                    });
+                    _debounce = Timer(
+                      const Duration(milliseconds: 300),
+                      () async {
+                        files = await fileService.searchFiles(
+                          widget.courseId,
+                          term: term,
+                          category: category,
+                        );
+                        if (mounted) setState(() {});
+                      },
+                    );
                   },
                 ),
               ),
@@ -82,7 +95,10 @@ class _FilesTabViewState extends State<FilesTabView> {
                 items: const [
                   DropdownMenuItem(value: 'all', child: Text('All')),
                   DropdownMenuItem(value: 'lecture', child: Text('Lectures')),
-                  DropdownMenuItem(value: 'assignment', child: Text('Assignments')),
+                  DropdownMenuItem(
+                    value: 'assignment',
+                    child: Text('Assignments'),
+                  ),
                   DropdownMenuItem(value: 'resource', child: Text('Resources')),
                   DropdownMenuItem(value: 'video', child: Text('Videos')),
                   DropdownMenuItem(value: 'document', child: Text('Documents')),
@@ -90,10 +106,14 @@ class _FilesTabViewState extends State<FilesTabView> {
                 ],
                 onChanged: (v) async {
                   category = v ?? 'all';
-                  files = await fileService.searchFiles(widget.courseId, term: term, category: category);
+                  files = await fileService.searchFiles(
+                    widget.courseId,
+                    term: term,
+                    category: category,
+                  );
                   setState(() {});
                 },
-              )
+              ),
             ],
           ),
         ),
@@ -121,46 +141,75 @@ class _FilesTabViewState extends State<FilesTabView> {
                                   await OpenFilex.open(f.localPath!);
                                 } else {
                                   if (context.mounted) {
-                                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Không có file cục bộ để xem')));
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text(
+                                          'Không có file cục bộ để xem',
+                                        ),
+                                      ),
+                                    );
                                   }
                                 }
                               },
                             ),
-                          Text('${f.downloadCount}')
+                          Text('${f.downloadCount}'),
                         ],
                       ),
                       onTap: () async {
                         await fileService.incrementDownload(f.id);
-                        final list = await fileService.getFilesByCourse(widget.courseId);
+                        final list = await fileService.getFilesByCourse(
+                          widget.courseId,
+                        );
                         setState(() => files = list);
                         if (f.localPath != null) {
                           if (f.mimeType.contains('pdf')) {
                             if (context.mounted) {
-                              Navigator.of(context).push(MaterialPageRoute(builder: (_) => PdfViewerScreen(path: f.localPath!)));
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (_) =>
+                                      PdfViewerScreen(path: f.localPath!),
+                                ),
+                              );
                             }
                           } else if (f.mimeType.startsWith('video/')) {
                             if (context.mounted) {
-                              Navigator.of(context).push(MaterialPageRoute(builder: (_) => VideoViewerScreen(path: f.localPath!)));
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (_) =>
+                                      VideoViewerScreen(path: f.localPath!),
+                                ),
+                              );
                             }
                           }
                         }
                       },
                       onLongPress: () async {
-                        final ok = await showDialog<bool>(
+                        final ok =
+                            await showDialog<bool>(
                               context: context,
                               builder: (ctx) => AlertDialog(
                                 title: const Text('Xóa tệp?'),
-                                content: Text('Bạn chắc chắn muốn xóa "${f.originalName}"?'),
+                                content: Text(
+                                  'Bạn chắc chắn muốn xóa "${f.originalName}"?',
+                                ),
                                 actions: [
-                                  TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Hủy')),
-                                  ElevatedButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Xóa')),
+                                  TextButton(
+                                    onPressed: () => Navigator.pop(ctx, false),
+                                    child: const Text('Hủy'),
+                                  ),
+                                  ElevatedButton(
+                                    onPressed: () => Navigator.pop(ctx, true),
+                                    child: const Text('Xóa'),
+                                  ),
                                 ],
                               ),
                             ) ??
                             false;
                         if (ok) {
                           await fileService.deleteFile(f.id);
-                          final list = await fileService.getFilesByCourse(widget.courseId);
+                          final list = await fileService.getFilesByCourse(
+                            widget.courseId,
+                          );
                           setState(() => files = list);
                         }
                       },
@@ -172,5 +221,3 @@ class _FilesTabViewState extends State<FilesTabView> {
     );
   }
 }
-
-

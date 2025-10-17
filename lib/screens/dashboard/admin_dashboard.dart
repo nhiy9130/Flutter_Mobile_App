@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import '../../features/auth/auth_state.dart';
 import '../../core/widgets/quick_action_card.dart';
 import '../../core/widgets/stat_card.dart';
@@ -24,10 +23,7 @@ class AdminDashboard extends ConsumerWidget {
         const SizedBox(height: 24),
 
         // System Overview
-        const SectionHeader(
-          title: 'Tổng quan hệ thống',
-          icon: Icons.dashboard,
-        ),
+        const SectionHeader(title: 'Tổng quan hệ thống', icon: Icons.dashboard),
         const SizedBox(height: 12),
         _buildSystemOverview(context),
         const SizedBox(height: 24),
@@ -42,19 +38,13 @@ class AdminDashboard extends ConsumerWidget {
         const SizedBox(height: 24),
 
         // Platform Analytics
-        const SectionHeader(
-          title: 'Thống kê nền tảng',
-          icon: Icons.analytics,
-        ),
+        const SectionHeader(title: 'Thống kê nền tảng', icon: Icons.analytics),
         const SizedBox(height: 12),
         _buildPlatformAnalytics(context),
         const SizedBox(height: 24),
 
         // System Activities
-        const SectionHeader(
-          title: 'Hoạt động hệ thống',
-          icon: Icons.history,
-        ),
+        const SectionHeader(title: 'Hoạt động hệ thống', icon: Icons.history),
         const SizedBox(height: 12),
         _buildSystemActivities(context),
       ],
@@ -63,15 +53,12 @@ class AdminDashboard extends ConsumerWidget {
 
   Widget _buildWelcomeCard(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [
-            Colors.orange.shade600,
-            Colors.red.shade600,
-          ],
+          colors: [Colors.orange.shade600, Colors.red.shade600],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -85,7 +72,7 @@ class AdminDashboard extends ConsumerWidget {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
+                  color: Colors.white.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: const Icon(
@@ -110,7 +97,7 @@ class AdminDashboard extends ConsumerWidget {
                     Text(
                       'Quản lý và giám sát hệ thống LMS',
                       style: theme.textTheme.bodyLarge?.copyWith(
-                        color: Colors.white.withOpacity(0.9),
+                        color: Colors.white.withValues(alpha: 0.9),
                       ),
                     ),
                   ],
@@ -140,7 +127,9 @@ class AdminDashboard extends ConsumerWidget {
               OutlinedButton.icon(
                 onPressed: () {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Tính năng báo cáo sẽ được cập nhật sớm')),
+                    const SnackBar(
+                      content: Text('Tính năng báo cáo sẽ được cập nhật sớm'),
+                    ),
                   );
                 },
                 icon: const Icon(Icons.assessment),
@@ -244,7 +233,9 @@ class AdminDashboard extends ConsumerWidget {
           color: Colors.purple,
           onTap: () {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Tính năng báo cáo sẽ được cập nhật sớm')),
+              const SnackBar(
+                content: Text('Tính năng báo cáo sẽ được cập nhật sớm'),
+              ),
             );
           },
         ),
@@ -317,7 +308,7 @@ class AdminDashboard extends ConsumerWidget {
           leading: Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: Colors.green.withOpacity(0.1),
+              color: Colors.green.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8),
             ),
             child: const Icon(Icons.person_add, color: Colors.green),
@@ -331,7 +322,7 @@ class AdminDashboard extends ConsumerWidget {
           leading: Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: Colors.blue.withOpacity(0.1),
+              color: Colors.blue.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8),
             ),
             child: const Icon(Icons.cloud_upload, color: Colors.blue),
@@ -345,7 +336,7 @@ class AdminDashboard extends ConsumerWidget {
           leading: Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: Colors.orange.withOpacity(0.1),
+              color: Colors.orange.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8),
             ),
             child: const Icon(Icons.update, color: Colors.orange),
@@ -359,7 +350,7 @@ class AdminDashboard extends ConsumerWidget {
           leading: Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: Colors.purple.withOpacity(0.1),
+              color: Colors.purple.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8),
             ),
             child: const Icon(Icons.security, color: Colors.purple),
