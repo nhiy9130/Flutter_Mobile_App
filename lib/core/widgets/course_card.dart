@@ -49,9 +49,7 @@ class CourseCard extends StatelessWidget {
                 // Course Description
                 Text(
                   course.description ?? 'No description available',
-                  style: AppTypography.bodyMedium.copyWith(
-                    color: AppColors.grey600,
-                  ),
+                  style: AppTypography.bodyMedium.copyWith(color: AppColors.grey600),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -69,17 +67,11 @@ class CourseCard extends StatelessWidget {
                     // Enrollment Count
                     Row(
                       children: [
-                        Icon(
-                          Icons.people,
-                          size: AppSizes.iconSm,
-                          color: AppColors.grey600,
-                        ),
+                        Icon(Icons.people, size: AppSizes.iconSm, color: AppColors.grey600),
                         const SizedBox(width: AppSpacing.xs),
                         Text(
                           '${course.enrollmentCount ?? 0}',
-                          style: AppTypography.bodySmall.copyWith(
-                            color: AppColors.grey600,
-                          ),
+                          style: AppTypography.bodySmall.copyWith(color: AppColors.grey600),
                         ),
                       ],
                     ),
@@ -88,17 +80,11 @@ class CourseCard extends StatelessWidget {
                     // Rating
                     Row(
                       children: [
-                        Icon(
-                          Icons.star,
-                          size: AppSizes.iconSm,
-                          color: AppColors.warning,
-                        ),
+                        Icon(Icons.star, size: AppSizes.iconSm, color: AppColors.warning),
                         const SizedBox(width: AppSpacing.xs),
                         Text(
                           '${_getRating()}',
-                          style: AppTypography.bodySmall.copyWith(
-                            color: AppColors.grey600,
-                          ),
+                          style: AppTypography.bodySmall.copyWith(color: AppColors.grey600),
                         ),
                       ],
                     ),
@@ -151,27 +137,15 @@ class CourseCard extends StatelessWidget {
             _buildPlaceholderImage(),
 
           // Category Badge
-          Positioned(
-            top: AppSpacing.sm,
-            left: AppSpacing.sm,
-            child: _buildCategoryBadge(),
-          ),
+          Positioned(top: AppSpacing.sm, left: AppSpacing.sm, child: _buildCategoryBadge()),
 
           // Favorite Button (if not enrolled)
           if (!isEnrolled)
-            Positioned(
-              top: AppSpacing.sm,
-              right: AppSpacing.sm,
-              child: _buildFavoriteButton(),
-            ),
+            Positioned(top: AppSpacing.sm, right: AppSpacing.sm, child: _buildFavoriteButton()),
 
           // Progress Badge (if enrolled)
           if (isEnrolled)
-            Positioned(
-              top: AppSpacing.sm,
-              right: AppSpacing.sm,
-              child: _buildProgressBadge(),
-            ),
+            Positioned(top: AppSpacing.sm, right: AppSpacing.sm, child: _buildProgressBadge()),
         ],
       ),
     );
@@ -198,10 +172,7 @@ class CourseCard extends StatelessWidget {
 
   Widget _buildCategoryBadge() {
     return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.sm,
-        vertical: AppSpacing.xs,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
       decoration: BoxDecoration(
         color: AppColors.white.withValues(alpha: 0.9),
         borderRadius: BorderRadius.circular(AppRadius.sm),
@@ -220,21 +191,14 @@ class CourseCard extends StatelessWidget {
         color: AppColors.white.withValues(alpha: 0.9),
         borderRadius: BorderRadius.circular(AppRadius.sm),
       ),
-      child: Icon(
-        Icons.favorite_border,
-        size: AppSizes.iconSm,
-        color: AppColors.grey700,
-      ),
+      child: Icon(Icons.favorite_border, size: AppSizes.iconSm, color: AppColors.grey700),
     );
   }
 
   Widget _buildProgressBadge() {
     final progress = _getProgress();
     return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.sm,
-        vertical: AppSpacing.xs,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
       decoration: BoxDecoration(
         color: AppColors.success.withValues(alpha: 0.9),
         borderRadius: BorderRadius.circular(AppRadius.sm),
@@ -252,11 +216,7 @@ class CourseCard extends StatelessWidget {
   Widget _buildCourseMetadata() {
     return Row(
       children: [
-        Icon(
-          Icons.play_circle_outline,
-          size: AppSizes.iconSm,
-          color: AppColors.grey600,
-        ),
+        Icon(Icons.play_circle_outline, size: AppSizes.iconSm, color: AppColors.grey600),
         const SizedBox(width: AppSpacing.xs),
         Text(
           '${course.duration ?? '30'} phút',
@@ -337,10 +297,7 @@ class CourseCard extends StatelessWidget {
     }
 
     return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.sm,
-        vertical: AppSpacing.xs,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
       decoration: BoxDecoration(
         color: chipColor.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppRadius.sm),
@@ -353,10 +310,7 @@ class CourseCard extends StatelessWidget {
           const SizedBox(width: AppSpacing.xs),
           Text(
             statusText,
-            style: AppTypography.bodySmall.copyWith(
-              color: chipColor,
-              fontWeight: FontWeight.w600,
-            ),
+            style: AppTypography.bodySmall.copyWith(color: chipColor, fontWeight: FontWeight.w600),
           ),
         ],
       ),
@@ -368,10 +322,7 @@ class CourseCard extends StatelessWidget {
     final isFree = price == 0.0;
 
     return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.sm,
-        vertical: AppSpacing.xs,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
       decoration: BoxDecoration(
         color: isFree
             ? AppColors.success.withValues(alpha: 0.1)

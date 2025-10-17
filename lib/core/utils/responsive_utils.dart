@@ -14,8 +14,7 @@ class ResponsiveUtils {
 
   static bool isTablet(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
-    return width >= ResponsiveBreakpoints.mobile &&
-        width < ResponsiveBreakpoints.desktop;
+    return width >= ResponsiveBreakpoints.mobile && width < ResponsiveBreakpoints.desktop;
   }
 
   static bool isDesktop(BuildContext context) {
@@ -23,8 +22,7 @@ class ResponsiveUtils {
   }
 
   static bool isLargeDesktop(BuildContext context) {
-    return MediaQuery.of(context).size.width >=
-        ResponsiveBreakpoints.largeDesktop;
+    return MediaQuery.of(context).size.width >= ResponsiveBreakpoints.largeDesktop;
   }
 
   static double getScreenWidth(BuildContext context) {
@@ -68,12 +66,7 @@ class ResponsiveUtils {
 }
 
 class ResponsiveWidget extends StatelessWidget {
-  const ResponsiveWidget({
-    super.key,
-    required this.mobile,
-    this.tablet,
-    this.desktop,
-  });
+  const ResponsiveWidget({super.key, required this.mobile, this.tablet, this.desktop});
 
   final Widget mobile;
   final Widget? tablet;
@@ -190,12 +183,6 @@ class ResponsiveText extends StatelessWidget {
       style = mobileStyle;
     }
 
-    return Text(
-      text,
-      style: style,
-      textAlign: textAlign,
-      overflow: overflow,
-      maxLines: maxLines,
-    );
+    return Text(text, style: style, textAlign: textAlign, overflow: overflow, maxLines: maxLines);
   }
 }

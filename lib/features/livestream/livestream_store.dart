@@ -73,8 +73,7 @@ class LivestreamNotifier extends StateNotifier<LivestreamState> {
       final stream = await _webrtcClient.startLocal(video: true, audio: true);
       if (stream == null) {
         state = state.copyWith(
-          error:
-              'Failed to access camera/microphone. Please check permissions.',
+          error: 'Failed to access camera/microphone. Please check permissions.',
         );
         return;
       }
@@ -98,8 +97,7 @@ class LivestreamNotifier extends StateNotifier<LivestreamState> {
       final stream = await _webrtcClient.startLocal(video: true, audio: true);
       if (stream == null) {
         state = state.copyWith(
-          error:
-              'Failed to access camera/microphone. Please check permissions.',
+          error: 'Failed to access camera/microphone. Please check permissions.',
         );
         return;
       }
@@ -180,26 +178,17 @@ class LivestreamNotifier extends StateNotifier<LivestreamState> {
 
   Future<void> handleOffer(int fromUserId, String sdp) async {
     await _webrtcClient.createPeer(fromUserId, isOffer: false);
-    await _webrtcClient.setRemoteDescription(
-      fromUserId,
-      RTCSessionDescription(sdp, 'offer'),
-    );
+    await _webrtcClient.setRemoteDescription(fromUserId, RTCSessionDescription(sdp, 'offer'));
     await _webrtcClient.createAnswer(fromUserId);
     // In real implementation: emit answer to socket
     // socket.emit('livestream:webrtc-answer', {...})
   }
 
   Future<void> handleAnswer(int fromUserId, String sdp) async {
-    await _webrtcClient.setRemoteDescription(
-      fromUserId,
-      RTCSessionDescription(sdp, 'answer'),
-    );
+    await _webrtcClient.setRemoteDescription(fromUserId, RTCSessionDescription(sdp, 'answer'));
   }
 
-  Future<void> handleIceCandidate(
-    int fromUserId,
-    Map<String, dynamic> candidateData,
-  ) async {
+  Future<void> handleIceCandidate(int fromUserId, Map<String, dynamic> candidateData) async {
     final candidate = RTCIceCandidate(
       candidateData['candidate'],
       candidateData['sdpMid'],
@@ -215,7 +204,6 @@ class LivestreamNotifier extends StateNotifier<LivestreamState> {
   }
 }
 
-final livestreamProvider =
-    StateNotifierProvider<LivestreamNotifier, LivestreamState>(
-      (ref) => LivestreamNotifier(),
-    );
+final livestreamProvider = StateNotifierProvider<LivestreamNotifier, LivestreamState>(
+  (ref) => LivestreamNotifier(),
+);

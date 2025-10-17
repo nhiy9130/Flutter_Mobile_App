@@ -3,12 +3,7 @@ import '../../core/storage/prefs.dart';
 import '../../core/data/demo_data.dart';
 
 class User {
-  const User({
-    required this.id,
-    required this.email,
-    required this.fullName,
-    required this.role,
-  });
+  const User({required this.id, required this.email, required this.fullName, required this.role});
   final int id;
   final String email;
   final String fullName;
@@ -74,11 +69,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
     // Try demo accounts first
     final demoUser = DemoAccounts.authenticate(email, password);
     if (demoUser != null) {
-      state = AuthState(
-        user: demoUser,
-        token: 'demo-token-${demoUser.id}',
-        initialized: true,
-      );
+      state = AuthState(user: demoUser, token: 'demo-token-${demoUser.id}', initialized: true);
       await Prefs.saveAuth(
         token: 'demo-token-${demoUser.id}',
         user: {
@@ -99,12 +90,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
     );
     await Prefs.saveAuth(
       token: 'demo-token',
-      user: {
-        'id': 1,
-        'email': email,
-        'fullName': 'Demo User',
-        'role': 'student',
-      },
+      user: {'id': 1, 'email': email, 'fullName': 'Demo User', 'role': 'student'},
     );
     return true;
   }
@@ -115,6 +101,4 @@ class AuthNotifier extends StateNotifier<AuthState> {
   }
 }
 
-final authProvider = StateNotifierProvider<AuthNotifier, AuthState>(
-  (ref) => AuthNotifier(),
-);
+final authProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) => AuthNotifier());

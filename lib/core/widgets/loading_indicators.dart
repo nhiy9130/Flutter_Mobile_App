@@ -32,9 +32,7 @@ class LoadingIndicator extends StatelessWidget {
           const SizedBox(height: AppSpacing.md),
           Text(
             message!,
-            style: Theme.of(
-              context,
-            ).textTheme.bodyMedium?.copyWith(color: AppColors.grey600),
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppColors.grey600),
             textAlign: TextAlign.center,
           ),
         ],
@@ -143,11 +141,7 @@ class _DotsLoadingIndicatorState extends State<_DotsLoadingIndicator>
       return Tween<double>(begin: 0.0, end: 1.0).animate(
         CurvedAnimation(
           parent: _animationController,
-          curve: Interval(
-            index * 0.2,
-            (index * 0.2) + 0.4,
-            curve: Curves.easeInOut,
-          ),
+          curve: Interval(index * 0.2, (index * 0.2) + 0.4, curve: Curves.easeInOut),
         ),
       );
     });
@@ -174,10 +168,7 @@ class _DotsLoadingIndicatorState extends State<_DotsLoadingIndicator>
                 child: Container(
                   width: widget.size,
                   height: widget.size,
-                  decoration: BoxDecoration(
-                    color: widget.color,
-                    shape: BoxShape.circle,
-                  ),
+                  decoration: BoxDecoration(color: widget.color, shape: BoxShape.circle),
                 ),
               ),
             );
@@ -212,13 +203,15 @@ class _PulseLoadingIndicatorState extends State<_PulseLoadingIndicator>
       vsync: this,
     )..repeat(reverse: true);
 
-    _scaleAnimation = Tween<double>(begin: 0.8, end: 1.2).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
-    );
+    _scaleAnimation = Tween<double>(
+      begin: 0.8,
+      end: 1.2,
+    ).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeInOut));
 
-    _opacityAnimation = Tween<double>(begin: 0.5, end: 1.0).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
-    );
+    _opacityAnimation = Tween<double>(
+      begin: 0.5,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeInOut));
   }
 
   @override
@@ -239,10 +232,7 @@ class _PulseLoadingIndicatorState extends State<_PulseLoadingIndicator>
             child: Container(
               width: widget.size,
               height: widget.size,
-              decoration: BoxDecoration(
-                color: widget.color,
-                shape: BoxShape.circle,
-              ),
+              decoration: BoxDecoration(color: widget.color, shape: BoxShape.circle),
             ),
           ),
         );
@@ -308,8 +298,7 @@ class ShimmerLoading extends StatefulWidget {
   State<ShimmerLoading> createState() => _ShimmerLoadingState();
 }
 
-class _ShimmerLoadingState extends State<ShimmerLoading>
-    with SingleTickerProviderStateMixin {
+class _ShimmerLoadingState extends State<ShimmerLoading> with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _animation;
 
@@ -321,9 +310,10 @@ class _ShimmerLoadingState extends State<ShimmerLoading>
       vsync: this,
     )..repeat();
 
-    _animation = Tween<double>(begin: -1.0, end: 2.0).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
-    );
+    _animation = Tween<double>(
+      begin: -1.0,
+      end: 2.0,
+    ).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeInOut));
   }
 
   @override
@@ -346,11 +336,7 @@ class _ShimmerLoadingState extends State<ShimmerLoading>
             return LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.topRight,
-              colors: [
-                widget.baseColor,
-                widget.highlightColor,
-                widget.baseColor,
-              ],
+              colors: [widget.baseColor, widget.highlightColor, widget.baseColor],
               stops: [
                 (_animation.value - 1.0).clamp(0.0, 1.0),
                 _animation.value.clamp(0.0, 1.0),

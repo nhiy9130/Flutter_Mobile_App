@@ -85,9 +85,7 @@ class QuizAttempt {
       courseId: json['courseId'] as String,
       userId: json['userId'] as int,
       startTime: DateTime.parse(json['startTime'] as String),
-      endTime: json['endTime'] != null
-          ? DateTime.parse(json['endTime'] as String)
-          : null,
+      endTime: json['endTime'] != null ? DateTime.parse(json['endTime'] as String) : null,
       answers:
           (json['answers'] as List?)
               ?.map(
@@ -170,8 +168,7 @@ class QuizService {
       ),
       const QuizQuestion(
         id: 'q2',
-        question:
-            'React Hooks are functions that let you use state in functional components?',
+        question: 'React Hooks are functions that let you use state in functional components?',
         type: 'truefalse',
         options: ['True', 'False'],
         correctAnswer: 'True',
@@ -211,11 +208,7 @@ class QuizService {
     if (_session == null) return;
 
     final currentQ = _session!.currentQuestion;
-    final quizAnswer = QuizAnswer(
-      questionId: currentQ.id,
-      answer: answer,
-      timeSpent: timeSpent,
-    );
+    final quizAnswer = QuizAnswer(questionId: currentQ.id, answer: answer, timeSpent: timeSpent);
 
     // Auto-grade
     _gradeAnswer(quizAnswer, currentQ);
@@ -233,9 +226,7 @@ class QuizService {
     switch (question.type) {
       case 'multiple':
       case 'truefalse':
-        answer.isCorrect =
-            answer.answer.toLowerCase() ==
-            question.correctAnswer!.toLowerCase();
+        answer.isCorrect = answer.answer.toLowerCase() == question.correctAnswer!.toLowerCase();
         answer.score = answer.isCorrect! ? question.points.toDouble() : 0.0;
         break;
       case 'short':
@@ -257,8 +248,7 @@ class QuizService {
     if (_session == null) return false;
     if (_session!.currentIndex < _session!.questions.length - 1) {
       _session!.currentIndex++;
-      _session!.timeRemaining =
-          _session!.questions[_session!.currentIndex].timeLimitSec;
+      _session!.timeRemaining = _session!.questions[_session!.currentIndex].timeLimitSec;
       return true;
     }
     end();

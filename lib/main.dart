@@ -32,10 +32,7 @@ Future<void> main() async {
     'API_BASE_URL',
     defaultValue: 'http://localhost:3000/api',
   );
-  const socketUrl = String.fromEnvironment(
-    'SOCKET_URL',
-    defaultValue: 'http://localhost:3003',
-  );
+  const socketUrl = String.fromEnvironment('SOCKET_URL', defaultValue: 'http://localhost:3003');
   const demo = bool.fromEnvironment('DEMO_MODE', defaultValue: true);
 
   runApp(

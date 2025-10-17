@@ -3,31 +3,24 @@ import 'package:permission_handler/permission_handler.dart';
 import 'dart:io';
 
 class LocalNotificationService {
-  static final LocalNotificationService _instance =
-      LocalNotificationService._internal();
+  static final LocalNotificationService _instance = LocalNotificationService._internal();
   factory LocalNotificationService() => _instance;
   LocalNotificationService._internal();
 
-  final FlutterLocalNotificationsPlugin _notifications =
-      FlutterLocalNotificationsPlugin();
+  final FlutterLocalNotificationsPlugin _notifications = FlutterLocalNotificationsPlugin();
   bool _isInitialized = false;
 
   Future<void> initialize() async {
     if (_isInitialized) return;
 
-    const androidSettings = AndroidInitializationSettings(
-      '@mipmap/ic_launcher',
-    );
+    const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
     const iosSettings = DarwinInitializationSettings(
       requestAlertPermission: true,
       requestBadgePermission: true,
       requestSoundPermission: true,
     );
 
-    const settings = InitializationSettings(
-      android: androidSettings,
-      iOS: iosSettings,
-    );
+    const settings = InitializationSettings(android: androidSettings, iOS: iosSettings);
 
     await _notifications.initialize(
       settings,
@@ -44,9 +37,7 @@ class LocalNotificationService {
       return status.isGranted;
     } else if (Platform.isIOS) {
       final result = await _notifications
-          .resolvePlatformSpecificImplementation<
-            IOSFlutterLocalNotificationsPlugin
-          >()
+          .resolvePlatformSpecificImplementation<IOSFlutterLocalNotificationsPlugin>()
           ?.requestPermissions(alert: true, badge: true, sound: true);
       return result ?? false;
     }
@@ -87,10 +78,7 @@ class LocalNotificationService {
       presentSound: true,
     );
 
-    final details = NotificationDetails(
-      android: androidDetails,
-      iOS: iosDetails,
-    );
+    final details = NotificationDetails(android: androidDetails, iOS: iosDetails);
 
     await _notifications.show(id, title, body, details, payload: payload);
   }
@@ -118,10 +106,7 @@ class LocalNotificationService {
       presentSound: true,
     );
 
-    final details = NotificationDetails(
-      android: androidDetails,
-      iOS: iosDetails,
-    );
+    final details = NotificationDetails(android: androidDetails, iOS: iosDetails);
 
     // Note: flutter_local_notifications v17+ uses timezone package
     // For simplicity, we'll use the basic scheduling
@@ -163,9 +148,7 @@ enum NotificationPriority { low, normal, high }
 
 // Mapping from Socket events to local notifications
 class NotificationMapper {
-  static Future<void> handleSocketNotification(
-    Map<String, dynamic> data,
-  ) async {
+  static Future<void> handleSocketNotification(Map<String, dynamic> data) async {
     final service = LocalNotificationService();
 
     final type = data['type'] as String?;

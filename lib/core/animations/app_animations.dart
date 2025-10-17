@@ -45,8 +45,7 @@ class FadeInAnimation extends StatefulWidget {
   State<FadeInAnimation> createState() => _FadeInAnimationState();
 }
 
-class _FadeInAnimationState extends State<FadeInAnimation>
-    with SingleTickerProviderStateMixin {
+class _FadeInAnimationState extends State<FadeInAnimation> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _animation;
 
@@ -115,8 +114,7 @@ class SlideInAnimation extends StatefulWidget {
   State<SlideInAnimation> createState() => _SlideInAnimationState();
 }
 
-class _SlideInAnimationState extends State<SlideInAnimation>
-    with SingleTickerProviderStateMixin {
+class _SlideInAnimationState extends State<SlideInAnimation> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<Offset> _slideAnimation;
 
@@ -185,8 +183,7 @@ class ScaleAnimation extends StatefulWidget {
   State<ScaleAnimation> createState() => _ScaleAnimationState();
 }
 
-class _ScaleAnimationState extends State<ScaleAnimation>
-    with SingleTickerProviderStateMixin {
+class _ScaleAnimationState extends State<ScaleAnimation> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _scaleAnimation;
 
@@ -224,10 +221,7 @@ class _ScaleAnimationState extends State<ScaleAnimation>
     return AnimatedBuilder(
       animation: _scaleAnimation,
       builder: (context, child) {
-        return Transform.scale(
-          scale: _scaleAnimation.value,
-          child: widget.child,
-        );
+        return Transform.scale(scale: _scaleAnimation.value, child: widget.child);
       },
     );
   }
@@ -341,9 +335,7 @@ class _StaggeredAnimationState extends State<StaggeredAnimation> {
         final child = entry.value;
 
         return FadeSlideAnimation(
-          delay: Duration(
-            milliseconds: index * widget.staggerDelay.inMilliseconds,
-          ),
+          delay: Duration(milliseconds: index * widget.staggerDelay.inMilliseconds),
           duration: widget.duration,
           curve: widget.curve,
           slideBegin: widget.direction == Axis.vertical
@@ -388,10 +380,7 @@ class _AnimatedListBuilderState extends State<AnimatedListBuilder> {
       itemBuilder: (context, index) {
         return FadeSlideAnimation(
           delay: Duration(
-            milliseconds: (index * widget.staggerDelay.inMilliseconds).clamp(
-              0,
-              1000,
-            ),
+            milliseconds: (index * widget.staggerDelay.inMilliseconds).clamp(0, 1000),
           ),
           duration: widget.animationDuration,
           curve: widget.curve,
@@ -423,8 +412,7 @@ class AnimatedHoverCard extends StatefulWidget {
   State<AnimatedHoverCard> createState() => _AnimatedHoverCardState();
 }
 
-class _AnimatedHoverCardState extends State<AnimatedHoverCard>
-    with SingleTickerProviderStateMixin {
+class _AnimatedHoverCardState extends State<AnimatedHoverCard> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _scaleAnimation;
   late Animation<double> _elevationAnimation;
@@ -469,10 +457,7 @@ class _AnimatedHoverCardState extends State<AnimatedHoverCard>
           builder: (context, child) {
             return Transform.scale(
               scale: _scaleAnimation.value,
-              child: Card(
-                elevation: _elevationAnimation.value,
-                child: widget.child,
-              ),
+              child: Card(elevation: _elevationAnimation.value, child: widget.child),
             );
           },
         ),
@@ -498,8 +483,7 @@ class LoadingDotsAnimation extends StatefulWidget {
   State<LoadingDotsAnimation> createState() => _LoadingDotsAnimationState();
 }
 
-class _LoadingDotsAnimationState extends State<LoadingDotsAnimation>
-    with TickerProviderStateMixin {
+class _LoadingDotsAnimationState extends State<LoadingDotsAnimation> with TickerProviderStateMixin {
   late AnimationController _controller;
 
   @override
@@ -525,9 +509,7 @@ class _LoadingDotsAnimationState extends State<LoadingDotsAnimation>
           builder: (context, child) {
             final delay = index * 0.2;
             final animationValue = (_controller.value - delay).clamp(0.0, 1.0);
-            final scale =
-                0.5 +
-                (0.5 * (1 - (animationValue - 0.5).abs() * 2).clamp(0.0, 1.0));
+            final scale = 0.5 + (0.5 * (1 - (animationValue - 0.5).abs() * 2).clamp(0.0, 1.0));
 
             return Transform.scale(
               scale: scale,
@@ -535,10 +517,7 @@ class _LoadingDotsAnimationState extends State<LoadingDotsAnimation>
                 margin: const EdgeInsets.symmetric(horizontal: 2),
                 width: widget.size,
                 height: widget.size,
-                decoration: BoxDecoration(
-                  color: widget.color,
-                  shape: BoxShape.circle,
-                ),
+                decoration: BoxDecoration(color: widget.color, shape: BoxShape.circle),
               ),
             );
           },
@@ -571,31 +550,23 @@ class PageTransitionBuilder {
         break;
     }
 
-    final slideAnimation = Tween<Offset>(begin: begin, end: Offset.zero)
-        .animate(
-          CurvedAnimation(
-            parent: animation,
-            curve: AppAnimations.materialCurve,
-          ),
-        );
+    final slideAnimation = Tween<Offset>(
+      begin: begin,
+      end: Offset.zero,
+    ).animate(CurvedAnimation(parent: animation, curve: AppAnimations.materialCurve));
 
     return SlideTransition(position: slideAnimation, child: child);
   }
 
-  static Widget fadeTransition({
-    required Widget child,
-    required Animation<double> animation,
-  }) {
+  static Widget fadeTransition({required Widget child, required Animation<double> animation}) {
     return FadeTransition(opacity: animation, child: child);
   }
 
-  static Widget scaleTransition({
-    required Widget child,
-    required Animation<double> animation,
-  }) {
-    final scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(
-      CurvedAnimation(parent: animation, curve: AppAnimations.elasticOut),
-    );
+  static Widget scaleTransition({required Widget child, required Animation<double> animation}) {
+    final scaleAnimation = Tween<double>(
+      begin: 0.8,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: animation, curve: AppAnimations.elasticOut));
 
     return ScaleTransition(scale: scaleAnimation, child: child);
   }

@@ -45,14 +45,8 @@ class LMSApp extends ConsumerWidget {
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: const Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 6,
-                      ),
-                      child: Text(
-                        'Demo Mode',
-                        style: TextStyle(color: Colors.white, fontSize: 12),
-                      ),
+                      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                      child: Text('Demo Mode', style: TextStyle(color: Colors.white, fontSize: 12)),
                     ),
                   ),
                 ),

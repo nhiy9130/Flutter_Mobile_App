@@ -76,8 +76,7 @@ class DemoCourses {
         id: 'course-1',
         code: 'FLT101',
         title: 'Introduction to Flutter Development',
-        description:
-            'Learn Flutter from scratch and build beautiful cross-platform apps',
+        description: 'Learn Flutter from scratch and build beautiful cross-platform apps',
         instructorName: 'TS. Trần Thị Bình',
         thumbnailUrl: null,
         enrollmentCount: 245,
@@ -86,8 +85,7 @@ class DemoCourses {
         id: 'course-2',
         code: 'RCT201',
         title: 'Advanced React & TypeScript',
-        description:
-            'Master modern React patterns and TypeScript for production apps',
+        description: 'Master modern React patterns and TypeScript for production apps',
         instructorName: 'Dr. John Smith',
         thumbnailUrl: null,
         enrollmentCount: 189,
@@ -96,8 +94,7 @@ class DemoCourses {
         id: 'course-3',
         code: 'DS101',
         title: 'Data Science with Python',
-        description:
-            'Comprehensive guide to data analysis and machine learning',
+        description: 'Comprehensive guide to data analysis and machine learning',
         instructorName: 'Prof. Sarah Johnson',
         thumbnailUrl: null,
         enrollmentCount: 312,
@@ -115,8 +112,7 @@ class DemoCourses {
         id: 'course-5',
         code: 'AWS201',
         title: 'Cloud Architecture with AWS',
-        description:
-            'Build scalable cloud infrastructure on Amazon Web Services',
+        description: 'Build scalable cloud infrastructure on Amazon Web Services',
         instructorName: 'Michael Chen',
         thumbnailUrl: null,
         enrollmentCount: 156,
@@ -130,8 +126,7 @@ class DemoCourses {
         id: 'course-1',
         code: 'FLT101',
         title: 'Introduction to Flutter Development',
-        description:
-            'Learn Flutter from scratch and build beautiful cross-platform apps',
+        description: 'Learn Flutter from scratch and build beautiful cross-platform apps',
         instructorName: 'TS. Trần Thị Bình',
         thumbnailUrl: null,
         enrollmentCount: 245,
@@ -140,8 +135,7 @@ class DemoCourses {
         id: 'course-6',
         code: 'FLT301',
         title: 'Advanced Mobile Architecture',
-        description:
-            'Master clean architecture and advanced patterns in mobile development',
+        description: 'Master clean architecture and advanced patterns in mobile development',
         instructorName: 'TS. Trần Thị Bình',
         thumbnailUrl: null,
         enrollmentCount: 89,
@@ -176,20 +170,15 @@ class DemoChatData {
         'userId': 1001,
         'userName': 'Nguyễn Văn An',
         'message': 'Cảm ơn thầy! Em rất hào hứng được học Flutter.',
-        'timestamp': DateTime.now().subtract(
-          const Duration(hours: 1, minutes: 45),
-        ),
+        'timestamp': DateTime.now().subtract(const Duration(hours: 1, minutes: 45)),
       },
       {
         'id': 'msg-3',
         'courseId': courseId,
         'userId': 1002,
         'userName': 'Lê Thị Bình',
-        'message':
-            'Thầy có thể giải thích về StatefulWidget và StatelessWidget không ạ?',
-        'timestamp': DateTime.now().subtract(
-          const Duration(hours: 1, minutes: 30),
-        ),
+        'message': 'Thầy có thể giải thích về StatefulWidget và StatelessWidget không ạ?',
+        'timestamp': DateTime.now().subtract(const Duration(hours: 1, minutes: 30)),
       },
       {
         'id': 'msg-4',
@@ -198,9 +187,7 @@ class DemoChatData {
         'userName': 'TS. Trần Thị Bình',
         'message':
             'StatelessWidget dùng cho UI không thay đổi, còn StatefulWidget có thể cập nhật state. Mình sẽ demo chi tiết trong bài học tiếp theo.',
-        'timestamp': DateTime.now().subtract(
-          const Duration(hours: 1, minutes: 15),
-        ),
+        'timestamp': DateTime.now().subtract(const Duration(hours: 1, minutes: 15)),
       },
     ];
   }
@@ -280,8 +267,7 @@ class DemoQuizData {
         },
         {
           'id': 'q4',
-          'question':
-              'Giải thích sự khác biệt giữa hot reload và hot restart trong Flutter',
+          'question': 'Giải thích sự khác biệt giữa hot reload và hot restart trong Flutter',
           'type': 'essay',
           'points': 5,
         },

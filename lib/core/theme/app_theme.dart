@@ -45,9 +45,7 @@ class AppThemeState {
           vertical: AppSpacing.buttonVertical,
         ),
         minimumSize: const Size(0, AppSizes.buttonMd),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppRadius.button),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.button)),
         textStyle: AppTypography.buttonMedium,
       ),
     ),
@@ -93,11 +91,7 @@ class AppThemeState {
             color: Color(0xFF6366F1),
           );
         }
-        return TextStyle(
-          fontSize: 12,
-          fontWeight: FontWeight.w500,
-          color: Colors.grey.shade600,
-        );
+        return TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: Colors.grey.shade600);
       }),
     ),
     textTheme: const TextTheme(
@@ -136,11 +130,7 @@ class AppThemeState {
       centerTitle: false,
       backgroundColor: Color(0xFF1E293B),
       foregroundColor: Colors.white,
-      titleTextStyle: TextStyle(
-        fontSize: 20,
-        fontWeight: FontWeight.w600,
-        color: Colors.white,
-      ),
+      titleTextStyle: TextStyle(fontSize: 20, fontWeight: FontWeight.w600, color: Colors.white),
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
@@ -191,89 +181,25 @@ class AppThemeState {
             color: Color(0xFF818CF8),
           );
         }
-        return const TextStyle(
-          fontSize: 12,
-          fontWeight: FontWeight.w500,
-          color: Color(0xFF94A3B8),
-        );
+        return const TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: Color(0xFF94A3B8));
       }),
     ),
     textTheme: const TextTheme(
-      displayLarge: TextStyle(
-        fontSize: 57,
-        fontWeight: FontWeight.w400,
-        color: Colors.white,
-      ),
-      displayMedium: TextStyle(
-        fontSize: 45,
-        fontWeight: FontWeight.w400,
-        color: Colors.white,
-      ),
-      displaySmall: TextStyle(
-        fontSize: 36,
-        fontWeight: FontWeight.w400,
-        color: Colors.white,
-      ),
-      headlineLarge: TextStyle(
-        fontSize: 32,
-        fontWeight: FontWeight.w400,
-        color: Colors.white,
-      ),
-      headlineMedium: TextStyle(
-        fontSize: 28,
-        fontWeight: FontWeight.w600,
-        color: Colors.white,
-      ),
-      headlineSmall: TextStyle(
-        fontSize: 24,
-        fontWeight: FontWeight.w600,
-        color: Colors.white,
-      ),
-      titleLarge: TextStyle(
-        fontSize: 22,
-        fontWeight: FontWeight.w600,
-        color: Colors.white,
-      ),
-      titleMedium: TextStyle(
-        fontSize: 16,
-        fontWeight: FontWeight.w600,
-        color: Colors.white,
-      ),
-      titleSmall: TextStyle(
-        fontSize: 14,
-        fontWeight: FontWeight.w600,
-        color: Colors.white,
-      ),
-      bodyLarge: TextStyle(
-        fontSize: 16,
-        fontWeight: FontWeight.w400,
-        color: Color(0xFFE2E8F0),
-      ),
-      bodyMedium: TextStyle(
-        fontSize: 14,
-        fontWeight: FontWeight.w400,
-        color: Color(0xFFE2E8F0),
-      ),
-      bodySmall: TextStyle(
-        fontSize: 12,
-        fontWeight: FontWeight.w400,
-        color: Color(0xFFCBD5E1),
-      ),
-      labelLarge: TextStyle(
-        fontSize: 14,
-        fontWeight: FontWeight.w600,
-        color: Colors.white,
-      ),
-      labelMedium: TextStyle(
-        fontSize: 12,
-        fontWeight: FontWeight.w600,
-        color: Colors.white,
-      ),
-      labelSmall: TextStyle(
-        fontSize: 11,
-        fontWeight: FontWeight.w600,
-        color: Colors.white,
-      ),
+      displayLarge: TextStyle(fontSize: 57, fontWeight: FontWeight.w400, color: Colors.white),
+      displayMedium: TextStyle(fontSize: 45, fontWeight: FontWeight.w400, color: Colors.white),
+      displaySmall: TextStyle(fontSize: 36, fontWeight: FontWeight.w400, color: Colors.white),
+      headlineLarge: TextStyle(fontSize: 32, fontWeight: FontWeight.w400, color: Colors.white),
+      headlineMedium: TextStyle(fontSize: 28, fontWeight: FontWeight.w600, color: Colors.white),
+      headlineSmall: TextStyle(fontSize: 24, fontWeight: FontWeight.w600, color: Colors.white),
+      titleLarge: TextStyle(fontSize: 22, fontWeight: FontWeight.w600, color: Colors.white),
+      titleMedium: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.white),
+      titleSmall: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.white),
+      bodyLarge: TextStyle(fontSize: 16, fontWeight: FontWeight.w400, color: Color(0xFFE2E8F0)),
+      bodyMedium: TextStyle(fontSize: 14, fontWeight: FontWeight.w400, color: Color(0xFFE2E8F0)),
+      bodySmall: TextStyle(fontSize: 12, fontWeight: FontWeight.w400, color: Color(0xFFCBD5E1)),
+      labelLarge: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.white),
+      labelMedium: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.white),
+      labelSmall: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Colors.white),
     ),
   );
 }
@@ -311,8 +237,6 @@ class AppThemeNotifier extends StateNotifier<AppThemeState> {
   }
 }
 
-final appThemeProvider = StateNotifierProvider<AppThemeNotifier, AppThemeState>(
-  (ref) {
-    return AppThemeNotifier();
-  },
-);
+final appThemeProvider = StateNotifierProvider<AppThemeNotifier, AppThemeState>((ref) {
+  return AppThemeNotifier();
+});

@@ -81,32 +81,22 @@ class GlobalErrorHandler {
           '💡 MODERATE OVERFLOW: Consider using Flexible/Expanded widgets or reducing content size',
         );
       } else {
-        debugPrint(
-          '💡 SMALL OVERFLOW: Minor padding/margin adjustments may fix this',
-        );
+        debugPrint('💡 SMALL OVERFLOW: Minor padding/margin adjustments may fix this');
       }
     }
 
     // Detect overflow direction
     if (errorMessage.contains('bottom')) {
-      debugPrint(
-        '📍 VERTICAL OVERFLOW: Check Column height and children constraints',
-      );
+      debugPrint('📍 VERTICAL OVERFLOW: Check Column height and children constraints');
     } else if (errorMessage.contains('right')) {
-      debugPrint(
-        '📍 HORIZONTAL OVERFLOW: Check Row width and children constraints',
-      );
+      debugPrint('📍 HORIZONTAL OVERFLOW: Check Row width and children constraints');
     }
   }
 }
 
 /// Error widget builder để hiển thị lỗi một cách user-friendly
 class CustomErrorWidget extends StatelessWidget {
-  const CustomErrorWidget({
-    super.key,
-    required this.error,
-    this.showDetails = false,
-  });
+  const CustomErrorWidget({super.key, required this.error, this.showDetails = false});
 
   final FlutterErrorDetails error;
   final bool showDetails;
