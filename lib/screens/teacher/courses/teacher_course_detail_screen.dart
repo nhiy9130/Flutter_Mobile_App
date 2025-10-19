@@ -34,38 +34,8 @@ class _TeacherCourseDetailScreenState extends State<TeacherCourseDetailScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
-  final List<CourseSection> _courseContent = [
-    CourseSection(
-      title: 'Chương 1: Giới thiệu',
-      lectures: [
-        Lecture(
-          title: 'Bài 1: Chào mừng đến với khóa học',
-          type: 'video',
-          duration: '05:30',
-        ),
-        Lecture(
-          title: 'Bài 2: Tổng quan nội dung',
-          type: 'article',
-          duration: '10:00',
-        ),
-      ],
-    ),
-    CourseSection(
-      title: 'Chương 2: Kiến thức cơ bản',
-      lectures: [
-        Lecture(
-          title: 'Bài 3: Khái niệm căn bản',
-          type: 'video',
-          duration: '15:20',
-        ),
-        Lecture(
-          title: 'Bài 4: Kiểm tra kiến thức',
-          type: 'quiz',
-          duration: '20:00',
-        ),
-      ],
-    ),
-  ];
+  // Danh sách nội dung khóa học (đã được làm trống)
+  final List<CourseSection> _courseContent = [];
 
   @override
   void initState() {
@@ -108,30 +78,267 @@ class _TeacherCourseDetailScreenState extends State<TeacherCourseDetailScreen>
     }
   }
 
+  // Thêm chương mới
+  void _addNewSection(String sectionTitle) {
+    if (sectionTitle.trim().isEmpty) return;
+
+    setState(() {
+      _courseContent.add(CourseSection(title: sectionTitle, lectures: []));
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Icon(Icons.check_circle_rounded, color: Colors.white),
+            const SizedBox(width: 12),
+            Expanded(child: Text('Đã thêm chương: $sectionTitle')),
+          ],
+        ),
+        backgroundColor: Colors.green.shade600,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        margin: const EdgeInsets.all(16),
+      ),
+    );
+  }
+
+  // ============== CÁC HÀM QUẢN LÝ CHƯƠNG HỌC ==============
+
+  void _showSectionOptionsMenu(BuildContext context, int sectionIndex) {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        final sectionTitle = _courseContent[sectionIndex].title;
+        return Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[300],
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Tùy chọn cho: ${sectionTitle.length > 30 ? '${sectionTitle.substring(0, 27)}...' : sectionTitle}',
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                ),
+              ),
+              const SizedBox(height: 10),
+              // Tùy chọn chỉnh sửa
+              ListTile(
+                leading: Icon(Icons.edit_outlined, color: Colors.blue.shade600),
+                title: const Text(
+                  'Chỉnh sửa tên chương',
+                  style: TextStyle(fontWeight: FontWeight.w500),
+                ),
+                onTap: () {
+                  Navigator.pop(context);
+                  _showEditSectionDialog(context, sectionIndex);
+                },
+              ),
+              // Tùy chọn xóa
+              ListTile(
+                leading: Icon(
+                  Icons.delete_outline_rounded,
+                  color: Colors.red.shade600,
+                ),
+                title: const Text(
+                  'Xóa chương',
+                  style: TextStyle(fontWeight: FontWeight.w500),
+                ),
+                onTap: () {
+                  Navigator.pop(context);
+                  _showDeleteSectionConfirmationDialog(context, sectionIndex);
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _showEditSectionDialog(BuildContext context, int sectionIndex) {
+    final TextEditingController controller = TextEditingController(
+      text: _courseContent[sectionIndex].title,
+    );
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Text(
+          'Chỉnh sửa tên chương',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        content: TextField(
+          controller: controller,
+          autofocus: true,
+          decoration: InputDecoration(
+            labelText: 'Tên chương',
+            hintText: 'Ví dụ: Chương 1: Kiến thức cơ bản',
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+            prefixIcon: const Icon(Icons.folder_outlined),
+          ),
+          onSubmitted: (value) {
+            if (value.trim().isNotEmpty) {
+              Navigator.pop(context);
+              _editSectionTitle(sectionIndex, value);
+            }
+          },
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Hủy'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              if (controller.text.trim().isNotEmpty) {
+                Navigator.pop(context);
+                _editSectionTitle(sectionIndex, controller.text);
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.blue.shade600,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+            child: const Text('Lưu'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _editSectionTitle(int index, String newTitle) {
+    setState(() {
+      _courseContent[index] = CourseSection(
+        title: newTitle,
+        lectures: _courseContent[index].lectures,
+      );
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Icon(Icons.check_circle_rounded, color: Colors.white),
+            const SizedBox(width: 12),
+            Expanded(child: Text('Đã cập nhật tên chương: $newTitle')),
+          ],
+        ),
+        backgroundColor: Colors.blue.shade600,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        margin: const EdgeInsets.all(16),
+      ),
+    );
+  }
+
+  void _showDeleteSectionConfirmationDialog(
+    BuildContext context,
+    int sectionIndex,
+  ) {
+    final sectionTitle = _courseContent[sectionIndex].title;
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Text(
+          'Xóa chương',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        content: Text(
+          'Bạn có chắc chắn muốn xóa chương "$sectionTitle" không? Thao tác này sẽ xóa tất cả bài giảng bên trong.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Hủy'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              _deleteSection(sectionIndex, sectionTitle);
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red.shade600,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+            child: const Text('Xóa'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _deleteSection(int index, String title) {
+    setState(() {
+      _courseContent.removeAt(index);
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Icon(Icons.delete_forever_rounded, color: Colors.white),
+            const SizedBox(width: 12),
+            Expanded(child: Text('Đã xóa chương: $title')),
+          ],
+        ),
+        backgroundColor: Colors.red.shade600,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        margin: const EdgeInsets.all(16),
+      ),
+    );
+  }
+
+  // ========================================================================
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Scaffold(
+      backgroundColor: Colors.grey.shade50,
       body: NestedScrollView(
         headerSliverBuilder: (context, innerBoxIsScrolled) {
           return [
             SliverAppBar(
-              foregroundColor: Colors.white, // <--- THÊM DÒNG NÀY VÀO ĐÂY
-              expandedHeight: 200,
+              foregroundColor: Colors.white,
+              expandedHeight: 300,
+              title: Text(
+                widget.course.title,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
               pinned: true,
               floating: false,
               forceElevated: innerBoxIsScrolled,
               flexibleSpace: FlexibleSpaceBar(
                 titlePadding: const EdgeInsets.only(left: 16, bottom: 16),
-                // Giờ thì Text sẽ tự động có màu trắng
-                title: Text(
-                  widget.course.title,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize:
-                        16, // Flutter sẽ tự động co giãn kích thước khi thu gọn
-                  ),
-                ),
                 background: widget.course.imageFile != null
                     ? Stack(
                         fit: StackFit.expand,
@@ -147,7 +354,8 @@ class _TeacherCourseDetailScreenState extends State<TeacherCourseDetailScreen>
                                 end: Alignment.bottomCenter,
                                 colors: [
                                   Colors.transparent,
-                                  Colors.black.withOpacity(0.7),
+                                  // REPLACED: Colors.black.withOpacity(0.7)
+                                  Colors.black.withAlpha(179),
                                 ],
                               ),
                             ),
@@ -161,7 +369,8 @@ class _TeacherCourseDetailScreenState extends State<TeacherCourseDetailScreen>
                             end: Alignment.bottomRight,
                             colors: [
                               theme.primaryColor,
-                              theme.primaryColor.withOpacity(0.7),
+                              // REPLACED: theme.primaryColor.withOpacity(0.7)
+                              theme.primaryColor.withAlpha(179),
                             ],
                           ),
                         ),
@@ -173,9 +382,13 @@ class _TeacherCourseDetailScreenState extends State<TeacherCourseDetailScreen>
                   tooltip: 'Xem dưới dạng học viên',
                   onPressed: () {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Chức năng xem trước'),
-                        duration: Duration(seconds: 2),
+                      SnackBar(
+                        content: const Text('Chức năng xem trước'),
+                        behavior: SnackBarBehavior.floating,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        margin: const EdgeInsets.all(16),
                       ),
                     );
                   },
@@ -185,13 +398,14 @@ class _TeacherCourseDetailScreenState extends State<TeacherCourseDetailScreen>
               bottom: PreferredSize(
                 preferredSize: const Size.fromHeight(48),
                 child: Container(
-                  color: theme.scaffoldBackgroundColor,
+                  color: Colors.white,
                   child: TabBar(
                     controller: _tabController,
                     labelColor: theme.primaryColor,
                     unselectedLabelColor: Colors.grey,
                     indicatorColor: theme.primaryColor,
                     indicatorWeight: 3,
+                    labelStyle: const TextStyle(fontWeight: FontWeight.w600),
                     tabs: const [
                       Tab(
                         icon: Icon(Icons.dashboard_outlined),
@@ -225,8 +439,13 @@ class _TeacherCourseDetailScreenState extends State<TeacherCourseDetailScreen>
               onPressed: () {
                 _showAddContentDialog(context);
               },
-              label: const Text('Thêm nội dung'),
-              icon: const Icon(Icons.add),
+              label: const Text(
+                'Thêm nội dung',
+                style: TextStyle(fontWeight: FontWeight.w600),
+              ),
+              icon: const Icon(Icons.add_rounded),
+              backgroundColor: Colors.green.shade600,
+              foregroundColor: Colors.white,
               elevation: 4,
             )
           : null,
@@ -256,10 +475,12 @@ class _TeacherCourseDetailScreenState extends State<TeacherCourseDetailScreen>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
+        const Text(
           'Thống kê',
-          style: theme.textTheme.titleLarge?.copyWith(
+          style: TextStyle(
+            fontSize: 18,
             fontWeight: FontWeight.bold,
+            color: Colors.black87,
           ),
         ),
         const SizedBox(height: 12),
@@ -279,7 +500,7 @@ class _TeacherCourseDetailScreenState extends State<TeacherCourseDetailScreen>
               child: _buildStatCard2(
                 theme,
                 'Bài giảng',
-                '3',
+                '${_courseContent.fold(0, (sum, section) => sum + section.lectures.length)}',
                 Icons.video_library_rounded,
                 Colors.orange,
               ),
@@ -297,40 +518,45 @@ class _TeacherCourseDetailScreenState extends State<TeacherCourseDetailScreen>
     IconData icon,
     Color color,
   ) {
-    return Card(
-      elevation: 2,
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: color.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Icon(icon, color: color, size: 24),
-                ),
-              ],
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(10),
             ),
-            const SizedBox(height: 12),
-            Text(
-              value,
-              style: theme.textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
+            child: Icon(icon, color: color, size: 28),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            value,
+            style: const TextStyle(
+              fontSize: 28,
+              fontWeight: FontWeight.bold,
+              color: Colors.black87,
             ),
-            const SizedBox(height: 4),
-            Text(
-              label,
-              style: theme.textTheme.bodySmall?.copyWith(color: Colors.grey),
-            ),
-          ],
-        ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            label,
+            style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
+          ),
+        ],
       ),
     );
   }
@@ -339,15 +565,27 @@ class _TeacherCourseDetailScreenState extends State<TeacherCourseDetailScreen>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
+        const Text(
           'Hành động nhanh',
-          style: theme.textTheme.titleLarge?.copyWith(
+          style: TextStyle(
+            fontSize: 18,
             fontWeight: FontWeight.bold,
+            color: Colors.black87,
           ),
         ),
         const SizedBox(height: 12),
-        Card(
-          elevation: 2,
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.04),
+                blurRadius: 10,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
           child: Column(
             children: [
               _buildActionTile(
@@ -357,7 +595,7 @@ class _TeacherCourseDetailScreenState extends State<TeacherCourseDetailScreen>
                 color: Colors.blue,
                 onTap: () {},
               ),
-              const Divider(height: 1),
+              Divider(height: 1, color: Colors.grey.shade200),
               _buildActionTile(
                 icon: Icons.videocam_rounded,
                 title: 'Bắt đầu buổi học Live',
@@ -365,7 +603,7 @@ class _TeacherCourseDetailScreenState extends State<TeacherCourseDetailScreen>
                 color: Colors.red,
                 onTap: () {},
               ),
-              const Divider(height: 1),
+              Divider(height: 1, color: Colors.grey.shade200),
               _buildActionTile(
                 icon: Icons.quiz_rounded,
                 title: 'Tạo Quiz mới',
@@ -388,7 +626,7 @@ class _TeacherCourseDetailScreenState extends State<TeacherCourseDetailScreen>
     required VoidCallback onTap,
   }) {
     return ListTile(
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
       leading: Container(
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
@@ -397,9 +635,18 @@ class _TeacherCourseDetailScreenState extends State<TeacherCourseDetailScreen>
         ),
         child: Icon(icon, color: color, size: 24),
       ),
-      title: Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
-      subtitle: Text(subtitle),
-      trailing: Icon(Icons.chevron_right, color: Colors.grey[400]),
+      title: Text(
+        title,
+        style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+      ),
+      subtitle: Padding(
+        padding: const EdgeInsets.only(top: 4),
+        child: Text(
+          subtitle,
+          style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
+        ),
+      ),
+      trailing: Icon(Icons.chevron_right_rounded, color: Colors.grey[400]),
       onTap: onTap,
     );
   }
@@ -408,28 +655,42 @@ class _TeacherCourseDetailScreenState extends State<TeacherCourseDetailScreen>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
+        const Text(
           'Hoạt động gần đây',
-          style: theme.textTheme.titleLarge?.copyWith(
+          style: TextStyle(
+            fontSize: 18,
             fontWeight: FontWeight.bold,
+            color: Colors.black87,
           ),
         ),
         const SizedBox(height: 12),
-        Card(
-          elevation: 2,
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Center(
-              child: Column(
-                children: [
-                  Icon(Icons.history, size: 48, color: Colors.grey[400]),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Chưa có hoạt động nào',
-                    style: TextStyle(color: Colors.grey[600]),
-                  ),
-                ],
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.04),
+                blurRadius: 10,
+                offset: const Offset(0, 2),
               ),
+            ],
+          ),
+          padding: const EdgeInsets.all(32),
+          child: Center(
+            child: Column(
+              children: [
+                Icon(Icons.history_rounded, size: 48, color: Colors.grey[400]),
+                const SizedBox(height: 12),
+                Text(
+                  'Chưa có hoạt động nào',
+                  style: TextStyle(
+                    color: Colors.grey[600],
+                    fontSize: 15,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
             ),
           ),
         ),
@@ -441,25 +702,40 @@ class _TeacherCourseDetailScreenState extends State<TeacherCourseDetailScreen>
   Widget _buildContentTab(ThemeData theme) {
     if (_courseContent.isEmpty) {
       return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.menu_book_outlined, size: 80, color: Colors.grey[300]),
-            const SizedBox(height: 16),
-            Text(
-              'Chưa có nội dung nào',
-              style: theme.textTheme.titleMedium?.copyWith(
-                color: Colors.grey[600],
+        child: Padding(
+          padding: const EdgeInsets.all(32),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade100,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.menu_book_outlined,
+                  size: 64,
+                  color: Colors.grey[400],
+                ),
               ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Nhấn nút + để thêm chương hoặc bài giảng',
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: Colors.grey[500],
+              const SizedBox(height: 24),
+              Text(
+                'Chưa có nội dung nào',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.grey[700],
+                ),
               ),
-            ),
-          ],
+              const SizedBox(height: 8),
+              Text(
+                'Nhấn nút + bên dưới để thêm chương hoặc bài giảng',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 14, color: Colors.grey[500]),
+              ),
+            ],
+          ),
         ),
       );
     }
@@ -469,27 +745,38 @@ class _TeacherCourseDetailScreenState extends State<TeacherCourseDetailScreen>
       itemCount: _courseContent.length,
       itemBuilder: (context, index) {
         final section = _courseContent[index];
-        return Card(
-          elevation: 2,
-          margin: const EdgeInsets.only(bottom: 12),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+        return Container(
+          margin: const EdgeInsets.only(bottom: 16),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.04),
+                blurRadius: 10,
+                offset: const Offset(0, 2),
+              ),
+            ],
           ),
           child: Theme(
             data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
             child: ExpansionTile(
               tilePadding: const EdgeInsets.symmetric(
-                horizontal: 16,
+                horizontal: 20,
                 vertical: 8,
               ),
               childrenPadding: const EdgeInsets.only(bottom: 8),
               leading: Container(
-                padding: const EdgeInsets.all(8),
+                padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
                   color: theme.primaryColor.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(10),
                 ),
-                child: Icon(Icons.folder_outlined, color: theme.primaryColor),
+                child: Icon(
+                  Icons.folder_rounded,
+                  color: theme.primaryColor,
+                  size: 24,
+                ),
               ),
               title: Text(
                 section.title,
@@ -498,77 +785,96 @@ class _TeacherCourseDetailScreenState extends State<TeacherCourseDetailScreen>
                   fontSize: 16,
                 ),
               ),
-              subtitle: Text(
-                '${section.lectures.length} bài giảng',
-                style: TextStyle(color: Colors.grey[600], fontSize: 13),
+              subtitle: Padding(
+                padding: const EdgeInsets.only(top: 4),
+                child: Text(
+                  '${section.lectures.length} bài giảng',
+                  style: TextStyle(color: Colors.grey[600], fontSize: 13),
+                ),
               ),
               trailing: IconButton(
-                icon: const Icon(Icons.more_vert),
-                onPressed: () {},
+                icon: const Icon(Icons.more_vert_rounded),
+                onPressed: () {
+                  _showSectionOptionsMenu(context, index);
+                },
               ),
-              children: section.lectures.map((lecture) {
-                final color = _getColorForLectureType(lecture.type);
-                return Container(
-                  margin: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[50],
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: ListTile(
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 4,
-                    ),
-                    leading: Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: color.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Icon(
-                        _getIconForLectureType(lecture.type),
-                        color: color,
-                        size: 20,
-                      ),
-                    ),
-                    title: Text(
-                      lecture.title,
-                      style: const TextStyle(fontSize: 14),
-                    ),
-                    subtitle: Row(
-                      children: [
-                        Icon(
-                          Icons.access_time,
-                          size: 14,
-                          color: Colors.grey[600],
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          lecture.duration,
+              children: section.lectures.isEmpty
+                  ? [
+                      Padding(
+                        padding: const EdgeInsets.all(20),
+                        child: Text(
+                          'Chưa có bài giảng nào trong chương này',
                           style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey[600],
+                            color: Colors.grey[500],
+                            fontSize: 14,
                           ),
+                          textAlign: TextAlign.center,
                         ),
-                      ],
-                    ),
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.edit_outlined, size: 20),
-                          onPressed: () {},
+                      ),
+                    ]
+                  : section.lectures.map((lecture) {
+                      final color = _getColorForLectureType(lecture.type);
+                      return Container(
+                        margin: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 6,
                         ),
-                        const Icon(Icons.drag_handle, size: 20),
-                      ],
-                    ),
-                    onTap: () {},
-                  ),
-                );
-              }).toList(),
+                        decoration: BoxDecoration(
+                          color: Colors.grey[50],
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: ListTile(
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 4,
+                          ),
+                          leading: Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: color.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Icon(
+                              _getIconForLectureType(lecture.type),
+                              color: color,
+                              size: 20,
+                            ),
+                          ),
+                          title: Text(
+                            lecture.title,
+                            style: const TextStyle(fontSize: 14),
+                          ),
+                          subtitle: Row(
+                            children: [
+                              Icon(
+                                Icons.access_time_rounded,
+                                size: 14,
+                                color: Colors.grey[600],
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                lecture.duration,
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.grey[600],
+                                ),
+                              ),
+                            ],
+                          ),
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                icon: const Icon(Icons.edit_outlined, size: 20),
+                                onPressed: () {},
+                              ),
+                              const Icon(Icons.drag_handle_rounded, size: 20),
+                            ],
+                          ),
+                          onTap: () {},
+                        ),
+                      );
+                    }).toList(),
             ),
           ),
         );
@@ -582,12 +888,25 @@ class _TeacherCourseDetailScreenState extends State<TeacherCourseDetailScreen>
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.people_outlined, size: 80, color: Colors.grey[300]),
-          const SizedBox(height: 16),
+          Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: Colors.grey.shade100,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.people_outlined,
+              size: 64,
+              color: Colors.grey[400],
+            ),
+          ),
+          const SizedBox(height: 24),
           Text(
             'Chưa có học viên nào',
-            style: theme.textTheme.titleMedium?.copyWith(
-              color: Colors.grey[600],
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+              color: Colors.grey[700],
             ),
           ),
         ],
@@ -600,55 +919,65 @@ class _TeacherCourseDetailScreenState extends State<TeacherCourseDetailScreen>
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        Text(
+        const Text(
           'Thông tin khóa học',
-          style: theme.textTheme.titleLarge?.copyWith(
+          style: TextStyle(
+            fontSize: 18,
             fontWeight: FontWeight.bold,
+            color: Colors.black87,
           ),
         ),
         const SizedBox(height: 16),
-        Card(
-          elevation: 2,
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              children: [
-                TextFormField(
-                  initialValue: widget.course.title,
-                  decoration: InputDecoration(
-                    labelText: 'Tên khóa học',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    prefixIcon: const Icon(Icons.title),
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.04),
+                blurRadius: 10,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            children: [
+              TextFormField(
+                initialValue: widget.course.title,
+                decoration: InputDecoration(
+                  labelText: 'Tên khóa học',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
                   ),
+                  prefixIcon: const Icon(Icons.title_rounded),
                 ),
-                const SizedBox(height: 16),
-                TextFormField(
-                  initialValue: widget.course.description,
-                  decoration: InputDecoration(
-                    labelText: 'Mô tả',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    prefixIcon: const Icon(Icons.description),
+              ),
+              const SizedBox(height: 16),
+              TextFormField(
+                initialValue: widget.course.description,
+                decoration: InputDecoration(
+                  labelText: 'Mô tả',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
                   ),
-                  maxLines: 4,
+                  prefixIcon: const Icon(Icons.description_rounded),
                 ),
-                const SizedBox(height: 16),
-                TextFormField(
-                  decoration: InputDecoration(
-                    labelText: 'Giá khóa học',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    prefixIcon: const Icon(Icons.attach_money),
-                    suffixText: 'VNĐ',
+                maxLines: 4,
+              ),
+              const SizedBox(height: 16),
+              TextFormField(
+                decoration: InputDecoration(
+                  labelText: 'Giá khóa học',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
                   ),
-                  keyboardType: TextInputType.number,
+                  prefixIcon: const Icon(Icons.attach_money_rounded),
+                  suffixText: 'VNĐ',
                 ),
-              ],
-            ),
+                keyboardType: TextInputType.number,
+              ),
+            ],
           ),
         ),
         const SizedBox(height: 24),
@@ -658,17 +987,33 @@ class _TeacherCourseDetailScreenState extends State<TeacherCourseDetailScreen>
           child: ElevatedButton.icon(
             onPressed: () {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Đã lưu thay đổi'),
-                  duration: Duration(seconds: 2),
+                SnackBar(
+                  content: const Row(
+                    children: [
+                      Icon(Icons.check_circle_rounded, color: Colors.white),
+                      SizedBox(width: 12),
+                      Text('Đã lưu thay đổi'),
+                    ],
+                  ),
+                  backgroundColor: Colors.green.shade600,
+                  behavior: SnackBarBehavior.floating,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  margin: const EdgeInsets.all(16),
                 ),
               );
             },
-            icon: const Icon(Icons.save),
-            label: const Text('Lưu thay đổi'),
+            icon: const Icon(Icons.save_rounded),
+            label: const Text(
+              'Lưu thay đổi',
+              style: TextStyle(fontWeight: FontWeight.w600),
+            ),
             style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.green.shade600,
+              foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(12),
               ),
             ),
           ),
@@ -689,8 +1034,9 @@ class _TeacherCourseDetailScreenState extends State<TeacherCourseDetailScreen>
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
+      backgroundColor: Colors.white,
       builder: (context) => Padding(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(24),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -703,38 +1049,150 @@ class _TeacherCourseDetailScreenState extends State<TeacherCourseDetailScreen>
               ),
             ),
             const SizedBox(height: 20),
-            Text(
+            const Text(
               'Thêm nội dung mới',
-              style: Theme.of(
-                context,
-              ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.black87,
+              ),
             ),
             const SizedBox(height: 20),
             ListTile(
-              leading: const Icon(Icons.folder, color: Colors.orange),
-              title: const Text('Thêm chương mới'),
+              leading: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.orange.shade50,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(
+                  Icons.folder_rounded,
+                  color: Colors.orange.shade700,
+                ),
+              ),
+              title: const Text(
+                'Thêm chương mới',
+                style: TextStyle(fontWeight: FontWeight.w600),
+              ),
+              trailing: const Icon(Icons.chevron_right_rounded),
+              onTap: () {
+                Navigator.pop(context);
+                _showAddSectionDialog(context);
+              },
+            ),
+            const SizedBox(height: 8),
+            ListTile(
+              leading: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.red.shade50,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(
+                  Icons.video_library_rounded,
+                  color: Colors.red.shade700,
+                ),
+              ),
+              title: const Text(
+                'Thêm video',
+                style: TextStyle(fontWeight: FontWeight.w600),
+              ),
+              trailing: const Icon(Icons.chevron_right_rounded),
               onTap: () => Navigator.pop(context),
             ),
+            const SizedBox(height: 8),
             ListTile(
-              leading: const Icon(Icons.video_library, color: Colors.red),
-              title: const Text('Thêm video'),
+              leading: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.blue.shade50,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(Icons.article_rounded, color: Colors.blue.shade700),
+              ),
+              title: const Text(
+                'Thêm bài viết',
+                style: TextStyle(fontWeight: FontWeight.w600),
+              ),
+              trailing: const Icon(Icons.chevron_right_rounded),
               onTap: () => Navigator.pop(context),
             ),
+            const SizedBox(height: 8),
             ListTile(
-              leading: const Icon(Icons.article, color: Colors.blue),
-              title: const Text('Thêm bài viết'),
-              onTap: () => Navigator.pop(context),
-            ),
-            ListTile(
-              leading: const Icon(Icons.quiz, color: Colors.purple),
-              title: const Text('Thêm quiz'),
+              leading: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.purple.shade50,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(Icons.quiz_rounded, color: Colors.purple.shade700),
+              ),
+              title: const Text(
+                'Thêm quiz',
+                style: TextStyle(fontWeight: FontWeight.w600),
+              ),
+              trailing: const Icon(Icons.chevron_right_rounded),
               onTap: () {
                 Navigator.pop(context);
                 _createQuiz(context);
               },
             ),
+            const SizedBox(height: 10),
           ],
         ),
+      ),
+    );
+  }
+
+  void _showAddSectionDialog(BuildContext context) {
+    final TextEditingController controller = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Text(
+          'Thêm chương mới',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        content: TextField(
+          controller: controller,
+          autofocus: true,
+          decoration: InputDecoration(
+            labelText: 'Tên chương',
+            hintText: 'Ví dụ: Chương 1: Giới thiệu',
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+            prefixIcon: const Icon(Icons.folder_outlined),
+          ),
+          onSubmitted: (value) {
+            if (value.trim().isNotEmpty) {
+              Navigator.pop(context);
+              _addNewSection(value);
+            }
+          },
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Hủy'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              if (controller.text.trim().isNotEmpty) {
+                Navigator.pop(context);
+                _addNewSection(controller.text);
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.green.shade600,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+            child: const Text('Thêm'),
+          ),
+        ],
       ),
     );
   }
