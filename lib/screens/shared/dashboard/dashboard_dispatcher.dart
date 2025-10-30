@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../features/auth/auth_state.dart';
-import 'package:go_router/go_router.dart';
+import '../../../core/widgets/common_app_bar.dart';
 import '../../student/dashboard/student_dashboard.dart';
 import '../../teacher/dashboard/teacher_dashboard.dart';
 import '../../admin/dashboard/admin_dashboard.dart';
@@ -26,15 +26,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(_getDashboardTitle(user.role)),
-        actions: [
-          IconButton(
-            tooltip: 'Notifications',
-            icon: const Icon(Icons.notifications_outlined),
-            onPressed: () => context.go('/notifications-demo'),
-          ),
-        ],
+      appBar: CommonAppBar(
+        title: _getDashboardTitle(user.role),
+        showNotificationsAction: true,
       ),
       body: _buildDashboardBody(user),
     );

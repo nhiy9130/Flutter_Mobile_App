@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../../core/widgets/section_header.dart';
+import '../../../core/widgets/common_app_bar.dart';
 import '../../../core/widgets/quick_action_card.dart';
-import '../../../core/widgets/info_card.dart';
 import '../../../core/widgets/empty_state.dart';
-import '../quiz/quiz_creation_screen.dart';
 import '../students/student_management_screen.dart';
 
 class TeacherCoursesScreen extends ConsumerWidget {
@@ -15,15 +13,9 @@ class TeacherCoursesScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       backgroundColor: Colors.grey.shade50,
-      appBar: AppBar(
-        title: const Text(
-          'Quản lý khóa học',
-          style: TextStyle(fontWeight: FontWeight.w600),
-        ),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black87,
-        elevation: 0,
-        surfaceTintColor: Colors.white,
+      appBar: CommonAppBar(
+        title: 'Quản lý khóa học',
+        showNotificationsAction: false,
         actions: [
           IconButton(
             icon: Container(
@@ -43,6 +35,8 @@ class TeacherCoursesScreen extends ConsumerWidget {
           ),
           const SizedBox(width: 8),
         ],
+        backgroundColor: Colors.white,
+        elevation: 0,
       ),
       body: ListView(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
@@ -207,8 +201,6 @@ class TeacherCoursesScreen extends ConsumerWidget {
   }
 
   Widget _buildCourseCard(BuildContext context, Map<String, dynamic> course) {
-    final theme = Theme.of(context);
-
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
