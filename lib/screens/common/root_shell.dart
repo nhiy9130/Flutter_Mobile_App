@@ -93,7 +93,7 @@ class RootShell extends ConsumerWidget {
           const NavigationDestination(
             icon: Icon(Icons.school_outlined),
             selectedIcon: Icon(Icons.school),
-            label: 'Quản lý',
+            label: 'Khóa học',
           ),
           NavigationDestination(
             icon: Stack(
@@ -123,9 +123,9 @@ class RootShell extends ConsumerWidget {
       case 'admin':
         destinations.addAll([
           const NavigationDestination(
-            icon: Icon(Icons.admin_panel_settings_outlined),
-            selectedIcon: Icon(Icons.admin_panel_settings),
-            label: 'Quản trị',
+            icon: Icon(Icons.settings_outlined),
+            selectedIcon: Icon(Icons.settings),
+            label: 'Cài đặt',
           ),
           NavigationDestination(
             icon: Stack(
@@ -204,10 +204,13 @@ class RootShell extends ConsumerWidget {
             context.go('/my-courses');
             break;
           case 'instructor':
-          case 'admin':
-            // TODO: Navigate to management screens
-            context.go('/my-courses');
+            context.go('/teacher-courses');
             break;
+          case 'admin':
+            context.go('/admin-system-settings');
+            break;
+          default:
+            context.go('/my-courses');
         }
         break;
       case 2:

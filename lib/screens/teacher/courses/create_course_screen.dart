@@ -296,7 +296,7 @@ class _CreateCourseScreenState extends ConsumerState<CreateCourseScreen> {
         'Chọn danh mục khóa học',
         Icons.category_outlined,
       ),
-      value: _selectedCategory,
+      initialValue: _selectedCategory,
       items: _categories
           .map(
             (category) => DropdownMenuItem<String>(
