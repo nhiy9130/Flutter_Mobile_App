@@ -183,7 +183,7 @@ class RootShell extends ConsumerWidget {
       case 'student':
         return 'Trang chủ';
       case 'instructor':
-        return 'Giảng dạy';
+        return 'Trang chủ';
       case 'admin':
         return 'Quản trị';
       default:
@@ -204,6 +204,8 @@ class RootShell extends ConsumerWidget {
             context.go('/my-courses');
             break;
           case 'instructor':
+            context.go('/teacher-courses');
+            break;
           case 'admin':
             // TODO: Navigate to management screens
             context.go('/my-courses');

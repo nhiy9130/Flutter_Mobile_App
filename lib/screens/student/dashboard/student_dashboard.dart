@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/widgets/badges.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../features/auth/auth_state.dart';
@@ -175,22 +176,10 @@ class StudentDashboard extends ConsumerWidget {
           iconColor: AppColors.primary,
           iconBackgroundColor: AppColors.primaryContainer,
           onTap: () => context.go('/my-courses'),
-          trailing: Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.sm,
-              vertical: AppSpacing.xs2,
-            ),
-            decoration: BoxDecoration(
-              color: AppColors.primary,
-              borderRadius: BorderRadius.circular(AppRadius.full),
-            ),
-            child: Text(
-              '15',
-              style: AppTypography.caption.copyWith(
-                color: AppColors.white,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
+          trailing: const StatusBadge(
+            label: '15',
+            color: AppColors.primary,
+            variant: BadgeVariant.solid,
           ),
         ),
         ActionCard(
@@ -200,22 +189,10 @@ class StudentDashboard extends ConsumerWidget {
           iconColor: AppColors.warning,
           iconBackgroundColor: AppColors.warningContainer,
           onTap: () => context.go('/notifications-demo'),
-          trailing: Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.sm,
-              vertical: AppSpacing.xs2,
-            ),
-            decoration: BoxDecoration(
-              color: AppColors.error,
-              borderRadius: BorderRadius.circular(AppRadius.full),
-            ),
-            child: Text(
-              '5',
-              style: AppTypography.caption.copyWith(
-                color: AppColors.white,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
+          trailing: const StatusBadge(
+            label: '5',
+            color: AppColors.error,
+            variant: BadgeVariant.solid,
           ),
         ),
         ActionCard(
@@ -233,22 +210,10 @@ class StudentDashboard extends ConsumerWidget {
           iconColor: AppColors.secondary,
           iconBackgroundColor: AppColors.secondaryContainer,
           onTap: () => context.go('/my-courses'),
-          trailing: Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.sm,
-              vertical: AppSpacing.xs2,
-            ),
-            decoration: BoxDecoration(
-              color: AppColors.secondary,
-              borderRadius: BorderRadius.circular(AppRadius.full),
-            ),
-            child: Text(
-              '3',
-              style: AppTypography.caption.copyWith(
-                color: AppColors.white,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
+          trailing: const StatusBadge(
+            label: '3',
+            color: AppColors.secondary,
+            variant: BadgeVariant.solid,
           ),
         ),
       ],

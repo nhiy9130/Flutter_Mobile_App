@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/widgets/badges.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -121,13 +122,12 @@ class _ConversationListScreenState
                   style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
                 ),
                 if (unread > 0)
-                  Container(
-                    margin: const EdgeInsets.only(top: 6),
-                    width: 10,
-                    height: 10,
-                    decoration: const BoxDecoration(
+                  Padding(
+                    padding: const EdgeInsets.only(top: 6),
+                    child: StatusBadge(
+                      label: unread.toString(),
                       color: Colors.red,
-                      shape: BoxShape.circle,
+                      variant: BadgeVariant.solid,
                     ),
                   ),
               ],

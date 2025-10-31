@@ -1,23 +1,59 @@
 import 'package:flutter/material.dart';
+import 'dart:convert';
+import 'package:file_picker/file_picker.dart';
+import 'package:flutter_quill/flutter_quill.dart' as quill;
+import 'package:uuid/uuid.dart';
 // ignore: unused_import
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 // ignore: unused_import
 import '../../../features/courses/courses_service.dart';
 import '../../../features/courses/course_model.dart';
-import '../quiz/quiz_creation_screen.dart';
+// import '../quiz/quiz_creation_screen.dart';
+import 'tabs/content_tab.dart';
 
-// Mock data model for course content
+// Models
 class Lecture {
-  final String title;
-  final String type; // 'video', 'article', 'quiz'
-  final String duration;
-  Lecture({required this.title, required this.type, required this.duration});
+  final String id;
+  String title;
+  String type; // 'video', 'file', 'text' | backward: 'article','quiz'
+  String? url; // for video link
+  String? filePath; // for uploaded file
+  String? textJson; // for quill document
+  String? duration; // optional legacy
+
+  Lecture({
+    required this.id,
+    required this.title,
+    required this.type,
+    this.url,
+    this.filePath,
+    this.textJson,
+    this.duration,
+  });
 }
 
 class CourseSection {
-  final String title;
+  final String id;
+  String title;
   final List<Lecture> lectures;
-  CourseSection({required this.title, required this.lectures});
+  CourseSection({
+    required this.id,
+    required this.title,
+    required this.lectures,
+  });
+}
+
+class AssignmentItem {
+  String title;
+  DateTime deadline;
+  int submitted;
+  int total;
+  AssignmentItem({
+    required this.title,
+    required this.deadline,
+    required this.submitted,
+    required this.total,
+  });
 }
 
 class TeacherCourseDetailScreen extends StatefulWidget {
@@ -33,17 +69,65 @@ class TeacherCourseDetailScreen extends StatefulWidget {
 class _TeacherCourseDetailScreenState extends State<TeacherCourseDetailScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  final _uuid = const Uuid();
 
-  // Danh sách nội dung khóa học (đã được làm trống)
   final List<CourseSection> _courseContent = [];
+  final List<AssignmentItem> _assignments = [];
+  final List<Map<String, String>> _announcements = [];
+  final List<Map<String, String>> _students = [];
+  String _studentQuery = '';
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 4, vsync: this);
-    _tabController.addListener(() {
-      setState(() {});
-    });
+    _tabController = TabController(length: 5, vsync: this);
+    // seed demo data (optional)
+    _assignments.addAll([
+      AssignmentItem(
+        title: 'Bài tập 1: Widgets cơ bản',
+        deadline: DateTime.now().add(const Duration(days: 3)),
+        submitted: 12,
+        total: 40,
+      ),
+      AssignmentItem(
+        title: 'Quiz: State Management',
+        deadline: DateTime.now().add(const Duration(days: 7)),
+        submitted: 5,
+        total: 40,
+      ),
+    ]);
+    _announcements.addAll([
+      {
+        'title': 'Chào mừng đến với khóa học!',
+        'message': 'Hãy đọc kỹ syllabus và hoàn thành khảo sát tuần 1.',
+        'time': 'Hôm nay 09:00',
+      },
+      {
+        'title': 'Cập nhật tài liệu buổi 2',
+        'message': 'Đã upload slide và bài đọc tham khảo.',
+        'time': 'Hôm qua 16:20',
+      },
+    ]);
+    _students.addAll([
+      {
+        'id': 'SV001',
+        'name': 'Nguyễn Văn A',
+        'email': 'a.nguyen@example.com',
+        'joined': '2025-10-01',
+      },
+      {
+        'id': 'SV002',
+        'name': 'Trần Thị B',
+        'email': 'b.tran@example.com',
+        'joined': '2025-10-02',
+      },
+      {
+        'id': 'SV003',
+        'name': 'Lê Hoàng C',
+        'email': 'c.le@example.com',
+        'joined': '2025-10-03',
+      },
+    ]);
   }
 
   @override
@@ -69,6 +153,10 @@ class _TeacherCourseDetailScreenState extends State<TeacherCourseDetailScreen>
     switch (type) {
       case 'video':
         return Colors.red;
+      case 'file':
+        return Colors.teal;
+      case 'text':
+        return Colors.purple;
       case 'article':
         return Colors.blue;
       case 'quiz':
@@ -81,11 +169,11 @@ class _TeacherCourseDetailScreenState extends State<TeacherCourseDetailScreen>
   // Thêm chương mới
   void _addNewSection(String sectionTitle) {
     if (sectionTitle.trim().isEmpty) return;
-
     setState(() {
-      _courseContent.add(CourseSection(title: sectionTitle, lectures: []));
+      _courseContent.add(
+        CourseSection(id: _uuid.v4(), title: sectionTitle, lectures: []),
+      );
     });
-
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
@@ -104,74 +192,6 @@ class _TeacherCourseDetailScreenState extends State<TeacherCourseDetailScreen>
   }
 
   // ============== CÁC HÀM QUẢN LÝ CHƯƠNG HỌC ==============
-
-  void _showSectionOptionsMenu(BuildContext context, int sectionIndex) {
-    showModalBottomSheet(
-      context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (context) {
-        final sectionTitle = _courseContent[sectionIndex].title;
-        return Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Center(
-                child: Container(
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: Colors.grey[300],
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                'Tùy chọn cho: ${sectionTitle.length > 30 ? '${sectionTitle.substring(0, 27)}...' : sectionTitle}',
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87,
-                ),
-              ),
-              const SizedBox(height: 10),
-              // Tùy chọn chỉnh sửa
-              ListTile(
-                leading: Icon(Icons.edit_outlined, color: Colors.blue.shade600),
-                title: const Text(
-                  'Chỉnh sửa tên chương',
-                  style: TextStyle(fontWeight: FontWeight.w500),
-                ),
-                onTap: () {
-                  Navigator.pop(context);
-                  _showEditSectionDialog(context, sectionIndex);
-                },
-              ),
-              // Tùy chọn xóa
-              ListTile(
-                leading: Icon(
-                  Icons.delete_outline_rounded,
-                  color: Colors.red.shade600,
-                ),
-                title: const Text(
-                  'Xóa chương',
-                  style: TextStyle(fontWeight: FontWeight.w500),
-                ),
-                onTap: () {
-                  Navigator.pop(context);
-                  _showDeleteSectionConfirmationDialog(context, sectionIndex);
-                },
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
 
   void _showEditSectionDialog(BuildContext context, int sectionIndex) {
     final TextEditingController controller = TextEditingController(
@@ -230,10 +250,7 @@ class _TeacherCourseDetailScreenState extends State<TeacherCourseDetailScreen>
 
   void _editSectionTitle(int index, String newTitle) {
     setState(() {
-      _courseContent[index] = CourseSection(
-        title: newTitle,
-        lectures: _courseContent[index].lectures,
-      );
+      _courseContent[index].title = newTitle;
     });
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -354,7 +371,6 @@ class _TeacherCourseDetailScreenState extends State<TeacherCourseDetailScreen>
                                 end: Alignment.bottomCenter,
                                 colors: [
                                   Colors.transparent,
-                                  // REPLACED: Colors.black.withOpacity(0.7)
                                   Colors.black.withAlpha(179),
                                 ],
                               ),
@@ -369,56 +385,29 @@ class _TeacherCourseDetailScreenState extends State<TeacherCourseDetailScreen>
                             end: Alignment.bottomRight,
                             colors: [
                               theme.primaryColor,
-                              // REPLACED: theme.primaryColor.withOpacity(0.7)
                               theme.primaryColor.withAlpha(179),
                             ],
                           ),
                         ),
                       ),
               ),
-              actions: [
-                IconButton(
-                  icon: const Icon(Icons.preview_outlined),
-                  tooltip: 'Xem dưới dạng học viên',
-                  onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: const Text('Chức năng xem trước'),
-                        behavior: SnackBarBehavior.floating,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        margin: const EdgeInsets.all(16),
-                      ),
-                    );
-                  },
-                ),
-                IconButton(icon: const Icon(Icons.more_vert), onPressed: () {}),
-              ],
-              bottom: PreferredSize(
-                preferredSize: const Size.fromHeight(48),
-                child: Container(
-                  color: Colors.white,
-                  child: TabBar(
-                    controller: _tabController,
-                    labelColor: theme.primaryColor,
-                    unselectedLabelColor: Colors.grey,
-                    indicatorColor: theme.primaryColor,
-                    indicatorWeight: 3,
-                    labelStyle: const TextStyle(fontWeight: FontWeight.w600),
-                    tabs: const [
-                      Tab(
-                        icon: Icon(Icons.dashboard_outlined),
-                        text: 'Tổng quan',
-                      ),
-                      Tab(
-                        icon: Icon(Icons.menu_book_outlined),
-                        text: 'Nội dung',
-                      ),
-                      Tab(icon: Icon(Icons.people_outlined), text: 'Học viên'),
-                      Tab(icon: Icon(Icons.settings_outlined), text: 'Cài đặt'),
-                    ],
-                  ),
+            ),
+            SliverPersistentHeader(
+              pinned: true,
+              delegate: _TabBarDelegate(
+                TabBar(
+                  controller: _tabController,
+                  isScrollable: true,
+                  labelColor: theme.primaryColor,
+                  unselectedLabelColor: Colors.grey[700],
+                  indicatorColor: theme.primaryColor,
+                  tabs: const [
+                    Tab(text: 'Nội dung khóa học'),
+                    Tab(text: 'Sinh viên'),
+                    Tab(text: 'Bài tập & Điểm số'),
+                    Tab(text: 'Thông báo'),
+                    Tab(text: 'Cài đặt'),
+                  ],
                 ),
               ),
             ),
@@ -427,454 +416,391 @@ class _TeacherCourseDetailScreenState extends State<TeacherCourseDetailScreen>
         body: TabBarView(
           controller: _tabController,
           children: [
-            _buildOverviewTab(theme),
-            _buildContentTab(theme),
+            // TAB 1: NỘI DUNG KHÓA HỌC (mới)
+            ContentTab(
+              courseContent: _courseContent,
+              onAddSection: (ctx) => _showAddSectionDialog(ctx),
+              onEditSection: (ctx, i) => _showEditSectionDialog(ctx, i),
+              onDeleteSection: (ctx, i) =>
+                  _showDeleteSectionConfirmationDialog(ctx, i),
+              onAddEditLecture: (ctx, sectionIndex, {lecture, lectureIndex}) =>
+                  _showAddEditLectureDialog(
+                    ctx,
+                    sectionIndex,
+                    lecture: lecture,
+                    lectureIndex: lectureIndex,
+                  ),
+              onDeleteLecture: (ctx, sectionIndex, lectureIndex, title) =>
+                  _confirmDeleteLecture(ctx, sectionIndex, lectureIndex, title),
+              onReorderSections: (oldIndex, newIndex) {
+                setState(() {
+                  if (newIndex > oldIndex) newIndex -= 1;
+                  final item = _courseContent.removeAt(oldIndex);
+                  _courseContent.insert(newIndex, item);
+                });
+              },
+              onReorderLectures: (sectionIndex, oldIndex, newIndex) {
+                setState(() {
+                  if (newIndex > oldIndex) newIndex -= 1;
+                  final item = _courseContent[sectionIndex].lectures.removeAt(
+                    oldIndex,
+                  );
+                  _courseContent[sectionIndex].lectures.insert(newIndex, item);
+                });
+              },
+              getIconForType: _getIconForLectureType,
+              getColorForType: _getColorForLectureType,
+            ),
             _buildStudentsTab(theme),
+            _buildAssignmentsTab(theme),
+            _buildAnnouncementsTab(theme),
             _buildSettingsTab(theme),
           ],
         ),
       ),
-      floatingActionButton: _tabController.index == 1
-          ? FloatingActionButton.extended(
-              onPressed: () {
-                _showAddContentDialog(context);
-              },
-              label: const Text(
-                'Thêm nội dung',
-                style: TextStyle(fontWeight: FontWeight.w600),
-              ),
-              icon: const Icon(Icons.add_rounded),
-              backgroundColor: Colors.green.shade600,
-              foregroundColor: Colors.white,
-              elevation: 4,
-            )
-          : null,
     );
   }
 
-  // === WIDGETS CHO CÁC TAB ===
+  /// TAB 2: SINH VIÊN
+  Widget _buildStudentsTab(ThemeData theme) {
+    final filtered = _students
+        .where(
+          (s) =>
+              _studentQuery.isEmpty ||
+              s['name']!.toLowerCase().contains(_studentQuery.toLowerCase()) ||
+              s['email']!.toLowerCase().contains(_studentQuery.toLowerCase()) ||
+              s['id']!.toLowerCase().contains(_studentQuery.toLowerCase()),
+        )
+        .toList();
 
-  /// TAB 1: TỔNG QUAN
-  Widget _buildOverviewTab(ThemeData theme) {
-    return SingleChildScrollView(
+    return ListView(
       padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildStatCards(theme),
-          const SizedBox(height: 24),
-          _buildQuickActionsSection(theme),
-          const SizedBox(height: 24),
-          _buildRecentActivitySection(theme),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildStatCards(ThemeData theme) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Thống kê',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: Colors.black87,
-          ),
-        ),
-        const SizedBox(height: 12),
-        Row(
+        Wrap(
+          spacing: 12,
+          runSpacing: 12,
           children: [
-            Expanded(
-              child: _buildStatCard2(
-                theme,
-                'Học viên',
-                '0',
-                Icons.people_rounded,
-                Colors.blue,
+            ConstrainedBox(
+              constraints: const BoxConstraints(minWidth: 240),
+              child: SizedBox(
+                width: 420,
+                child: TextField(
+                  decoration: InputDecoration(
+                    hintText: 'Tìm kiếm sinh viên... (MSSV, tên, email)',
+                    prefixIcon: const Icon(Icons.search),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    isDense: true,
+                  ),
+                  onChanged: (v) => setState(() => _studentQuery = v),
+                ),
               ),
             ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: _buildStatCard2(
-                theme,
-                'Bài giảng',
-                '${_courseContent.fold(0, (sum, section) => sum + section.lectures.length)}',
-                Icons.video_library_rounded,
-                Colors.orange,
-              ),
+            OutlinedButton.icon(
+              onPressed: () => _showInviteStudentDialog(context),
+              icon: const Icon(Icons.mail_outline),
+              label: const Text('Mời sinh viên'),
             ),
           ],
         ),
-      ],
-    );
-  }
-
-  Widget _buildStatCard2(
-    ThemeData theme,
-    String label,
-    String value,
-    IconData icon,
-    Color color,
-  ) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Icon(icon, color: color, size: 28),
-          ),
-          const SizedBox(height: 16),
-          Text(
-            value,
-            style: const TextStyle(
-              fontSize: 28,
-              fontWeight: FontWeight.bold,
-              color: Colors.black87,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildQuickActionsSection(ThemeData theme) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Hành động nhanh',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: Colors.black87,
-          ),
-        ),
-        const SizedBox(height: 12),
-        Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.04),
-                blurRadius: 10,
-                offset: const Offset(0, 2),
-              ),
+        const SizedBox(height: 16),
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: DataTable(
+            columns: const [
+              DataColumn(label: Text('MSSV')),
+              DataColumn(label: Text('Họ và Tên')),
+              DataColumn(label: Text('Email')),
+              DataColumn(label: Text('Ngày tham gia')),
+              DataColumn(label: Text('Hành động')),
             ],
-          ),
-          child: Column(
-            children: [
-              _buildActionTile(
-                icon: Icons.announcement_rounded,
-                title: 'Tạo thông báo mới',
-                subtitle: 'Gửi thông báo đến học viên',
-                color: Colors.blue,
-                onTap: () {},
-              ),
-              Divider(height: 1, color: Colors.grey.shade200),
-              _buildActionTile(
-                icon: Icons.videocam_rounded,
-                title: 'Bắt đầu buổi học Live',
-                subtitle: 'Phát trực tiếp bài giảng',
-                color: Colors.red,
-                onTap: () {},
-              ),
-              Divider(height: 1, color: Colors.grey.shade200),
-              _buildActionTile(
-                icon: Icons.quiz_rounded,
-                title: 'Tạo Quiz mới',
-                subtitle: 'Kiểm tra kiến thức học viên',
-                color: Colors.purple,
-                onTap: () => _createQuiz(context),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildActionTile({
-    required IconData icon,
-    required String title,
-    required String subtitle,
-    required Color color,
-    required VoidCallback onTap,
-  }) {
-    return ListTile(
-      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-      leading: Container(
-        padding: const EdgeInsets.all(10),
-        decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: Icon(icon, color: color, size: 24),
-      ),
-      title: Text(
-        title,
-        style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
-      ),
-      subtitle: Padding(
-        padding: const EdgeInsets.only(top: 4),
-        child: Text(
-          subtitle,
-          style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
-        ),
-      ),
-      trailing: Icon(Icons.chevron_right_rounded, color: Colors.grey[400]),
-      onTap: onTap,
-    );
-  }
-
-  Widget _buildRecentActivitySection(ThemeData theme) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Hoạt động gần đây',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: Colors.black87,
-          ),
-        ),
-        const SizedBox(height: 12),
-        Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.04),
-                blurRadius: 10,
-                offset: const Offset(0, 2),
-              ),
-            ],
-          ),
-          padding: const EdgeInsets.all(32),
-          child: Center(
-            child: Column(
-              children: [
-                Icon(Icons.history_rounded, size: 48, color: Colors.grey[400]),
-                const SizedBox(height: 12),
-                Text(
-                  'Chưa có hoạt động nào',
-                  style: TextStyle(
-                    color: Colors.grey[600],
-                    fontSize: 15,
-                    fontWeight: FontWeight.w500,
+            rows: filtered
+                .map(
+                  (s) => DataRow(
+                    cells: [
+                      DataCell(Text(s['id']!)),
+                      DataCell(Text(s['name']!)),
+                      DataCell(Text(s['email']!)),
+                      DataCell(Text(s['joined']!)),
+                      DataCell(
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IconButton(
+                              tooltip: 'Xem tiến độ',
+                              icon: const Icon(Icons.show_chart),
+                              onPressed: () {},
+                            ),
+                            IconButton(
+                              tooltip: 'Gửi tin nhắn',
+                              icon: const Icon(Icons.message_outlined),
+                              onPressed: () {},
+                            ),
+                            IconButton(
+                              tooltip: 'Xóa khỏi lớp',
+                              icon: const Icon(
+                                Icons.delete_outline,
+                                color: Colors.red,
+                              ),
+                              onPressed: () {},
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
+                )
+                .toList(),
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// TAB 3: BÀI TẬP & ĐIỂM SỐ
+  Widget _buildAssignmentsTab(ThemeData theme) {
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        Wrap(
+          spacing: 12,
+          runSpacing: 12,
+          children: [
+            ElevatedButton.icon(
+              onPressed: _openCreateAssignment,
+              icon: const Icon(Icons.add_task_rounded),
+              label: const Text('Tạo bài tập mới'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.green.shade600,
+                foregroundColor: Colors.white,
+              ),
+            ),
+            OutlinedButton.icon(
+              onPressed: _openGradebook,
+              icon: const Icon(Icons.grid_on_rounded),
+              label: const Text('Xem Bảng điểm tổng hợp'),
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
+        if (_assignments.isEmpty)
+          Container(
+            padding: const EdgeInsets.all(32),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.04),
+                  blurRadius: 10,
+                  offset: const Offset(0, 2),
                 ),
               ],
             ),
+            child: const Center(child: Text('Chưa có bài tập nào')),
+          )
+        else
+          ..._assignments.map((a) {
+            return Card(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: ListTile(
+                leading: const Icon(Icons.assignment_outlined),
+                title: Text(
+                  a.title,
+                  style: const TextStyle(fontWeight: FontWeight.w600),
+                ),
+                subtitle: Text(
+                  'Hạn nộp: ${_fmtDateTime(a.deadline)} • Đã nộp: ${a.submitted}/${a.total}',
+                ),
+                trailing: const Icon(Icons.chevron_right_rounded),
+                onTap: () => _openGrading(a),
+              ),
+            );
+          }),
+      ],
+    );
+  }
+
+  /// TAB 4: THÔNG BÁO
+  Widget _buildAnnouncementsTab(ThemeData theme) {
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        Align(
+          alignment: Alignment.centerLeft,
+          child: ElevatedButton.icon(
+            onPressed: _openCreateAnnouncement,
+            icon: const Icon(Icons.campaign_outlined),
+            label: const Text('Tạo thông báo'),
+          ),
+        ),
+        const SizedBox(height: 12),
+        ..._announcements.map(
+          (n) => Card(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: ListTile(
+              leading: const Icon(Icons.announcement_outlined),
+              title: Text(n['title']!),
+              subtitle: Text(n['message']!),
+              trailing: Text(
+                n['time']!,
+                style: TextStyle(color: Colors.grey.shade600),
+              ),
+            ),
           ),
         ),
       ],
     );
   }
 
-  /// TAB 2: NỘI DUNG KHÓA HỌC
-  Widget _buildContentTab(ThemeData theme) {
-    if (_courseContent.isEmpty) {
-      return Center(
-        child: Padding(
-          padding: const EdgeInsets.all(32),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(24),
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade100,
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  Icons.menu_book_outlined,
-                  size: 64,
-                  color: Colors.grey[400],
-                ),
-              ),
-              const SizedBox(height: 24),
-              Text(
-                'Chưa có nội dung nào',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.grey[700],
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Nhấn nút + bên dưới để thêm chương hoặc bài giảng',
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 14, color: Colors.grey[500]),
-              ),
-            ],
-          ),
-        ),
-      );
-    }
+  // Helpers for Assignments/Announcements/Students
+  String _fmtDateTime(DateTime dt) {
+    return '${dt.day.toString().padLeft(2, '0')}/${dt.month.toString().padLeft(2, '0')} ${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}'
+        .toString();
+  }
 
-    return ListView.builder(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
-      itemCount: _courseContent.length,
-      itemBuilder: (context, index) {
-        final section = _courseContent[index];
-        return Container(
-          margin: const EdgeInsets.only(bottom: 16),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.04),
-                blurRadius: 10,
-                offset: const Offset(0, 2),
-              ),
-            ],
-          ),
-          child: Theme(
-            data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
-            child: ExpansionTile(
-              tilePadding: const EdgeInsets.symmetric(
-                horizontal: 20,
-                vertical: 8,
-              ),
-              childrenPadding: const EdgeInsets.only(bottom: 8),
-              leading: Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: theme.primaryColor.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(10),
+  void _openCreateAssignment() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) {
+        final titleCtl = TextEditingController();
+        final descCtl = TextEditingController();
+        final pointsCtl = TextEditingController(text: '10');
+        DateTime? pickedDeadline;
+        String deadlineLabel = 'Chọn hạn nộp';
+        return StatefulBuilder(
+          builder: (context, setModalState) => Padding(
+            padding: EdgeInsets.only(
+              bottom: MediaQuery.of(ctx).viewInsets.bottom + 16,
+              left: 16,
+              right: 16,
+              top: 16,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Container(
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: Colors.grey[300],
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
                 ),
-                child: Icon(
-                  Icons.folder_rounded,
-                  color: theme.primaryColor,
-                  size: 24,
+                const SizedBox(height: 16),
+                const Text(
+                  'Tạo bài tập mới',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
-              ),
-              title: Text(
-                section.title,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
+                const SizedBox(height: 12),
+                TextField(
+                  controller: titleCtl,
+                  decoration: InputDecoration(
+                    labelText: 'Tiêu đề bài tập',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    prefixIcon: const Icon(Icons.title_rounded),
+                  ),
                 ),
-              ),
-              subtitle: Padding(
-                padding: const EdgeInsets.only(top: 4),
-                child: Text(
-                  '${section.lectures.length} bài giảng',
-                  style: TextStyle(color: Colors.grey[600], fontSize: 13),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: descCtl,
+                  maxLines: 3,
+                  decoration: InputDecoration(
+                    labelText: 'Mô tả / Yêu cầu',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    prefixIcon: const Icon(Icons.description_outlined),
+                  ),
                 ),
-              ),
-              trailing: IconButton(
-                icon: const Icon(Icons.more_vert_rounded),
-                onPressed: () {
-                  _showSectionOptionsMenu(context, index);
-                },
-              ),
-              children: section.lectures.isEmpty
-                  ? [
-                      Padding(
-                        padding: const EdgeInsets.all(20),
-                        child: Text(
-                          'Chưa có bài giảng nào trong chương này',
-                          style: TextStyle(
-                            color: Colors.grey[500],
-                            fontSize: 14,
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: pointsCtl,
+                        keyboardType: TextInputType.number,
+                        decoration: InputDecoration(
+                          labelText: 'Tổng điểm',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
                           ),
-                          textAlign: TextAlign.center,
+                          prefixIcon: const Icon(Icons.score_outlined),
                         ),
                       ),
-                    ]
-                  : section.lectures.map((lecture) {
-                      final color = _getColorForLectureType(lecture.type);
-                      return Container(
-                        margin: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 6,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.grey[50],
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: ListTile(
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 4,
-                          ),
-                          leading: Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: color.withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(8),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: () async {
+                          final d = await showDatePicker(
+                            context: ctx,
+                            initialDate: DateTime.now().add(
+                              const Duration(days: 3),
                             ),
-                            child: Icon(
-                              _getIconForLectureType(lecture.type),
-                              color: color,
-                              size: 20,
+                            firstDate: DateTime.now(),
+                            lastDate: DateTime.now().add(
+                              const Duration(days: 365),
                             ),
-                          ),
-                          title: Text(
-                            lecture.title,
-                            style: const TextStyle(fontSize: 14),
-                          ),
-                          subtitle: Row(
-                            children: [
-                              Icon(
-                                Icons.access_time_rounded,
-                                size: 14,
-                                color: Colors.grey[600],
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                lecture.duration,
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: Colors.grey[600],
-                                ),
-                              ),
-                            ],
-                          ),
-                          trailing: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              IconButton(
-                                icon: const Icon(Icons.edit_outlined, size: 20),
-                                onPressed: () {},
-                              ),
-                              const Icon(Icons.drag_handle_rounded, size: 20),
-                            ],
-                          ),
-                          onTap: () {},
-                        ),
-                      );
-                    }).toList(),
+                          );
+                          if (d != null) {
+                            setModalState(() {
+                              pickedDeadline = d;
+                              deadlineLabel = _fmtDateTime(d);
+                            });
+                          }
+                        },
+                        icon: const Icon(Icons.event_outlined),
+                        label: Text(deadlineLabel),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(ctx),
+                      child: const Text('Hủy'),
+                    ),
+                    const SizedBox(width: 8),
+                    ElevatedButton(
+                      onPressed: () {
+                        if (titleCtl.text.trim().isEmpty) return;
+                        setState(() {
+                          _assignments.add(
+                            AssignmentItem(
+                              title: titleCtl.text.trim(),
+                              deadline:
+                                  pickedDeadline ??
+                                  DateTime.now().add(const Duration(days: 7)),
+                              submitted: 0,
+                              total: _students.length,
+                            ),
+                          );
+                        });
+                        Navigator.pop(ctx);
+                      },
+                      child: const Text('Giao bài'),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
         );
@@ -882,32 +808,274 @@ class _TeacherCourseDetailScreenState extends State<TeacherCourseDetailScreen>
     );
   }
 
-  /// TAB 3: DANH SÁCH HỌC VIÊN
-  Widget _buildStudentsTab(ThemeData theme) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              color: Colors.grey.shade100,
-              shape: BoxShape.circle,
+  void _openGrading(AssignmentItem a) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => _GradingScreen(assignment: a, students: _students),
+      ),
+    );
+  }
+
+  void _openGradebook() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) =>
+            _GradebookScreen(students: _students, assignments: _assignments),
+      ),
+    );
+  }
+
+  void _openCreateAnnouncement() {
+    final titleCtl = TextEditingController();
+    final msgCtl = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Tạo thông báo'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: titleCtl,
+              decoration: const InputDecoration(labelText: 'Tiêu đề'),
             ),
-            child: Icon(
-              Icons.people_outlined,
-              size: 64,
-              color: Colors.grey[400],
+            const SizedBox(height: 8),
+            TextField(
+              controller: msgCtl,
+              decoration: const InputDecoration(labelText: 'Nội dung'),
+              maxLines: 3,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Hủy'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              setState(() {
+                _announcements.insert(0, {
+                  'title': titleCtl.text.trim(),
+                  'message': msgCtl.text.trim(),
+                  'time': 'Vừa xong',
+                });
+              });
+              Navigator.pop(ctx);
+            },
+            child: const Text('Đăng'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showInviteStudentDialog(BuildContext context) {
+    final emailCtl = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Mời sinh viên'),
+        content: TextField(
+          controller: emailCtl,
+          decoration: const InputDecoration(
+            labelText: 'Email sinh viên',
+            hintText: 'student@example.com',
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Hủy'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(ctx);
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(const SnackBar(content: Text('Đã gửi lời mời')));
+            },
+            child: const Text('Gửi mời'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showAddEditLectureDialog(
+    BuildContext context,
+    int sectionIndex, {
+    Lecture? lecture,
+    int? lectureIndex,
+  }) {
+    final isEdit = lecture != null;
+    final titleCtl = TextEditingController(text: lecture?.title ?? '');
+    String type = lecture?.type ?? 'video';
+    final linkCtl = TextEditingController(text: lecture?.url ?? '');
+    String? pickedFilePath = lecture?.filePath;
+    String pickedFileName = pickedFilePath != null && pickedFilePath.isNotEmpty
+        ? pickedFilePath.split('\\').last.split('/').last
+        : '';
+    final quillController = quill.QuillController.basic();
+
+    showDialog(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setLocal) => AlertDialog(
+          title: Text(isEdit ? 'Chỉnh sửa bài giảng' : 'Thêm bài giảng'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                TextField(
+                  controller: titleCtl,
+                  decoration: const InputDecoration(
+                    labelText: 'Tiêu đề bài giảng',
+                  ),
+                ),
+                const SizedBox(height: 12),
+                DropdownButtonFormField<String>(
+                  value: type,
+                  items: const [
+                    DropdownMenuItem(value: 'video', child: Text('Video')),
+                    DropdownMenuItem(value: 'file', child: Text('Tệp tin')),
+                    DropdownMenuItem(value: 'text', child: Text('Văn bản')),
+                  ],
+                  onChanged: (v) => setLocal(() => type = v ?? 'video'),
+                  decoration: const InputDecoration(labelText: 'Loại nội dung'),
+                ),
+                const SizedBox(height: 12),
+                if (type == 'video') ...[
+                  TextField(
+                    controller: linkCtl,
+                    decoration: const InputDecoration(
+                      labelText: 'Link Youtube/Vimeo',
+                      hintText: 'https://...',
+                    ),
+                  ),
+                ] else if (type == 'file') ...[
+                  Row(
+                    children: [
+                      ElevatedButton.icon(
+                        onPressed: () async {
+                          final res = await FilePicker.platform.pickFiles();
+                          if (res != null && res.files.isNotEmpty) {
+                            setLocal(() {
+                              pickedFilePath = res.files.single.path;
+                              pickedFileName = res.files.single.name;
+                            });
+                          }
+                        },
+                        icon: const Icon(Icons.upload_file),
+                        label: const Text('Tải lên'),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          pickedFileName.isNotEmpty
+                              ? pickedFileName
+                              : 'Chưa chọn tệp',
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                ] else if (type == 'text') ...[
+                  Container(
+                    height: 200,
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey.shade300),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: quill.QuillEditor.basic(controller: quillController),
+                  ),
+                ],
+              ],
             ),
           ),
-          const SizedBox(height: 24),
-          Text(
-            'Chưa có học viên nào',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-              color: Colors.grey[700],
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('Hủy'),
             ),
+            ElevatedButton(
+              onPressed: () {
+                if (titleCtl.text.trim().isEmpty) return;
+                setState(() {
+                  if (isEdit) {
+                    final l =
+                        _courseContent[sectionIndex].lectures[lectureIndex!];
+                    l.title = titleCtl.text.trim();
+                    l.type = type;
+                    l.url = type == 'video' ? linkCtl.text.trim() : null;
+                    l.filePath = type == 'file' ? pickedFilePath : null;
+                    if (type == 'text') {
+                      try {
+                        l.textJson = jsonEncode(
+                          quillController.document.toDelta().toJson(),
+                        );
+                      } catch (_) {
+                        l.textJson = '';
+                      }
+                    } else {
+                      l.textJson = null;
+                    }
+                  } else {
+                    _courseContent[sectionIndex].lectures.add(
+                      Lecture(
+                        id: _uuid.v4(),
+                        title: titleCtl.text.trim(),
+                        type: type,
+                        url: type == 'video' ? linkCtl.text.trim() : null,
+                        filePath: type == 'file' ? pickedFilePath : null,
+                        textJson: type == 'text'
+                            ? jsonEncode(
+                                quillController.document.toDelta().toJson(),
+                              )
+                            : null,
+                      ),
+                    );
+                  }
+                });
+                Navigator.pop(ctx);
+              },
+              child: Text(isEdit ? 'Lưu' : 'Thêm'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _confirmDeleteLecture(
+    BuildContext context,
+    int sectionIndex,
+    int lectureIndex,
+    String title,
+  ) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Xóa bài giảng'),
+        content: Text('Bạn có chắc chắn muốn xóa "$title" không?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Hủy'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              setState(() {
+                _courseContent[sectionIndex].lectures.removeAt(lectureIndex);
+              });
+              Navigator.pop(ctx);
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red.shade600,
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('Xóa'),
           ),
         ],
       ),
@@ -1022,128 +1190,6 @@ class _TeacherCourseDetailScreenState extends State<TeacherCourseDetailScreen>
     );
   }
 
-  void _createQuiz(BuildContext context) {
-    Navigator.of(
-      context,
-    ).push(MaterialPageRoute(builder: (context) => const QuizCreationScreen()));
-  }
-
-  void _showAddContentDialog(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      backgroundColor: Colors.white,
-      builder: (context) => Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: Colors.grey[300],
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-            const SizedBox(height: 20),
-            const Text(
-              'Thêm nội dung mới',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.black87,
-              ),
-            ),
-            const SizedBox(height: 20),
-            ListTile(
-              leading: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Colors.orange.shade50,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Icon(
-                  Icons.folder_rounded,
-                  color: Colors.orange.shade700,
-                ),
-              ),
-              title: const Text(
-                'Thêm chương mới',
-                style: TextStyle(fontWeight: FontWeight.w600),
-              ),
-              trailing: const Icon(Icons.chevron_right_rounded),
-              onTap: () {
-                Navigator.pop(context);
-                _showAddSectionDialog(context);
-              },
-            ),
-            const SizedBox(height: 8),
-            ListTile(
-              leading: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Colors.red.shade50,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Icon(
-                  Icons.video_library_rounded,
-                  color: Colors.red.shade700,
-                ),
-              ),
-              title: const Text(
-                'Thêm video',
-                style: TextStyle(fontWeight: FontWeight.w600),
-              ),
-              trailing: const Icon(Icons.chevron_right_rounded),
-              onTap: () => Navigator.pop(context),
-            ),
-            const SizedBox(height: 8),
-            ListTile(
-              leading: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Colors.blue.shade50,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Icon(Icons.article_rounded, color: Colors.blue.shade700),
-              ),
-              title: const Text(
-                'Thêm bài viết',
-                style: TextStyle(fontWeight: FontWeight.w600),
-              ),
-              trailing: const Icon(Icons.chevron_right_rounded),
-              onTap: () => Navigator.pop(context),
-            ),
-            const SizedBox(height: 8),
-            ListTile(
-              leading: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Colors.purple.shade50,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Icon(Icons.quiz_rounded, color: Colors.purple.shade700),
-              ),
-              title: const Text(
-                'Thêm quiz',
-                style: TextStyle(fontWeight: FontWeight.w600),
-              ),
-              trailing: const Icon(Icons.chevron_right_rounded),
-              onTap: () {
-                Navigator.pop(context);
-                _createQuiz(context);
-              },
-            ),
-            const SizedBox(height: 10),
-          ],
-        ),
-      ),
-    );
-  }
-
   void _showAddSectionDialog(BuildContext context) {
     final TextEditingController controller = TextEditingController();
 
@@ -1196,4 +1242,121 @@ class _TeacherCourseDetailScreenState extends State<TeacherCourseDetailScreen>
       ),
     );
   }
+}
+
+class _GradingScreen extends StatelessWidget {
+  final AssignmentItem assignment;
+  final List<Map<String, String>> students;
+  const _GradingScreen({required this.assignment, required this.students});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Chấm: ${assignment.title}')),
+      body: Column(
+        children: [
+          const SizedBox(height: 8),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Wrap(
+              spacing: 8,
+              children: const [
+                Chip(label: Text('Tất cả')),
+                Chip(label: Text('Đã nộp')),
+                Chip(label: Text('Chưa nộp')),
+                Chip(label: Text('Đã chấm')),
+              ],
+            ),
+          ),
+          const Divider(),
+          Expanded(
+            child: ListView.separated(
+              itemCount: students.length,
+              separatorBuilder: (_, __) => const Divider(height: 1),
+              itemBuilder: (context, i) {
+                final s = students[i];
+                return ListTile(
+                  leading: CircleAvatar(child: Text(s['name']![0])),
+                  title: Text(s['name']!),
+                  subtitle: Text(s['email']!),
+                  trailing: ElevatedButton(
+                    onPressed: () {},
+                    child: const Text('Chấm điểm'),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _GradebookScreen extends StatelessWidget {
+  final List<Map<String, String>> students;
+  final List<AssignmentItem> assignments;
+  const _GradebookScreen({required this.students, required this.assignments});
+
+  @override
+  Widget build(BuildContext context) {
+    final shownAssignments = assignments.take(3).toList();
+    return Scaffold(
+      appBar: AppBar(title: const Text('Bảng điểm tổng hợp')),
+      body: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: SingleChildScrollView(
+          child: DataTable(
+            columns: [
+              const DataColumn(label: Text('Sinh viên')),
+              ...shownAssignments
+                  .map((a) => DataColumn(label: Text(a.title)))
+                  .toList(),
+              const DataColumn(label: Text('Tổng kết')),
+            ],
+            rows: students.map((s) {
+              final scores = List<int>.generate(
+                shownAssignments.length,
+                (i) => 0,
+              );
+              final total = scores.fold<int>(0, (sum, e) => sum + e);
+              return DataRow(
+                cells: [
+                  DataCell(Text(s['name']!)),
+                  ...scores.map((sc) => DataCell(Text('$sc'))),
+                  DataCell(Text('$total')),
+                ],
+              );
+            }).toList(),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _TabBarDelegate extends SliverPersistentHeaderDelegate {
+  final TabBar _tabBar;
+  _TabBarDelegate(this._tabBar);
+
+  @override
+  double get minExtent => _tabBar.preferredSize.height;
+
+  @override
+  double get maxExtent => _tabBar.preferredSize.height;
+
+  @override
+  Widget build(
+    BuildContext context,
+    double shrinkOffset,
+    bool overlapsContent,
+  ) {
+    return Container(
+      color: Theme.of(context).scaffoldBackgroundColor,
+      child: _tabBar,
+    );
+  }
+
+  @override
+  bool shouldRebuild(covariant _TabBarDelegate oldDelegate) => false;
 }
