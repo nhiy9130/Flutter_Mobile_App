@@ -12,7 +12,8 @@ class RootShell extends ConsumerWidget {
     if (location.startsWith('/dashboard')) {
       return 0;
     }
-    if (location.startsWith('/courses') || location.startsWith('/my-courses')) {
+    if (location.startsWith('/teacher-courses') ||
+        location.startsWith('/my-courses')) {
       return 1;
     }
     if (location.startsWith('/messages')) {

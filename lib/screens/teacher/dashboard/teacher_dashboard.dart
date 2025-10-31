@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../features/auth/auth_state.dart';
 // import '../../../core/widgets/quick_action_card.dart';
-import '../../../core/widgets/stat_card.dart';
+import '../../../core/widgets/custom_cards.dart' as cc;
 import '../../../core/widgets/progress_card.dart';
 import '../../../core/widgets/section_header.dart';
 import '../../../core/widgets/info_card.dart';
@@ -113,35 +113,35 @@ class TeacherDashboard extends ConsumerWidget {
       mainAxisSpacing: 16,
       crossAxisSpacing: 16,
       children: const [
-        StatCard(
-          icon: Icons.school_rounded,
+        cc.StatCard(
+          title: 'Khóa học',
           value: '2',
-          label: 'Khóa học',
-          color: Colors.blue,
+          icon: Icons.school_rounded,
+          valueColor: Colors.blue,
         ),
-        StatCard(
-          icon: Icons.people_rounded,
+        cc.StatCard(
+          title: 'Sinh viên',
           value: '73',
-          label: 'Sinh viên',
-          color: Colors.green,
-          trend: '+5',
-          trendUp: true,
+          icon: Icons.people_rounded,
+          valueColor: Colors.green,
+          trend: cc.TrendDirection.up,
+          trendValue: '+5',
         ),
-        StatCard(
-          icon: Icons.star_rounded,
+        cc.StatCard(
+          title: 'Đánh giá TB',
           value: '4.8',
-          label: 'Đánh giá TB',
-          color: Colors.orange,
-          trend: '+0.2',
-          trendUp: true,
+          icon: Icons.star_rounded,
+          valueColor: Colors.orange,
+          trend: cc.TrendDirection.up,
+          trendValue: '+0.2',
         ),
-        StatCard(
-          icon: Icons.assignment_turned_in_rounded,
+        cc.StatCard(
+          title: 'Bài tập đã chấm',
           value: '156',
-          label: 'Bài tập đã chấm',
-          color: Colors.purple,
-          trend: '+12',
-          trendUp: true,
+          icon: Icons.assignment_turned_in_rounded,
+          valueColor: Colors.purple,
+          trend: cc.TrendDirection.up,
+          trendValue: '+12',
         ),
       ],
     );

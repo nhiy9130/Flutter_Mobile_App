@@ -2,90 +2,152 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/widgets/common_app_bar.dart';
-import '../../../core/widgets/quick_action_card.dart';
-import '../../../core/widgets/empty_state.dart';
-import '../students/student_management_screen.dart';
+import '../../../core/widgets/course_card.dart';
 
-class TeacherCoursesScreen extends ConsumerWidget {
+class TeacherCoursesScreen extends ConsumerStatefulWidget {
   const TeacherCoursesScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<TeacherCoursesScreen> createState() =>
+      _TeacherCoursesScreenState();
+}
+
+class _TeacherCoursesScreenState extends ConsumerState<TeacherCoursesScreen> {
+  bool _showSearch = false;
+  final TextEditingController _searchController = TextEditingController();
+
+  // Bộ lọc đơn giản (demo)
+  final List<Map<String, dynamic>> _allCourses = [
+    {
+      'id': 'course-1',
+      'title': 'Lập trình Flutter từ A-Z',
+      'thumbnail':
+          'https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=800&auto=format&fit=crop',
+      'category': 'Lập trình',
+      'level': 'Cơ bản',
+      'rating': 4.6,
+      'enrolled': '10,8k',
+      'duration': '24 giờ',
+    },
+    {
+      'id': 'course-2',
+      'title': 'Thiết kế UI/UX chuyên sâu',
+      'thumbnail':
+          'https://images.unsplash.com/photo-1545239351-1141bd82e8a6?q=80&w=800&auto=format&fit=crop',
+      'category': 'Thiết kế',
+      'level': 'Nâng cao',
+      'rating': 4.2,
+      'enrolled': '5,3k',
+      'duration': '18 giờ',
+    },
+    {
+      'id': 'course-3',
+      'title': 'Kinh doanh cho người mới bắt đầu',
+      'thumbnail':
+          'https://images.unsplash.com/photo-1556157382-97eda2d62296?q=80&w=800&auto=format&fit=crop',
+      'category': 'Kinh doanh',
+      'level': 'Cơ bản',
+      'rating': 4.8,
+      'enrolled': '2,1k',
+      'duration': '12 giờ',
+    },
+  ];
+
+  final Set<String> _selectedCategories = {};
+  final Set<String> _selectedLevels = {};
+  double _minRating = 0.0;
+
+  List<Map<String, dynamic>> get _filteredCourses {
+    final q = _searchController.text.trim().toLowerCase();
+    return _allCourses.where((c) {
+      final matchQuery =
+          q.isEmpty || (c['title'] as String).toLowerCase().contains(q);
+      final matchCategory =
+          _selectedCategories.isEmpty ||
+          _selectedCategories.contains(c['category']);
+      final matchLevel =
+          _selectedLevels.isEmpty || _selectedLevels.contains(c['level']);
+      final matchRating = (c['rating'] as num).toDouble() >= _minRating;
+      return matchQuery && matchCategory && matchLevel && matchRating;
+    }).toList();
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey.shade50,
       appBar: CommonAppBar(
-        title: 'Quản lý khóa học',
+        title: 'Tất cả khóa học',
         showNotificationsAction: false,
         actions: [
           IconButton(
-            icon: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: Colors.green.shade50,
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                Icons.add_rounded,
-                color: Colors.green.shade700,
-                size: 20,
-              ),
-            ),
-            onPressed: () => context.go('/create-course'),
-            tooltip: 'Tạo khóa học mới',
+            icon: const Icon(Icons.search_rounded),
+            tooltip: 'Tìm kiếm',
+            onPressed: () => setState(() => _showSearch = !_showSearch),
+          ),
+          IconButton(
+            icon: const Icon(Icons.filter_list_rounded),
+            tooltip: 'Bộ lọc',
+            onPressed: _openFilterSheet,
           ),
           const SizedBox(width: 8),
         ],
         backgroundColor: Colors.white,
         elevation: 0,
       ),
-      body: ListView(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+      body: Column(
         children: [
-          // Quick Actions for Teachers
-          _buildSectionHeader(
-            context,
-            title: 'Hành động nhanh',
-            icon: Icons.bolt_rounded,
-            iconColor: Colors.orange,
+          if (_showSearch)
+            Container(
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+              decoration: const BoxDecoration(color: Colors.white),
+              child: TextField(
+                controller: _searchController,
+                onChanged: (_) => setState(() {}),
+                decoration: InputDecoration(
+                  hintText: 'Tìm kiếm khóa học...',
+                  prefixIcon: const Icon(Icons.search_rounded),
+                  isDense: true,
+                  contentPadding: const EdgeInsets.symmetric(
+                    vertical: 12,
+                    horizontal: 12,
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  suffixIcon: _searchController.text.isNotEmpty
+                      ? IconButton(
+                          icon: const Icon(Icons.clear_rounded),
+                          onPressed: () {
+                            _searchController.clear();
+                            setState(() {});
+                          },
+                        )
+                      : null,
+                ),
+              ),
+            ),
+          Expanded(
+            child: ListView.separated(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+              itemCount: _filteredCourses.length,
+              separatorBuilder: (_, __) => const SizedBox(height: 12),
+              itemBuilder: (context, index) {
+                final raw = _filteredCourses[index];
+                final course = _CardCourse.fromMap(raw);
+                return CourseCard(
+                  course: course,
+                  onTap: () => context.go('/teacher/courses/${raw['id']}'),
+                );
+              },
+            ),
           ),
-          const SizedBox(height: 16),
-          _buildTeacherQuickActions(context),
-          const SizedBox(height: 32),
-
-          // My Active Courses
-          _buildSectionHeader(
-            context,
-            title: 'Khóa học đang giảng dạy',
-            icon: Icons.school_rounded,
-            iconColor: Colors.blue,
-            actionLabel: 'Xem tất cả',
-            onActionTap: () {},
-          ),
-          const SizedBox(height: 16),
-          _buildActiveCourses(context),
-          const SizedBox(height: 32),
-
-          // Draft Courses
-          _buildSectionHeader(
-            context,
-            title: 'Khóa học nháp',
-            icon: Icons.drafts_rounded,
-            iconColor: Colors.grey,
-          ),
-          const SizedBox(height: 16),
-          _buildDraftCourses(context),
-          const SizedBox(height: 32),
-
-          // Recent Activities
-          _buildSectionHeader(
-            context,
-            title: 'Hoạt động gần đây',
-            icon: Icons.history_rounded,
-            iconColor: Colors.purple,
-          ),
-          const SizedBox(height: 16),
-          _buildRecentActivities(context),
-          const SizedBox(height: 20),
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
@@ -102,499 +164,216 @@ class TeacherCoursesScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildSectionHeader(
-    BuildContext context, {
-    required String title,
-    required IconData icon,
-    required Color iconColor,
-    String? actionLabel,
-    VoidCallback? onActionTap,
-  }) {
-    return Row(
-      children: [
-        Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: iconColor.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Icon(icon, color: iconColor, size: 20),
-        ),
-        const SizedBox(width: 12),
-        Text(
-          title,
-          style: const TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: Colors.black87,
-          ),
-        ),
-        const Spacer(),
-        if (actionLabel != null)
-          TextButton(
-            onPressed: onActionTap,
-            child: Text(
-              actionLabel,
-              style: TextStyle(
-                color: Colors.green.shade700,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-      ],
-    );
-  }
-
-  Widget _buildTeacherQuickActions(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: QuickActionCard(
-            icon: Icons.announcement_rounded,
-            title: 'Thông báo',
-            subtitle: 'Gửi thông báo cho lớp',
-            color: Colors.orange,
-            onTap: () => _createAnnouncement(context),
-          ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: QuickActionCard(
-            icon: Icons.assessment_rounded,
-            title: 'Báo cáo',
-            subtitle: 'Xem thống kê lớp học',
-            color: Colors.teal,
-            onTap: () => _viewReports(context),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildActiveCourses(BuildContext context) {
-    final courses = [
-      {
-        'id': 'course-1',
-        'title': 'Introduction to Flutter Development',
-        'code': 'FLT101',
-        'students': 45,
-        'status': 'active',
-        'progress': 0.7,
-        'nextClass': '2024-10-15 14:00',
-      },
-      {
-        'id': 'course-2',
-        'title': 'Advanced Mobile Development',
-        'code': 'AMD201',
-        'students': 28,
-        'status': 'active',
-        'progress': 0.4,
-        'nextClass': '2024-10-16 10:00',
-      },
-    ];
-
-    return Column(
-      children: courses
-          .map((course) => _buildCourseCard(context, course))
-          .toList(),
-    );
-  }
-
-  Widget _buildCourseCard(BuildContext context, Map<String, dynamic> course) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: InkWell(
-        onTap: () => context.go('/teacher/courses/${course['id']}'),
-        borderRadius: BorderRadius.circular(16),
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 6,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.blue.shade50,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(
-                      course['code'],
-                      style: TextStyle(
-                        color: Colors.blue.shade700,
-                        fontSize: 13,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 0.5,
-                      ),
-                    ),
-                  ),
-                  const Spacer(),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 6,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.green.shade50,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Container(
-                          width: 6,
-                          height: 6,
-                          decoration: BoxDecoration(
-                            color: Colors.green.shade600,
-                            shape: BoxShape.circle,
-                          ),
-                        ),
-                        const SizedBox(width: 6),
-                        Text(
-                          'Đang hoạt động',
-                          style: TextStyle(
-                            color: Colors.green.shade700,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              Text(
-                course['title'],
-                style: const TextStyle(
-                  fontSize: 17,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87,
-                ),
-              ),
-              const SizedBox(height: 12),
-              Row(
-                children: [
-                  Icon(
-                    Icons.people_rounded,
-                    size: 18,
-                    color: Colors.grey.shade600,
-                  ),
-                  const SizedBox(width: 6),
-                  Text(
-                    '${course['students']} sinh viên',
-                    style: TextStyle(fontSize: 14, color: Colors.grey.shade700),
-                  ),
-                  const SizedBox(width: 20),
-                  Icon(
-                    Icons.schedule_rounded,
-                    size: 18,
-                    color: Colors.grey.shade600,
-                  ),
-                  const SizedBox(width: 6),
-                  Expanded(
-                    child: Text(
-                      'Tiết tiếp: ${course['nextClass']}',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey.shade700,
-                      ),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade50,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Tiến độ khóa học',
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: Colors.grey.shade600,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(4),
-                            child: LinearProgressIndicator(
-                              value: course['progress'],
-                              backgroundColor: Colors.grey.shade200,
-                              valueColor: AlwaysStoppedAnimation<Color>(
-                                Colors.green.shade600,
-                              ),
-                              minHeight: 6,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Text(
-                      '${(course['progress'] * 100).toInt()}%',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.green.shade700,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 16),
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: () => _manageStudents(context, course['id']),
-                      icon: const Icon(Icons.people_rounded, size: 18),
-                      label: const Text('Sinh viên'),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: Colors.grey.shade700,
-                        side: BorderSide(color: Colors.grey.shade300),
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: () => _viewGrades(context, course['id']),
-                      icon: const Icon(Icons.grade_rounded, size: 18),
-                      label: const Text('Điểm'),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: Colors.grey.shade700,
-                        side: BorderSide(color: Colors.grey.shade300),
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDraftCourses(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: const Padding(
-        padding: EdgeInsets.all(32),
-        child: EmptyState(
-          icon: Icons.drafts_rounded,
-          title: 'Chưa có khóa học nháp',
-          subtitle: 'Tạo khóa học mới để bắt đầu',
-          actionLabel: 'Tạo khóa học',
-        ),
-      ),
-    );
-  }
-
-  Widget _buildRecentActivities(BuildContext context) {
-    final activities = [
-      {
-        'type': 'quiz_created',
-        'title': 'Tạo quiz "Flutter Widgets"',
-        'course': 'FLT101',
-        'time': '2 giờ trước',
-        'icon': Icons.quiz_rounded,
-        'color': Colors.purple,
-      },
-      {
-        'type': 'announcement',
-        'title': 'Thông báo về deadline bài tập',
-        'course': 'AMD201',
-        'time': '4 giờ trước',
-        'icon': Icons.announcement_rounded,
-        'color': Colors.orange,
-      },
-      {
-        'type': 'livestream',
-        'title': 'Buổi live "State Management"',
-        'course': 'FLT101',
-        'time': '1 ngày trước',
-        'icon': Icons.videocam_rounded,
-        'color': Colors.red,
-      },
-    ];
-
-    return Column(
-      children: activities.map((activity) {
-        return Container(
-          margin: const EdgeInsets.only(bottom: 12),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.03),
-                blurRadius: 8,
-                offset: const Offset(0, 2),
-              ),
-            ],
-          ),
-          child: ListTile(
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 16,
-              vertical: 8,
-            ),
-            leading: Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: (activity['color'] as Color).withOpacity(0.1),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Icon(
-                activity['icon'] as IconData,
-                color: activity['color'] as Color,
-                size: 22,
-              ),
-            ),
-            title: Text(
-              activity['title'] as String,
-              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
-            ),
-            subtitle: Padding(
-              padding: const EdgeInsets.only(top: 4),
-              child: Text(
-                '${activity['course']} • ${activity['time']}',
-                style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
-              ),
-            ),
-            trailing: Icon(
-              Icons.more_vert_rounded,
-              color: Colors.grey.shade400,
-            ),
-          ),
-        );
-      }).toList(),
-    );
-  }
-
-  void _createAnnouncement(BuildContext context) {
-    showDialog(
+  void _openFilterSheet() {
+    final categories = ['Lập trình', 'Thiết kế', 'Kinh doanh'];
+    final levels = ['Cơ bản', 'Nâng cao'];
+    showModalBottomSheet(
       context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text(
-          'Tạo thông báo',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        content: const Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              decoration: InputDecoration(
-                labelText: 'Tiêu đề',
-                hintText: 'Thông báo quan trọng...',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            SizedBox(height: 16),
-            TextField(
-              maxLines: 4,
-              decoration: InputDecoration(
-                labelText: 'Nội dung',
-                hintText: 'Nội dung thông báo...',
-                border: OutlineInputBorder(),
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Hủy'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: const Row(
+      isScrollControlled: false,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
                     children: [
-                      Icon(Icons.check_circle_rounded, color: Colors.white),
-                      SizedBox(width: 12),
-                      Text('Thông báo đã được gửi!'),
+                      const Icon(Icons.filter_list_rounded),
+                      const SizedBox(width: 8),
+                      const Text(
+                        'Bộ lọc',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      const Spacer(),
+                      TextButton(
+                        onPressed: () {
+                          setModalState(() {
+                            _selectedCategories.clear();
+                            _selectedLevels.clear();
+                            _minRating = 0.0;
+                          });
+                        },
+                        child: const Text('Đặt lại'),
+                      ),
                     ],
                   ),
-                  backgroundColor: Colors.green.shade600,
-                  behavior: SnackBarBehavior.floating,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
+                  const SizedBox(height: 12),
+                  const Text(
+                    'Danh mục',
+                    style: TextStyle(fontWeight: FontWeight.w600),
                   ),
-                ),
-              );
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.green.shade600,
-              foregroundColor: Colors.white,
-            ),
-            child: const Text('Gửi'),
-          ),
-        ],
-      ),
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: categories.map((cat) {
+                      final selected = _selectedCategories.contains(cat);
+                      return FilterChip(
+                        label: Text(cat),
+                        selected: selected,
+                        onSelected: (v) {
+                          setModalState(() {
+                            if (v) {
+                              _selectedCategories.add(cat);
+                            } else {
+                              _selectedCategories.remove(cat);
+                            }
+                          });
+                        },
+                      );
+                    }).toList(),
+                  ),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'Mức độ',
+                    style: TextStyle(fontWeight: FontWeight.w600),
+                  ),
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: levels.map((lv) {
+                      final selected = _selectedLevels.contains(lv);
+                      return FilterChip(
+                        label: Text(lv),
+                        selected: selected,
+                        onSelected: (v) {
+                          setModalState(() {
+                            if (v) {
+                              _selectedLevels.add(lv);
+                            } else {
+                              _selectedLevels.remove(lv);
+                            }
+                          });
+                        },
+                      );
+                    }).toList(),
+                  ),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'Đánh giá tối thiểu',
+                    style: TextStyle(fontWeight: FontWeight.w600),
+                  ),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Slider(
+                          min: 0.0,
+                          max: 5.0,
+                          divisions: 10,
+                          label: _minRating.toStringAsFixed(1),
+                          value: _minRating,
+                          onChanged: (v) => setModalState(() => _minRating = v),
+                        ),
+                      ),
+                      SizedBox(
+                        width: 48,
+                        child: Text(
+                          _minRating.toStringAsFixed(1),
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(fontWeight: FontWeight.w600),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      icon: const Icon(Icons.check_rounded),
+                      label: const Text('Áp dụng'),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        setState(() {});
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
     );
   }
 
-  void _viewReports(BuildContext context) {
-    // TODO: Navigate to reports
-  }
+  // Các hành động CTA được loại bỏ khi dùng CourseCard chuẩn.
+}
 
-  void _manageStudents(BuildContext context, String courseId) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => StudentManagementScreen(courseId: courseId),
-      ),
+class _CardCourse {
+  final String? title;
+  final String? description;
+  final String? imageUrl;
+  final String? category;
+  final String? difficulty; // 'beginner' | 'intermediate' | 'advanced'
+  final int? duration; // phút
+  final dynamic enrollmentCount; // cho phép String như '10,8k' hoặc int
+  final double? rating;
+  final double? price;
+  final double? progress; // nếu có tham gia
+
+  _CardCourse({
+    this.title,
+    this.description,
+    this.imageUrl,
+    this.category,
+    this.difficulty,
+    this.duration,
+    this.enrollmentCount,
+    this.rating,
+    this.price,
+    this.progress,
+  });
+
+  static _CardCourse fromMap(Map<String, dynamic> m) {
+    return _CardCourse(
+      title: m['title'] as String?,
+      description: m['description'] as String? ?? 'Khóa học phổ biến',
+      imageUrl: m['thumbnail'] as String?,
+      category: m['category'] as String?,
+      difficulty: _mapLevelToDifficulty(m['level'] as String?),
+      duration: _parseDurationToMinutes(m['duration'] as String?),
+      enrollmentCount: m['enrolled'],
+      rating: (m['rating'] as num?)?.toDouble(),
+      price: (m['price'] as num?)?.toDouble() ?? 0.0,
+      progress: (m['progress'] as num?)?.toDouble(),
     );
   }
 
-  void _viewGrades(BuildContext context, String courseId) {
-    context.go('/teacher/courses/$courseId/grades');
+  static String? _mapLevelToDifficulty(String? level) {
+    if (level == null) return null;
+    final l = level.toLowerCase();
+    if (l.contains('cơ bản') || l.contains('beginner')) return 'beginner';
+    if (l.contains('trung cấp') || l.contains('intermediate'))
+      return 'intermediate';
+    if (l.contains('nâng cao') || l.contains('advanced')) return 'advanced';
+    return null;
+  }
+
+  static int? _parseDurationToMinutes(String? raw) {
+    if (raw == null) return null;
+    // Hỗ trợ dạng '24 giờ' hoặc '18 giờ' -> phút
+    final lower = raw.toLowerCase().trim();
+    final matchHour = RegExp(r'^(\d+)[\s]*giờ').firstMatch(lower);
+    if (matchHour != null) {
+      final h = int.tryParse(matchHour.group(1)!);
+      if (h != null) return h * 60;
+    }
+    final matchMin = RegExp(r'^(\d+)[\s]*phút').firstMatch(lower);
+    if (matchMin != null) {
+      return int.tryParse(matchMin.group(1)!);
+    }
+    // fallback: cố gắng parse số đứng đầu
+    final number = RegExp(r'\d+').firstMatch(lower)?.group(0);
+    return int.tryParse(number ?? '');
   }
 }
