@@ -15,6 +15,8 @@ import '../screens/common/root_shell.dart';
 import '../screens/shared/dashboard/dashboard_dispatcher.dart'; // DashboardScreen class
 import '../screens/shared/livestream/livestream_screen.dart';
 import '../screens/shared/notifications/notifications_screen.dart';
+import '../screens/shared/messages/messages_screen.dart';
+import '../screens/shared/messages/chat_detail_screen.dart';
 import '../screens/shared/settings/settings_screen.dart';
 import '../screens/shared/profile/profile_screen.dart';
 
@@ -63,7 +65,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             builder: (context, state) => const TeacherCoursesScreen(),
           ),
 
-           // GoRoute(
+          // GoRoute(
           //   path: '/teacher/courses/:courseId',
           //   redirect: (context, state) => requireAuth(context, state),
           //   builder: (context, state) =>
@@ -86,13 +88,26 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: '/course/:id/live',
             redirect: (context, state) => requireAuth(context, state),
-            builder: (context, state) =>
-                LivestreamScreen(courseId: state.pathParameters['id']!, isHost: false),
+            builder: (context, state) => LivestreamScreen(
+              courseId: state.pathParameters['id']!,
+              isHost: false,
+            ),
           ),
           GoRoute(
             path: '/notifications-demo',
             redirect: (context, state) => requireAuth(context, state),
             builder: (context, state) => const NotificationsScreen(),
+          ),
+          GoRoute(
+            path: '/messages',
+            redirect: (context, state) => requireAuth(context, state),
+            builder: (context, state) => const MessagesScreen(),
+          ),
+          GoRoute(
+            path: '/messages/:courseId',
+            redirect: (context, state) => requireAuth(context, state),
+            builder: (context, state) =>
+                ChatDetailScreen(courseId: state.pathParameters['courseId']!),
           ),
           GoRoute(
             path: '/settings',

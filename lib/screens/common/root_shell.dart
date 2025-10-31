@@ -15,7 +15,7 @@ class RootShell extends ConsumerWidget {
     if (location.startsWith('/courses') || location.startsWith('/my-courses')) {
       return 1;
     }
-    if (location.startsWith('/notifications')) {
+    if (location.startsWith('/messages')) {
       return 2;
     }
     if (location.startsWith('/profile')) {
@@ -67,18 +67,18 @@ class RootShell extends ConsumerWidget {
             icon: Stack(
               clipBehavior: Clip.none,
               children: [
-                const Icon(Icons.notifications_outlined),
+                const Icon(Icons.chat_bubble_outline),
                 if (unread > 0) _buildNotificationBadge(unread),
               ],
             ),
             selectedIcon: Stack(
               clipBehavior: Clip.none,
               children: [
-                const Icon(Icons.notifications),
+                const Icon(Icons.chat_bubble),
                 if (unread > 0) _buildNotificationBadge(unread),
               ],
             ),
-            label: 'Thông báo',
+            label: 'Messages',
           ),
           const NavigationDestination(
             icon: Icon(Icons.person_outline),
@@ -99,18 +99,18 @@ class RootShell extends ConsumerWidget {
             icon: Stack(
               clipBehavior: Clip.none,
               children: [
-                const Icon(Icons.notifications_outlined),
+                const Icon(Icons.chat_bubble_outline),
                 if (unread > 0) _buildNotificationBadge(unread),
               ],
             ),
             selectedIcon: Stack(
               clipBehavior: Clip.none,
               children: [
-                const Icon(Icons.notifications),
+                const Icon(Icons.chat_bubble),
                 if (unread > 0) _buildNotificationBadge(unread),
               ],
             ),
-            label: 'Thông báo',
+            label: 'Messages',
           ),
           const NavigationDestination(
             icon: Icon(Icons.person_outline),
@@ -131,18 +131,18 @@ class RootShell extends ConsumerWidget {
             icon: Stack(
               clipBehavior: Clip.none,
               children: [
-                const Icon(Icons.notifications_outlined),
+                const Icon(Icons.chat_bubble_outline),
                 if (unread > 0) _buildNotificationBadge(unread),
               ],
             ),
             selectedIcon: Stack(
               clipBehavior: Clip.none,
               children: [
-                const Icon(Icons.notifications),
+                const Icon(Icons.chat_bubble),
                 if (unread > 0) _buildNotificationBadge(unread),
               ],
             ),
-            label: 'Thông báo',
+            label: 'Messages',
           ),
           const NavigationDestination(
             icon: Icon(Icons.person_outline),
@@ -211,7 +211,7 @@ class RootShell extends ConsumerWidget {
         }
         break;
       case 2:
-        context.go('/notifications-demo');
+        context.go('/messages');
         break;
       case 3:
         context.go('/profile');
