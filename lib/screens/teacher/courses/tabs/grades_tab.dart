@@ -4,11 +4,26 @@ import '../providers/teacher_course_providers.dart';
 import '../gradebook_screen.dart';
 import '../../../../core/widgets/custom_button.dart';
 
-class GradesTab extends ConsumerWidget {
+class GradesTab extends ConsumerStatefulWidget {
   const GradesTab({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<GradesTab> createState() => _GradesTabState();
+}
+
+class _GradesTabState extends ConsumerState<GradesTab> {
+  final ScrollController _hController = ScrollController();
+  final ScrollController _vController = ScrollController();
+
+  @override
+  void dispose() {
+    _hController.dispose();
+    _vController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final assignments = ref.watch(assignmentsProvider);
     final students = ref.watch(studentsProvider);
 
@@ -69,8 +84,11 @@ class GradesTab extends ConsumerWidget {
             ),
             child: Scrollbar(
               thumbVisibility: true,
+              controller: _hController,
               child: SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
+                controller: _hController,
+                primary: false,
                 padding: const EdgeInsets.all(8),
                 child: ConstrainedBox(
                   constraints: BoxConstraints(
@@ -79,6 +97,8 @@ class GradesTab extends ConsumerWidget {
                         : minTableWidth,
                   ),
                   child: SingleChildScrollView(
+                    controller: _vController,
+                    primary: false,
                     child: DataTableTheme(
                       data: const DataTableThemeData(
                         headingRowHeight: 44,

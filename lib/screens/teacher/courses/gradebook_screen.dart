@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
 import 'models/course_content_models.dart';
 
-class GradebookScreen extends StatelessWidget {
+class GradebookScreen extends StatefulWidget {
   final List<Map<String, String>> students;
   final List<AssignmentItem> assignments;
   const GradebookScreen({
@@ -13,20 +13,35 @@ class GradebookScreen extends StatelessWidget {
   });
 
   @override
+  State<GradebookScreen> createState() => _GradebookScreenState();
+}
+
+class _GradebookScreenState extends State<GradebookScreen> {
+  // Controllers for keeping scrollbars functional when thumbVisibility is true
+  final ScrollController _hController = ScrollController();
+  final ScrollController _vController = ScrollController();
+
+  @override
+  void dispose() {
+    _hController.dispose();
+    _vController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     // Giới hạn số cột hiển thị mặc định để thân thiện di động
-    final shownAssignments = assignments.take(5).toList();
+    final shownAssignments = widget.assignments.take(5).toList();
 
     // Tính toán chiều rộng tối thiểu cho bảng để không bị bóp trên màn nhỏ
     const firstColWidth = 180.0;
     const perAssignmentColWidth = 120.0;
     const totalColWidth = 100.0;
+    const headerHeight = 44.0;
+    const rowHeight = 52.0; // đồng bộ ListView bên trái với DataTable bên phải
 
-    final screenWidth = MediaQuery.of(context).size.width;
-    final minTableWidth =
-        firstColWidth +
-        shownAssignments.length * perAssignmentColWidth +
-        totalColWidth;
+    final minRightTableWidth =
+        shownAssignments.length * perAssignmentColWidth + totalColWidth;
 
     return Scaffold(
       appBar: AppBar(
@@ -45,7 +60,7 @@ class GradebookScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Gợi ý sử dụng khi ở màn hình hẹp
+              // Gợi ý sử dụng (giữ nguyên, rất tốt)
               Container(
                 decoration: BoxDecoration(
                   color: Colors.blue.withOpacity(0.06),
@@ -76,137 +91,238 @@ class GradebookScreen extends StatelessWidget {
                 ),
               ),
 
-              // Bảng điểm có thể cuộn ngang và dọc
+              // Bảng điểm: Pin cột "Sinh viên" bên trái, bảng điểm ở bên phải
               Expanded(
-                child: Scrollbar(
-                  thumbVisibility: true,
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(
-                        minWidth: screenWidth > minTableWidth
-                            ? screenWidth
-                            : minTableWidth,
+                // <-- BỌC BẢNG TRONG MỘT CONTAINER (Card-like)
+                // Giúp phân tách bảng với nền, tạo cảm giác gọn gàng.
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.grey.shade300),
+                  ),
+                  clipBehavior: Clip.antiAlias, // <-- Quan trọng để bo góc
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Cột cố định "Sinh viên"
+                      SizedBox(
+                        width: firstColWidth,
+                        child: Column(
+                          children: [
+                            // Header khớp với DataTable header
+                            // <-- THÊM MÀU NỀN VÀ STYLE CHO HEADER
+                            Container(
+                              height: headerHeight,
+                              alignment: Alignment.centerLeft,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                              ), // <-- Tăng padding
+                              color: Colors.grey.shade100, // <-- Nền header
+                              child: Text(
+                                'SINH VIÊN', // <-- VIẾT HOA
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold, // <-- In đậm
+                                  color: Colors.grey.shade700,
+                                  letterSpacing:
+                                      0.5, // <-- Tăng khoảng cách chữ
+                                ),
+                              ),
+                            ),
+                            const Divider(
+                              height: 1,
+                              thickness: 1,
+                            ), // <-- Rõ ràng hơn
+                            Expanded(
+                              child: ListView.builder(
+                                controller: _vController,
+                                primary: false,
+                                itemExtent: rowHeight,
+                                itemCount: widget.students.length,
+                                itemBuilder: (context, i) {
+                                  final s = widget.students[i];
+                                  return Container(
+                                    // <-- THAY ĐỔI MÀU ZEBRA
+                                    color: i.isEven
+                                        ? Colors.black.withOpacity(0.02)
+                                        : null,
+                                    alignment: Alignment.centerLeft,
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 16, // <-- Tăng padding
+                                    ),
+                                    child: Text(
+                                      s['name'] ?? '-',
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      // <-- Tăng độ đậm cho tên
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                      child: SingleChildScrollView(
-                        child: DataTableTheme(
-                          data: const DataTableThemeData(
-                            headingRowHeight: 44,
-                            dataRowMinHeight: 44,
-                            dataRowMaxHeight: 56,
-                            horizontalMargin: 8,
-                            columnSpacing: 12,
-                          ),
-                          child: DataTable(
-                            columns: [
-                              const DataColumn(
-                                label: SizedBox(
-                                  width: firstColWidth,
-                                  child: Text(
-                                    'Sinh viên',
-                                    overflow: TextOverflow.ellipsis,
-                                    maxLines: 1,
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              ...shownAssignments.map(
-                                (a) => DataColumn(
-                                  label: SizedBox(
-                                    width: perAssignmentColWidth,
-                                    child: Tooltip(
-                                      message: a.title,
-                                      child: Text(
-                                        a.title,
-                                        overflow: TextOverflow.ellipsis,
-                                        maxLines: 1,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              const DataColumn(
-                                label: SizedBox(
-                                  width: totalColWidth,
-                                  child: Text(
-                                    'Tổng',
-                                    overflow: TextOverflow.ellipsis,
-                                    maxLines: 1,
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                            rows: List<DataRow>.generate(students.length, (i) {
-                              final s = students[i];
-                              final scores = List<int>.generate(
-                                shownAssignments.length,
-                                (idx) => 0,
-                              );
-                              final total = scores.fold<int>(
-                                0,
-                                (sum, e) => sum + e,
-                              );
+                      // <-- BỎ SIZEDBOX(width: 8) VÀ DÙNG DIVIDER
+                      const VerticalDivider(width: 1, thickness: 1),
 
-                              return DataRow(
-                                color:
-                                    MaterialStateProperty.resolveWith<Color?>(
-                                      (states) => i.isEven
-                                          ? Colors.grey.withOpacity(0.05)
-                                          : null,
-                                    ),
-                                cells: [
-                                  DataCell(
-                                    SizedBox(
-                                      width: firstColWidth,
-                                      child: Text(
-                                        s['name'] ?? '-',
-                                        overflow: TextOverflow.ellipsis,
-                                        maxLines: 1,
-                                      ),
-                                    ),
-                                  ),
-                                  ...scores.map(
-                                    (sc) => DataCell(
-                                      SizedBox(
-                                        width: perAssignmentColWidth,
-                                        child: Text(
-                                          sc > 0 ? '$sc' : '-',
-                                          style: TextStyle(
-                                            color: sc > 0
-                                                ? null
-                                                : Colors.grey[600],
+                      // Bảng bên phải có thể cuộn ngang + dọc
+                      Expanded(
+                        child: Scrollbar(
+                          thumbVisibility: true,
+                          controller: _hController,
+                          child: SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            controller: _hController,
+                            primary: false,
+                            child: ConstrainedBox(
+                              constraints: BoxConstraints(
+                                minWidth: minRightTableWidth,
+                              ),
+                              child: Scrollbar(
+                                controller: _vController,
+                                child: SingleChildScrollView(
+                                  controller: _vController,
+                                  primary: false,
+                                  child: DataTableTheme(
+                                    data: DataTableThemeData(
+                                      headingRowHeight: headerHeight,
+                                      // <-- THÊM MÀU NỀN CHO HEADER
+                                      headingRowColor:
+                                          MaterialStateProperty.all(
+                                            Colors.grey.shade100,
                                           ),
-                                          overflow: TextOverflow.ellipsis,
-                                          maxLines: 1,
+                                      dataRowMinHeight: rowHeight,
+                                      dataRowMaxHeight: rowHeight,
+                                      horizontalMargin: 8,
+                                      columnSpacing: 12,
+                                    ),
+                                    child: DataTable(
+                                      columns: [
+                                        ...List.generate(
+                                          shownAssignments.length,
+                                          (idx) {
+                                            final a = shownAssignments[idx];
+                                            final colLabel =
+                                                'Bài ${idx + 1} (10đ)';
+                                            return DataColumn(
+                                              label: SizedBox(
+                                                width: perAssignmentColWidth,
+                                                child: Tooltip(
+                                                  message: a.title,
+                                                  child: Text(
+                                                    // <-- STYLE HEADER
+                                                    colLabel.toUpperCase(),
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                    maxLines: 1,
+                                                    style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color:
+                                                          Colors.grey.shade700,
+                                                      letterSpacing: 0.5,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            );
+                                          },
                                         ),
+                                        DataColumn(
+                                          label: SizedBox(
+                                            width: totalColWidth,
+                                            child: Text(
+                                              // <-- STYLE HEADER
+                                              'TỔNG KẾT',
+                                              overflow: TextOverflow.ellipsis,
+                                              maxLines: 1,
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.grey.shade700,
+                                                letterSpacing: 0.5,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                      rows: List<DataRow>.generate(
+                                        widget.students.length,
+                                        (i) {
+                                          final scores = List<int>.generate(
+                                            shownAssignments.length,
+                                            (idx) => 0,
+                                          );
+                                          final total = scores.fold<int>(
+                                            0,
+                                            (sum, e) => sum + e,
+                                          );
+                                          return DataRow(
+                                            color:
+                                                MaterialStateProperty.resolveWith<
+                                                  Color?
+                                                >(
+                                                  (states) => i.isEven
+                                                      // <-- ĐỔI MÀU ZEBRA
+                                                      ? Colors.black
+                                                            .withOpacity(0.02)
+                                                      : null,
+                                                ),
+                                            cells: [
+                                              ...scores.map(
+                                                (sc) => DataCell(
+                                                  SizedBox(
+                                                    width:
+                                                        perAssignmentColWidth,
+                                                    child: Text(
+                                                      sc > 0 ? '$sc' : '-',
+                                                      style: TextStyle(
+                                                        color: sc > 0
+                                                            ? null
+                                                            : Colors.grey[600],
+                                                      ),
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                      maxLines: 1,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              DataCell(
+                                                SizedBox(
+                                                  width: totalColWidth,
+                                                  child: Text(
+                                                    '$total',
+                                                    // <-- TẠO ĐIỂM NHẤN
+                                                    style: const TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color: Colors.deepPurple,
+                                                    ),
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                    maxLines: 1,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          );
+                                        },
                                       ),
                                     ),
                                   ),
-                                  DataCell(
-                                    SizedBox(
-                                      width: totalColWidth,
-                                      child: Text(
-                                        '$total',
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                        overflow: TextOverflow.ellipsis,
-                                        maxLines: 1,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              );
-                            }),
+                                ),
+                              ),
+                            ),
                           ),
                         ),
                       ),
-                    ),
+                    ],
                   ),
                 ),
               ),
@@ -219,7 +335,7 @@ class GradebookScreen extends StatelessWidget {
 
   Future<void> _exportCsv(BuildContext context) async {
     // Xuất toàn bộ danh sách bài tập thay vì chỉ phần hiển thị
-    final allAssignments = assignments;
+    final allAssignments = widget.assignments;
 
     // Chuẩn bị dữ liệu CSV
     String escapeCsv(String? input) {
@@ -241,7 +357,7 @@ class GradebookScreen extends StatelessWidget {
     buffer.writeln(escapeCsv('Tổng'));
 
     // Rows
-    for (final s in students) {
+    for (final s in widget.students) {
       final name = s['name'] ?? '-';
       buffer.write(escapeCsv(name));
       int total = 0;
