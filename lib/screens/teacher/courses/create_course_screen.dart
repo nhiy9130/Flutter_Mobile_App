@@ -5,6 +5,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../../features/courses/course_model.dart';
+import '../../../core/widgets/common_app_bar.dart';
+import '../../../core/widgets/custom_cards.dart';
+import '../../../core/widgets/custom_text_field.dart';
+import '../../../core/widgets/custom_button.dart';
+import '../../../core/widgets/section_header.dart';
 
 class CreateCourseScreen extends ConsumerStatefulWidget {
   const CreateCourseScreen({super.key});
@@ -23,6 +28,9 @@ class _CreateCourseScreenState extends ConsumerState<CreateCourseScreen> {
   String? _selectedCategory;
   File? _pickedImage;
 
+  // Biến cờ để ngăn việc gọi image_picker nhiều lần
+  bool _isPickingImage = false;
+
   final List<String> _categories = [
     'Lập trình di động',
     'Phát triển Web',
@@ -39,13 +47,33 @@ class _CreateCourseScreenState extends ConsumerState<CreateCourseScreen> {
     super.dispose();
   }
 
+  // SỬA LỖI: Cập nhật hàm _pickImage với biến cờ
   Future<void> _pickImage() async {
-    final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    // 1. Kiểm tra xem có đang chọn ảnh hay không, nếu có thì thoát
+    if (_isPickingImage) return;
 
-    if (pickedFile != null) {
+    try {
+      // 2. Đặt cờ thành true để báo hiệu đang bận
       setState(() {
-        _pickedImage = File(pickedFile.path);
+        _isPickingImage = true;
+      });
+
+      final picker = ImagePicker();
+      final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
+      if (pickedFile != null) {
+        setState(() {
+          _pickedImage = File(pickedFile.path);
+        });
+      }
+    } catch (e) {
+      debugPrint('Lỗi khi chọn ảnh: $e');
+      // Bạn có thể hiển thị SnackBar lỗi ở đây nếu muốn
+    } finally {
+      // 3. (QUAN TRỌNG) Luôn đặt cờ về false sau khi hoàn tất
+      //    (dù thành công hay thất bại)
+      setState(() {
+        _isPickingImage = false;
       });
     }
   }
@@ -133,16 +161,11 @@ class _CreateCourseScreenState extends ConsumerState<CreateCourseScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey.shade50,
-      appBar: AppBar(
-        title: const Text(
-          'Tạo khóa học mới',
-          style: TextStyle(fontWeight: FontWeight.w600),
-        ),
+      appBar: const CommonAppBar(
+        title: 'Tạo khóa học mới',
+        showNotificationsAction: false,
         backgroundColor: Colors.white,
-        foregroundColor: Colors.black87,
         elevation: 0,
-        shadowColor: Colors.black12,
-        surfaceTintColor: Colors.white,
       ),
       body: GestureDetector(
         onTap: () => FocusScope.of(context).unfocus(),
@@ -167,226 +190,131 @@ class _CreateCourseScreenState extends ConsumerState<CreateCourseScreen> {
   }
 
   Widget _buildInfoCard() {
-    return _simpleCard(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: Colors.green.shade50,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Icon(
-                Icons.info_outline,
-                color: Colors.green.shade700,
-                size: 20,
-              ),
-            ),
-            const SizedBox(width: 12),
-            const Text(
-              'Thông tin cơ bản',
-              style: TextStyle(
-                fontSize: 17,
-                fontWeight: FontWeight.w600,
-                color: Colors.black87,
-              ),
-            ),
-          ],
+        const SectionHeader(
+          title: 'Thông tin cơ bản',
+          icon: Icons.info_outline,
         ),
-        const SizedBox(height: 20),
-        _buildTextField(
-          controller: _titleController,
-          label: 'Tên khóa học',
-          hint: 'Ví dụ: Lập trình Flutter cho người mới',
-          icon: Icons.school_outlined,
-        ),
-        const SizedBox(height: 16),
-        _buildTextField(
-          controller: _descriptionController,
-          label: 'Mô tả khóa học',
-          hint: 'Mô tả chi tiết về nội dung khóa học...',
-          icon: Icons.description_outlined,
-          maxLines: 4,
+        const SizedBox(height: 8),
+        CustomCard(
+          child: Column(
+            children: [
+              CustomTextField(
+                controller: _titleController,
+                label: 'Tên khóa học',
+                hint: 'Ví dụ: Lập trình Flutter cho người mới',
+                prefixIcon: const Icon(Icons.school_outlined),
+                validator: (value) => value == null || value.isEmpty
+                    ? 'Tên khóa học không được để trống'
+                    : null,
+              ),
+              const SizedBox(height: 16),
+              CustomTextField(
+                controller: _descriptionController,
+                label: 'Mô tả khóa học',
+                hint: 'Mô tả chi tiết về nội dung khóa học...',
+                prefixIcon: const Icon(Icons.description_outlined),
+                maxLines: 4,
+                validator: (value) => value == null || value.isEmpty
+                    ? 'Mô tả khóa học không được để trống'
+                    : null,
+              ),
+            ],
+          ),
         ),
       ],
     );
   }
 
   Widget _buildDetailsCard() {
-    return _simpleCard(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: Colors.blue.shade50,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Icon(
-                Icons.calendar_today_outlined,
-                color: Colors.blue.shade700,
-                size: 20,
-              ),
-            ),
-            const SizedBox(width: 12),
-            const Text(
-              'Chi tiết khóa học',
-              style: TextStyle(
-                fontSize: 17,
-                fontWeight: FontWeight.w600,
-                color: Colors.black87,
-              ),
-            ),
-          ],
+        const SectionHeader(
+          title: 'Chi tiết khóa học',
+          icon: Icons.calendar_today_outlined,
         ),
-        const SizedBox(height: 20),
-        _buildDropdown(),
-        const SizedBox(height: 16),
-        Row(
-          children: [
-            Expanded(
-              child: _buildDatePickerField(
-                controller: _startDateController,
-                label: 'Ngày bắt đầu',
-                icon: Icons.date_range_outlined,
+        const SizedBox(height: 8),
+        CustomCard(
+          child: Column(
+            children: [
+              _buildDropdown(),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Expanded(
+                    child: CustomTextField(
+                      controller: _startDateController,
+                      label: 'Ngày bắt đầu',
+                      hint: 'Chọn Ngày bắt đầu',
+                      prefixIcon: const Icon(Icons.date_range_outlined),
+                      readOnly: true,
+                      onTap: () => _pickDate(_startDateController),
+                      validator: (value) => value == null || value.isEmpty
+                          ? 'Ngày bắt đầu không được để trống'
+                          : null,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: CustomTextField(
+                      controller: _endDateController,
+                      label: 'Ngày kết thúc',
+                      hint: 'Chọn Ngày kết thúc',
+                      prefixIcon: const Icon(Icons.event_outlined),
+                      readOnly: true,
+                      onTap: () => _pickDate(_endDateController),
+                      validator: (value) => value == null || value.isEmpty
+                          ? 'Ngày kết thúc không được để trống'
+                          : null,
+                    ),
+                  ),
+                ],
               ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: _buildDatePickerField(
-                controller: _endDateController,
-                label: 'Ngày kết thúc',
-                icon: Icons.event_outlined,
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ],
     );
   }
 
   Widget _buildImagePickerCard() {
-    return _simpleCard(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: Colors.purple.shade50,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Icon(
-                Icons.image_outlined,
-                color: Colors.purple.shade700,
-                size: 20,
-              ),
-            ),
-            const SizedBox(width: 12),
-            const Text(
-              'Ảnh bìa khóa học',
-              style: TextStyle(
-                fontSize: 17,
-                fontWeight: FontWeight.w600,
-                color: Colors.black87,
-              ),
-            ),
-          ],
+        const SectionHeader(
+          title: 'Ảnh bìa khóa học',
+          icon: Icons.image_outlined,
         ),
-        const SizedBox(height: 16),
-        _buildImagePicker(),
+        const SizedBox(height: 8),
+        CustomCard(child: _buildImagePicker()),
       ],
     );
   }
 
-  Widget _simpleCard({required List<Widget> children}) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(children: children),
-      ),
-    );
-  }
+  // _simpleCard không còn cần thiết vì đã dùng CustomCard
 
   Widget _buildSubmitButton() {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        gradient: LinearGradient(
-          colors: [Colors.green.shade600, Colors.green.shade700],
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.green.shade600.withOpacity(0.3),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: ElevatedButton.icon(
-        onPressed: _submitForm,
-        icon: const Icon(
-          Icons.add_circle_outline,
-          color: Colors.white,
-          size: 22,
-        ),
-        label: const Text(
-          'Tạo khóa học',
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            letterSpacing: 0.5,
-          ),
-        ),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.transparent,
-          foregroundColor: Colors.white,
-          shadowColor: Colors.transparent,
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-        ),
-      ),
+    return CustomButton(
+      // Vô hiệu hóa nút khi đang chọn ảnh
+      onPressed: _isPickingImage ? null : _submitForm,
+      text: 'Tạo khóa học',
+      icon: Icons.add_circle_outline,
+      isExpanded: true,
     );
   }
 
-  TextFormField _buildTextField({
-    required TextEditingController controller,
-    required String label,
-    required String hint,
-    required IconData icon,
-    int maxLines = 1,
-  }) {
-    return TextFormField(
-      controller: controller,
-      maxLines: maxLines,
-      style: const TextStyle(fontSize: 15),
-      decoration: _inputDecoration(label, hint, icon),
-      validator: (value) =>
-          value == null || value.isEmpty ? '$label không được để trống' : null,
-    );
-  }
+  // Dùng CustomTextField thay vì TextFormField thông thường
 
   DropdownButtonFormField<String> _buildDropdown() {
     return DropdownButtonFormField(
-      decoration: _inputDecoration(
-        'Danh mục',
-        'Chọn danh mục khóa học',
-        Icons.category_outlined,
+      decoration: const InputDecoration(
+        labelText: 'Danh mục',
+        hintText: 'Chọn danh mục khóa học',
+        border: OutlineInputBorder(),
+        prefixIcon: Icon(Icons.category_outlined),
       ),
       value: _selectedCategory,
       style: const TextStyle(fontSize: 15, color: Colors.black87),
@@ -403,58 +331,12 @@ class _CreateCourseScreenState extends ConsumerState<CreateCourseScreen> {
     );
   }
 
-  Widget _buildDatePickerField({
-    required TextEditingController controller,
-    required String label,
-    required IconData icon,
-  }) {
-    return TextFormField(
-      controller: controller,
-      readOnly: true,
-      style: const TextStyle(fontSize: 15),
-      decoration: _inputDecoration(label, 'Chọn $label', icon),
-      onTap: () => _pickDate(controller),
-      validator: (value) =>
-          value == null || value.isEmpty ? '$label không được để trống' : null,
-    );
-  }
-
-  InputDecoration _inputDecoration(String label, String hint, IconData icon) {
-    return InputDecoration(
-      labelText: label,
-      hintText: hint,
-      hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14),
-      labelStyle: TextStyle(color: Colors.grey.shade700, fontSize: 14),
-      prefixIcon: Icon(icon, color: Colors.grey.shade600, size: 22),
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide.none,
-      ),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: Colors.grey.shade200, width: 1.5),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: Colors.green.shade600, width: 2),
-      ),
-      errorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: Colors.red.shade300, width: 1.5),
-      ),
-      focusedErrorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: Colors.red.shade400, width: 2),
-      ),
-      filled: true,
-      fillColor: Colors.grey.shade50,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-    );
-  }
+  // _buildDatePickerField và _inputDecoration không còn cần thiết
 
   Widget _buildImagePicker() {
     return GestureDetector(
-      onTap: _pickImage,
+      // Chỉ cho phép nhấn nếu không đang chọn ảnh
+      onTap: _isPickingImage ? null : _pickImage,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         child: _pickedImage != null
@@ -508,15 +390,20 @@ class _CreateCourseScreenState extends ConsumerState<CreateCourseScreen> {
                         color: Colors.green.shade50,
                         shape: BoxShape.circle,
                       ),
-                      child: Icon(
-                        Icons.add_photo_alternate_outlined,
-                        size: 40,
-                        color: Colors.green.shade600,
-                      ),
+                      // Hiển thị loading nếu đang chọn
+                      child: _isPickingImage
+                          ? const CircularProgressIndicator()
+                          : Icon(
+                              Icons.add_photo_alternate_outlined,
+                              size: 40,
+                              color: Colors.green.shade600,
+                            ),
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      'Nhấn để tải lên ảnh bìa',
+                      _isPickingImage
+                          ? 'Đang mở thư viện...'
+                          : 'Nhấn để tải lên ảnh bìa',
                       style: TextStyle(
                         color: Colors.grey.shade700,
                         fontWeight: FontWeight.w600,

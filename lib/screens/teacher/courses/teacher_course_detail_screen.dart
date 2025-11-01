@@ -10,6 +10,9 @@ import '../../../features/courses/courses_service.dart';
 import '../../../features/courses/course_model.dart';
 // import '../quiz/quiz_creation_screen.dart';
 import 'tabs/content_tab.dart';
+import '../../../core/widgets/custom_cards.dart';
+import '../../../core/widgets/empty_state.dart';
+import '../../../core/widgets/custom_button.dart';
 
 // Models
 class Lecture {
@@ -402,7 +405,7 @@ class _TeacherCourseDetailScreenState extends State<TeacherCourseDetailScreen>
                   unselectedLabelColor: Colors.grey[700],
                   indicatorColor: theme.primaryColor,
                   tabs: const [
-                    Tab(text: 'Nội dung khóa học'),
+                    Tab(text: 'Nội dung'),
                     Tab(text: 'Sinh viên'),
                     Tab(text: 'Bài tập & Điểm số'),
                     Tab(text: 'Thông báo'),
@@ -505,55 +508,124 @@ class _TeacherCourseDetailScreenState extends State<TeacherCourseDetailScreen>
           ],
         ),
         const SizedBox(height: 16),
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: DataTable(
-            columns: const [
-              DataColumn(label: Text('MSSV')),
-              DataColumn(label: Text('Họ và Tên')),
-              DataColumn(label: Text('Email')),
-              DataColumn(label: Text('Ngày tham gia')),
-              DataColumn(label: Text('Hành động')),
-            ],
-            rows: filtered
-                .map(
-                  (s) => DataRow(
-                    cells: [
-                      DataCell(Text(s['id']!)),
-                      DataCell(Text(s['name']!)),
-                      DataCell(Text(s['email']!)),
-                      DataCell(Text(s['joined']!)),
-                      DataCell(
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            IconButton(
-                              tooltip: 'Xem tiến độ',
-                              icon: const Icon(Icons.show_chart),
-                              onPressed: () {},
-                            ),
-                            IconButton(
-                              tooltip: 'Gửi tin nhắn',
-                              icon: const Icon(Icons.message_outlined),
-                              onPressed: () {},
-                            ),
-                            IconButton(
-                              tooltip: 'Xóa khỏi lớp',
-                              icon: const Icon(
-                                Icons.delete_outline,
-                                color: Colors.red,
-                              ),
-                              onPressed: () {},
-                            ),
-                          ],
-                        ),
+        if (filtered.isEmpty)
+          const CustomCard(
+            child: EmptyState(
+              icon: Icons.person_search_rounded,
+              title: 'Không tìm thấy sinh viên',
+              subtitle: 'Hãy thử từ khóa khác hoặc mời sinh viên tham gia lớp',
+            ),
+          )
+        else
+          ...filtered.map((s) {
+            final isJoined = (s['joined'] != null && s['joined']!.isNotEmpty);
+            final name = s['name']!;
+            final email = s['email']!;
+            final id = s['id']!;
+
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: CustomCard(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    CircleAvatar(
+                      radius: 20, // 40px đường kính
+                      child: Text(
+                        name.isNotEmpty ? name[0].toUpperCase() : '?',
                       ),
-                    ],
-                  ),
-                )
-                .toList(),
-          ),
-        ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            name,
+                            style: const TextStyle(fontWeight: FontWeight.w700),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            '$email • $id',
+                            style: TextStyle(color: Colors.grey[700]),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Chip(
+                      label: Text(isJoined ? 'Đã tham gia' : 'Chờ duyệt'),
+                      backgroundColor: (isJoined ? Colors.green : Colors.orange)
+                          .withValues(alpha: 0.1),
+                      side: BorderSide(
+                        color: (isJoined ? Colors.green : Colors.orange)
+                            .withValues(alpha: 0.3),
+                      ),
+                      labelStyle: TextStyle(
+                        color: isJoined ? Colors.green : Colors.orange,
+                        fontWeight: FontWeight.w600,
+                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                    ),
+                    const SizedBox(width: 8),
+                    PopupMenuButton<String>(
+                      tooltip: 'Tùy chọn',
+                      onSelected: (value) async {
+                        if (value == 'approve') {
+                          if (!isJoined) {
+                            setState(() {
+                              s['joined'] = DateTime.now().toIso8601String();
+                            });
+                          }
+                        } else if (value == 'remove') {
+                          final confirm = await showDialog<bool>(
+                            context: context,
+                            builder: (ctx) => AlertDialog(
+                              title: const Text('Xóa khỏi lớp?'),
+                              content: Text(
+                                'Bạn có chắc muốn xóa $name khỏi lớp?',
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.pop(ctx, false),
+                                  child: const Text('Hủy'),
+                                ),
+                                ElevatedButton(
+                                  onPressed: () => Navigator.pop(ctx, true),
+                                  child: const Text('Xóa'),
+                                ),
+                              ],
+                            ),
+                          );
+                          if (confirm == true) {
+                            setState(() {
+                              _students.removeWhere((e) => e['id'] == id);
+                            });
+                          }
+                        }
+                      },
+                      itemBuilder: (context) => [
+                        if (!isJoined)
+                          const PopupMenuItem(
+                            value: 'approve',
+                            child: Text('Duyệt tham gia'),
+                          ),
+                        const PopupMenuItem(
+                          value: 'remove',
+                          child: Text('Xóa khỏi lớp'),
+                        ),
+                      ],
+                      icon: const Icon(Icons.more_vert_rounded),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }),
       ],
     );
   }
@@ -563,25 +635,53 @@ class _TeacherCourseDetailScreenState extends State<TeacherCourseDetailScreen>
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        Wrap(
-          spacing: 12,
-          runSpacing: 12,
-          children: [
-            ElevatedButton.icon(
-              onPressed: _openCreateAssignment,
-              icon: const Icon(Icons.add_task_rounded),
-              label: const Text('Tạo bài tập mới'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green.shade600,
-                foregroundColor: Colors.white,
-              ),
-            ),
-            OutlinedButton.icon(
-              onPressed: _openGradebook,
-              icon: const Icon(Icons.grid_on_rounded),
-              label: const Text('Xem Bảng điểm tổng hợp'),
-            ),
-          ],
+        LayoutBuilder(
+          builder: (context, constraints) {
+            final bool isNarrow = constraints.maxWidth < 700;
+            if (isNarrow) {
+              // Trên màn hình hẹp, xếp dọc để tránh tràn
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  CustomButton(
+                    onPressed: _openCreateAssignment,
+                    text: 'Tạo bài tập mới',
+                    icon: Icons.add_task_rounded,
+                    variant: ButtonVariant.primary,
+                  ),
+                  const SizedBox(height: 12),
+                  CustomButton(
+                    onPressed: _openGradebook,
+                    text: 'Xem Bảng điểm tổng hợp',
+                    icon: Icons.grid_on_rounded,
+                    variant: ButtonVariant.outline,
+                  ),
+                ],
+              );
+            }
+            // Màn hình đủ rộng: đặt 2 nút trên cùng một hàng
+            return Row(
+              children: [
+                Expanded(
+                  child: CustomButton(
+                    onPressed: _openCreateAssignment,
+                    text: 'Tạo bài tập mới',
+                    icon: Icons.add_task_rounded,
+                    variant: ButtonVariant.primary,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: CustomButton(
+                    onPressed: _openGradebook,
+                    text: 'Xem Bảng điểm tổng hợp',
+                    icon: Icons.grid_on_rounded,
+                    variant: ButtonVariant.outline,
+                  ),
+                ),
+              ],
+            );
+          },
         ),
         const SizedBox(height: 16),
         if (_assignments.isEmpty)
