@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/teacher_course_providers.dart';
 import '../gradebook_screen.dart';
-import '../../../../core/widgets/custom_button.dart';
+import '../assignment_grade_screen.dart';
+import '../../../../core/widgets/widgets.dart';
 
 class GradesTab extends ConsumerStatefulWidget {
   const GradesTab({super.key});
@@ -53,6 +54,40 @@ class _GradesTabState extends ConsumerState<GradesTab> {
           ),
         ),
         const SizedBox(height: 12),
+
+        // Danh sách bảng điểm theo từng bài tập (Card)
+        if (assignments.isNotEmpty) ...[
+          const SectionHeader(
+            title: 'Bảng điểm theo bài',
+            icon: Icons.assignment_turned_in_rounded,
+          ),
+          ListView.separated(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: assignments.length,
+            separatorBuilder: (_, __) => const SizedBox(height: 8),
+            itemBuilder: (context, index) {
+              final a = assignments[index];
+              return ActionCard(
+                title: a.title,
+                subtitle: 'Xem bảng điểm bài này',
+                icon: Icons.assignment_turned_in_rounded,
+                onTap: () {
+                  final studentsList = ref.read(studentsProvider);
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => AssignmentGradeScreen(
+                        assignment: a,
+                        students: studentsList,
+                      ),
+                    ),
+                  );
+                },
+              );
+            },
+          ),
+          const SizedBox(height: 16),
+        ],
         if (assignments.isEmpty || students.isEmpty)
           Container(
             padding: const EdgeInsets.all(24),
