@@ -97,9 +97,14 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: '/teacher/courses/:courseId',
             builder: (context, state) {
-              // Lấy đối tượng Course từ tham số 'extra'
-              final course = state.extra as Course;
-              return TeacherCourseDetailScreen(course: course);
+              // Lấy đối tượng Course từ tham số 'extra' nếu có
+              final extra = state.extra;
+              if (extra is Course) {
+                return TeacherCourseDetailScreen(course: extra);
+              }
+              // Nếu không truyền kèm Course qua 'extra', tránh crash do cast null.
+              // Có thể chọn redirect hoặc hiển thị màn hình thông báo.
+              return const NotFoundScreen();
             },
           ),
           GoRoute(

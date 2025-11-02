@@ -196,8 +196,7 @@ class _TeacherCoursesScreenState extends ConsumerState<TeacherCoursesScreen> {
                         thumbnailUrl: raw['thumbnail'] as String?,
                         enrolledText: '${raw['enrolled']} học viên',
                         durationText: raw['duration'] as String,
-                        onTap: () =>
-                            context.go('/teacher/courses/${raw['id']}'),
+                        onTap: () => context.go('/course/${raw['id']}'),
                         trailing: PopupMenuButton<String>(
                           tooltip: 'Tùy chọn',
                           itemBuilder: (context) => const [
