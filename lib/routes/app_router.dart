@@ -23,20 +23,24 @@ import '../screens/shared/profile/profile_edit_screen.dart';
 import '../screens/shared/calendar/calendar_screen.dart';
 import '../screens/shared/calendar/event_detail_screen.dart';
 
-// Common auth screens  
+// Common auth screens
 import '../screens/common/auth/privacy_policy_screen.dart';
 
 // Student screens
+import '../screens/student/courses/course_preview_screen.dart';
 import '../screens/student/courses/student_courses_screen.dart'; // CoursesScreen class
-import '../screens/student/courses/course_detail/course_detail_screen.dart' as student_course;
+import '../screens/student/courses/course_detail/course_detail_screen.dart'
+    as student_course;
 import '../screens/student/courses/course_edit_screen.dart';
 
 // Teacher screens
 import '../screens/teacher/courses/teacher_courses_screen.dart';
 import '../screens/teacher/courses/create_course_screen.dart';
 import '../screens/teacher/courses/teacher_course_detail_screen.dart';
-import '../screens/teacher/students/student_management_screen.dart' as student_mgmt;
-import '../screens/teacher/students/student_detail_screen.dart' as teacher_student;
+import '../screens/teacher/students/student_management_screen.dart'
+    as student_mgmt;
+import '../screens/teacher/students/student_detail_screen.dart'
+    as teacher_student;
 
 // Admin screens
 import '../screens/admin/system/system_settings_screen.dart';
@@ -101,8 +105,9 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: '/course/:id',
             redirect: (context, state) => requireAuth(context, state),
-            builder: (context, state) =>
-                student_course.CourseDetailScreen(courseId: state.pathParameters['id']!),
+            builder: (context, state) => student_course.CourseDetailScreen(
+              courseId: state.pathParameters['id']!,
+            ),
           ),
           GoRoute(
             path: '/course/:id/live',
@@ -110,6 +115,13 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             builder: (context, state) => LivestreamScreen(
               courseId: state.pathParameters['id']!,
               isHost: false,
+            ),
+          ),
+          GoRoute(
+            path: '/course-preview/:courseId',
+            redirect: (context, state) => requireAuth(context, state),
+            builder: (context, state) => CoursePreviewScreen(
+              courseId: state.pathParameters['courseId']!,
             ),
           ),
           GoRoute(
@@ -147,18 +159,19 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             path: '/create-course',
             builder: (context, state) => const CreateCourseScreen(),
           ),
-          
+
           // Profile editing routes
           GoRoute(
             path: '/profile/edit',
             redirect: (context, state) => requireAuth(context, state),
-            pageBuilder: (context, state) => CustomPageTransition.buildTransition(
-              child: const ProfileEditScreen(),
-              state: state,
-              type: PageTransitionType.slideUp,
-            ),
+            pageBuilder: (context, state) =>
+                CustomPageTransition.buildTransition(
+                  child: const ProfileEditScreen(),
+                  state: state,
+                  type: PageTransitionType.slideUp,
+                ),
           ),
-          
+
           // Calendar routes
           GoRoute(
             path: '/calendar/event/:eventId',
@@ -169,41 +182,42 @@ final appRouterProvider = Provider<GoRouter>((ref) {
               return EventDetailScreen(event: event);
             },
           ),
-          
+
           // Course editing routes
           GoRoute(
             path: '/course/:courseId/edit',
             redirect: (context, state) => requireAuth(context, state),
-            builder: (context, state) => CourseEditScreen(
-              courseId: state.pathParameters['courseId']!,
-            ),
+            builder: (context, state) =>
+                CourseEditScreen(courseId: state.pathParameters['courseId']!),
           ),
-          
+
           // Student management routes
           GoRoute(
             path: '/teacher/course/:courseId/students',
             redirect: (context, state) => requireAuth(context, state),
-            pageBuilder: (context, state) => CustomPageTransition.listTransition(
-              child: student_mgmt.StudentManagementScreen(
-                courseId: state.pathParameters['courseId']!,
-              ),
-              state: state,
-            ),
+            pageBuilder: (context, state) =>
+                CustomPageTransition.listTransition(
+                  child: student_mgmt.StudentManagementScreen(
+                    courseId: state.pathParameters['courseId']!,
+                  ),
+                  state: state,
+                ),
           ),
-          
+
           GoRoute(
             path: '/teacher/student/:studentId/detail',
             redirect: (context, state) => requireAuth(context, state),
-            pageBuilder: (context, state) => CustomPageTransition.detailTransition(
-              child: teacher_student.StudentDetailScreen(
-                studentId: state.pathParameters['studentId']!,
-              ),
-              state: state,
-            ),
+            pageBuilder: (context, state) =>
+                CustomPageTransition.detailTransition(
+                  child: teacher_student.StudentDetailScreen(
+                    studentId: state.pathParameters['studentId']!,
+                  ),
+                  state: state,
+                ),
           ),
         ],
       ),
-      
+
       // Privacy policy route (outside shell for accessibility)
       GoRoute(
         path: '/privacy-policy',

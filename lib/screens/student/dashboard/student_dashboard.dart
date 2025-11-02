@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-import '../../../core/widgets/badges.dart';
+// Removed old badges import; we'll use QuickActionCard badges instead
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../features/auth/auth_state.dart';
 import '../../../core/widgets/widgets.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_dimensions.dart';
-import '../../../core/theme/app_typography.dart';
 
 class StudentDashboard extends ConsumerWidget {
   const StudentDashboard({super.key, required this.user});
@@ -22,63 +21,32 @@ class StudentDashboard extends ConsumerWidget {
         const SizedBox(height: AppSpacing.sectionSpacing),
 
         // Quick Actions
-        _buildSectionHeader('Truy cập nhanh', Icons.flash_on),
+        const SectionHeader(title: 'Truy cập nhanh', icon: Icons.flash_on),
         const SizedBox(height: AppSpacing.sectionHeaderSpacing),
         _buildQuickActions(context),
         const SizedBox(height: AppSpacing.sectionSpacing),
 
         // Learning Progress
-        _buildSectionHeader(
-          'Tiến độ học tập',
-          Icons.trending_up,
+        SectionHeader(
+          title: 'Tiến độ học tập',
+          icon: Icons.trending_up,
           action: 'Xem tất cả',
+          onActionPressed: () => context.go('/my-courses'),
         ),
         const SizedBox(height: AppSpacing.sectionHeaderSpacing),
         _buildLearningProgress(context),
         const SizedBox(height: AppSpacing.sectionSpacing),
 
         // Analytics
-        _buildSectionHeader('Thống kê', Icons.analytics),
+        const SectionHeader(title: 'Thống kê', icon: Icons.analytics),
         const SizedBox(height: AppSpacing.sectionHeaderSpacing),
         _buildAnalytics(context),
         const SizedBox(height: AppSpacing.sectionSpacing),
 
         // Recommendations
-        _buildSectionHeader('Gợi ý cho bạn', Icons.recommend),
+        const SectionHeader(title: 'Gợi ý cho bạn', icon: Icons.recommend),
         const SizedBox(height: AppSpacing.sectionHeaderSpacing),
         _buildRecommendations(context),
-      ],
-    );
-  }
-
-  Widget _buildSectionHeader(String title, IconData icon, {String? action}) {
-    return Row(
-      children: [
-        Container(
-          padding: const EdgeInsets.all(AppSpacing.xs),
-          decoration: BoxDecoration(
-            color: AppColors.primary.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(AppRadius.sm),
-          ),
-          child: Icon(icon, size: AppSizes.iconSm, color: AppColors.primary),
-        ),
-        const SizedBox(width: AppSpacing.sm),
-        Text(title, style: AppTypography.h5),
-        if (action != null) ...[
-          const Spacer(),
-          TextButton(
-            onPressed: () {
-              // TODO: Handle action
-            },
-            child: Text(
-              action,
-              style: AppTypography.bodySmall.copyWith(
-                color: AppColors.primary,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
-        ],
       ],
     );
   }
@@ -86,77 +54,24 @@ class StudentDashboard extends ConsumerWidget {
   Widget _buildWelcomeCard(BuildContext context) {
     final hour = DateTime.now().hour;
     String greeting = 'Chào buổi sáng';
-    IconData greetingIcon = Icons.wb_sunny;
+    if (hour >= 12 && hour < 18) greeting = 'Chào buổi chiều';
+    if (hour >= 18) greeting = 'Chào buổi tối';
 
-    if (hour >= 12 && hour < 18) {
-      greeting = 'Chào buổi chiều';
-      greetingIcon = Icons.wb_sunny_outlined;
-    }
-    if (hour >= 18) {
-      greeting = 'Chào buổi tối';
-      greetingIcon = Icons.nights_stay;
-    }
-
-    return CustomCard(
-      padding: const EdgeInsets.all(AppSpacing.cardPaddingLarge),
-      gradient: AppColors.primaryGradient,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(AppSpacing.sm),
-                decoration: BoxDecoration(
-                  color: AppColors.white.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(AppRadius.md),
-                ),
-                child: Icon(
-                  greetingIcon,
-                  color: AppColors.white,
-                  size: AppSizes.iconLg,
-                ),
-              ),
-              const SizedBox(width: AppSpacing.md),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '$greeting!',
-                      style: AppTypography.bodyMedium.copyWith(
-                        color: AppColors.white.withValues(alpha: 0.9),
-                      ),
-                    ),
-                    Text(
-                      user.fullName,
-                      style: AppTypography.h4.copyWith(
-                        color: AppColors.white,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: AppSpacing.md),
-          Text(
-            'Sẵn sàng để học tập hôm nay chưa? 🚀',
-            style: AppTypography.bodyLarge.copyWith(
-              color: AppColors.white.withValues(alpha: 0.9),
-            ),
-          ),
-          const SizedBox(height: AppSpacing.lg),
-          CustomButton(
-            onPressed: () => context.go('/my-courses'),
-            text: 'Xem khóa học của tôi',
-            icon: Icons.school,
-            variant: ButtonVariant.secondary,
-            size: ButtonSize.medium,
-          ),
-        ],
-      ),
+    return AdvancedInfoCard(
+      leadingIcon: Icons.emoji_objects_outlined,
+      title: '$greeting, ${user.fullName} 👋',
+      subtitle: 'Sẵn sàng để học tập hôm nay chưa? 🚀',
+      gradientColors: [
+        AppColors.primary,
+        AppColors.primary.withValues(alpha: 0.85),
+      ],
+      primaryActionLabel: 'Bắt đầu học',
+      primaryActionIcon: Icons.play_arrow_rounded,
+      onPrimaryAction: () => context.go('/my-courses'),
+      secondaryActionLabel: 'Thông báo',
+      secondaryActionIcon: Icons.notifications_none_rounded,
+      onSecondaryAction: () => context.go('/notifications-demo'),
+      accentColor: AppColors.white,
     );
   }
 
@@ -165,56 +80,41 @@ class StudentDashboard extends ConsumerWidget {
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       crossAxisCount: 2,
-      childAspectRatio: 1.2,
+      childAspectRatio: 1.15,
       mainAxisSpacing: AppSpacing.md,
       crossAxisSpacing: AppSpacing.md,
       children: [
-        ActionCard(
-          title: 'Khóa học',
-          subtitle: '15 khóa học đang tham gia',
+        QuickActionCard(
           icon: Icons.menu_book_outlined,
-          iconColor: AppColors.primary,
-          iconBackgroundColor: AppColors.primaryContainer,
+          title: 'Khóa học',
+          subtitle: 'Danh sách khóa học',
           onTap: () => context.go('/my-courses'),
-          trailing: const StatusBadge(
-            label: '15',
-            color: AppColors.primary,
-            variant: BadgeVariant.solid,
-          ),
+          color: AppColors.primary,
+          badge: '15',
         ),
-        ActionCard(
-          title: 'Thông báo',
-          subtitle: '5 thông báo mới',
+        QuickActionCard(
           icon: Icons.notifications_outlined,
-          iconColor: AppColors.warning,
-          iconBackgroundColor: AppColors.warningContainer,
+          title: 'Thông báo',
+          subtitle: 'Tin mới & cập nhật',
           onTap: () => context.go('/notifications-demo'),
-          trailing: const StatusBadge(
-            label: '5',
-            color: AppColors.error,
-            variant: BadgeVariant.solid,
-          ),
+          color: AppColors.warning,
+          badge: '5',
         ),
-        ActionCard(
-          title: 'Live Streams',
-          subtitle: '2 buổi học trực tuyến',
+        QuickActionCard(
           icon: Icons.videocam_outlined,
-          iconColor: AppColors.error,
-          iconBackgroundColor: AppColors.errorContainer,
+          title: 'Live Streams',
+          subtitle: 'Lịch buổi trực tuyến',
           onTap: () => context.go('/my-courses'),
+          color: AppColors.error,
+          badge: '2',
         ),
-        ActionCard(
-          title: 'Bài tập',
-          subtitle: '3 bài tập chưa nộp',
+        QuickActionCard(
           icon: Icons.quiz_outlined,
-          iconColor: AppColors.secondary,
-          iconBackgroundColor: AppColors.secondaryContainer,
+          title: 'Bài tập',
+          subtitle: 'Bài tập chưa nộp',
           onTap: () => context.go('/my-courses'),
-          trailing: const StatusBadge(
-            label: '3',
-            color: AppColors.secondary,
-            variant: BadgeVariant.solid,
-          ),
+          color: AppColors.secondary,
+          badge: '3',
         ),
       ],
     );

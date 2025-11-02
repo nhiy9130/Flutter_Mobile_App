@@ -22,6 +22,7 @@ class SectionHeader extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           if (icon != null) ...[
             Icon(icon, size: 20, color: theme.colorScheme.primary),
@@ -30,23 +31,30 @@ class SectionHeader extends StatelessWidget {
           Expanded(
             child: Text(
               title,
-              style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+              style: theme.textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
               overflow: TextOverflow.ellipsis,
               maxLines: 1,
             ),
           ),
           if (action != null && onActionPressed != null)
-            Flexible(
-              child: TextButton(
-                onPressed: onActionPressed,
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Flexible(child: Text(action!, overflow: TextOverflow.ellipsis, maxLines: 1)),
-                    const SizedBox(width: 4),
-                    const Icon(Icons.arrow_forward, size: 16),
-                  ],
+            TextButton.icon(
+              onPressed: onActionPressed,
+              style: TextButton.styleFrom(
+                visualDensity: const VisualDensity(
+                  horizontal: -2,
+                  vertical: -2,
                 ),
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                minimumSize: const Size(0, 36),
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              ),
+              icon: const Icon(Icons.arrow_forward, size: 16),
+              label: Text(
+                action!,
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
               ),
             ),
         ],
