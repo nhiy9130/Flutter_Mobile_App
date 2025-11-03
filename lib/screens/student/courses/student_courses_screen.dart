@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../features/auth/auth_state.dart';
 import '../../../features/courses/courses_service.dart';
-import 'package:go_router/go_router.dart';
 import '../../../core/widgets/widgets.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_dimensions.dart';
 import '../../../core/theme/app_typography.dart';
 import 'course_detail/course_detail_screen.dart';
+import 'discover/recommended_courses_screen.dart';
 //import '../courses/course_preview_screen.dart';
 
 // --- PHẦN PROVIDER (GIỮ NGUYÊN) ---
@@ -86,7 +86,13 @@ class _CoursesScreenState extends ConsumerState<CoursesScreen> {
         actions: [
           IconButton(
             tooltip: 'Tìm khóa học mới',
-            onPressed: () => context.go('/courses'),
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => const RecommendedCoursesScreen(),
+                ),
+              );
+            },
             icon: const Icon(Icons.add, color: Colors.white),
           ),
           IconButton(
@@ -567,7 +573,13 @@ class _CoursesScreenState extends ConsumerState<CoursesScreen> {
       subtitle: subtitle,
       actionText: filter == CourseFilter.enrolled ? 'Khám phá khóa học' : null,
       onAction: filter == CourseFilter.enrolled
-          ? () => context.go('/courses')
+          ? () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => const RecommendedCoursesScreen(),
+                ),
+              );
+            }
           : null,
     );
   }

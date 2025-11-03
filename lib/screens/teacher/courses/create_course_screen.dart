@@ -138,23 +138,9 @@ class _CreateCourseScreenState extends ConsumerState<CreateCourseScreen> {
       instructorName: 'Tên giáo viên',
     );
 
-    context.push('/teacher/courses/${newCourse.id}', extra: newCourse);
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Row(
-          children: [
-            Icon(Icons.check_circle_rounded, color: Colors.white),
-            SizedBox(width: 12),
-            Expanded(child: Text('Khóa học đã được tạo thành công!')),
-          ],
-        ),
-        backgroundColor: Colors.green.shade600,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        margin: const EdgeInsets.all(16),
-      ),
-    );
+    // Điều hướng đến màn chi tiết khóa học ngay sau khi tạo (dành cho instructor)
+    // Sử dụng go_router để không xung đột với Navigator 2.0/page-based
+    context.go('/course/${newCourse.id}');
   }
 
   @override

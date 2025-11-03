@@ -63,7 +63,7 @@ class StudentDashboard extends ConsumerWidget {
       subtitle: 'Sẵn sàng để học tập hôm nay chưa? 🚀',
       gradientColors: [
         AppColors.primary,
-        AppColors.primary.withValues(alpha: 0.85),
+        const Color.fromARGB(255, 97, 98, 174).withValues(alpha: 0.85),
       ],
       primaryActionLabel: 'Bắt đầu học',
       primaryActionIcon: Icons.play_arrow_rounded,
@@ -71,7 +71,7 @@ class StudentDashboard extends ConsumerWidget {
       secondaryActionLabel: 'Thông báo',
       secondaryActionIcon: Icons.notifications_none_rounded,
       onSecondaryAction: () => context.go('/notifications-demo'),
-      accentColor: AppColors.white,
+      accentColor: const Color.fromARGB(255, 77, 78, 179),
     );
   }
 
