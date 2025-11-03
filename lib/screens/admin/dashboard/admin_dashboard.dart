@@ -64,7 +64,7 @@ class AdminDashboard extends ConsumerWidget {
       primaryActionIcon: Icons.school,
       onPrimaryAction: () => context.go('/admin-course-management'),
       secondaryActionLabel: 'Báo cáo',
-      secondaryActionIcon: Icons.people,
+      secondaryActionIcon: Icons.analytics,
       onSecondaryAction: () => context.go('/admin-reports'),
     );
   }
