@@ -12,6 +12,14 @@ class RootShell extends ConsumerWidget {
     if (location.startsWith('/dashboard')) {
       return 0;
     }
+    // Admin mappings
+    if (location.startsWith('/admin-course-management') ||
+        location.startsWith('/admin-system-settings')) {
+      return 1;
+    }
+    if (location.startsWith('/admin-user-management')) {
+      return 2;
+    }
     if (location.startsWith('/teacher-courses') ||
         location.startsWith('/my-courses')) {
       return 1;
@@ -124,26 +132,14 @@ class RootShell extends ConsumerWidget {
       case 'admin':
         destinations.addAll([
           const NavigationDestination(
-            icon: Icon(Icons.settings_outlined),
-            selectedIcon: Icon(Icons.settings),
-            label: 'Cài đặt',
+            icon: Icon(Icons.school_outlined),
+            selectedIcon: Icon(Icons.school),
+            label: 'Khóa học',
           ),
-          NavigationDestination(
-            icon: Stack(
-              clipBehavior: Clip.none,
-              children: [
-                const Icon(Icons.chat_bubble_outline),
-                if (unread > 0) _buildNotificationBadge(unread),
-              ],
-            ),
-            selectedIcon: Stack(
-              clipBehavior: Clip.none,
-              children: [
-                const Icon(Icons.chat_bubble),
-                if (unread > 0) _buildNotificationBadge(unread),
-              ],
-            ),
-            label: 'Messages',
+          const NavigationDestination(
+            icon: Icon(Icons.group_outlined),
+            selectedIcon: Icon(Icons.group),
+            label: 'Người dùng',
           ),
           const NavigationDestination(
             icon: Icon(Icons.person_outline),
@@ -208,14 +204,18 @@ class RootShell extends ConsumerWidget {
             context.go('/teacher-courses');
             break;
           case 'admin':
-            context.go('/admin-system-settings');
+            context.go('/admin-course-management');
             break;
           default:
             context.go('/my-courses');
         }
         break;
       case 2:
-        context.go('/messages');
+        if (role == 'admin') {
+          context.go('/admin-user-management');
+        } else {
+          context.go('/messages');
+        }
         break;
       case 3:
         context.go('/profile');

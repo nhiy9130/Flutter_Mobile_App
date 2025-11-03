@@ -44,6 +44,8 @@ import '../screens/teacher/students/student_detail_screen.dart'
 
 // Admin screens
 import '../screens/admin/system/system_settings_screen.dart';
+import '../screens/admin/courses/course_management_screen.dart';
+import '../screens/admin/users/user_management_screen.dart';
 
 import 'guards/auth_guard.dart';
 import '../core/widgets/page_transitions.dart';
@@ -86,6 +88,18 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             path: '/admin-system-settings',
             redirect: (context, state) => requireAuth(context, state),
             builder: (context, state) => const SystemSettingsScreen(),
+          ),
+
+          GoRoute(
+            path: '/admin-course-management',
+            redirect: (context, state) => requireAuth(context, state),
+            builder: (context, state) => const CourseManagementScreen(),
+          ),
+
+          GoRoute(
+            path: '/admin-user-management',
+            redirect: (context, state) => requireAuth(context, state),
+            builder: (context, state) => const UserManagementScreen(),
           ),
 
           // GoRoute(

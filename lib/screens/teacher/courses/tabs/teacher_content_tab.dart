@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import '../models/course_content_models.dart';
 
-class TeacherContentTab extends StatelessWidget {
+class TeacherContentTab extends StatefulWidget {
   const TeacherContentTab({
     super.key,
     required this.courseContent,
@@ -40,10 +41,390 @@ class TeacherContentTab extends StatelessWidget {
   final Color Function(String type) getColorForType;
 
   @override
+  State<TeacherContentTab> createState() => _TeacherContentTabState();
+}
+
+class _TeacherContentTabState extends State<TeacherContentTab> {
+  late List<CourseSection> _sections;
+
+  @override
+  void initState() {
+    super.initState();
+    _sections = widget.courseContent.isEmpty
+        ? <CourseSection>[]
+        : widget.courseContent.map((s) => _coerceSection(s)).toList();
+  }
+
+  CourseSection _coerceSection(dynamic s) {
+    try {
+      // Nếu đã đúng model chuẩn
+      if (s is CourseSection) return s;
+      // Nếu là Map hoặc object có các field title/lectures
+      final title = _getString(s, ['title']) ?? 'Chương mới';
+      final id =
+          _getString(s, ['id']) ??
+          DateTime.now().millisecondsSinceEpoch.toString();
+      final List<dynamic> rawLectures =
+          _getList(s, ['lectures']) ?? <dynamic>[];
+      final lectures = rawLectures.map((l) => _coerceLecture(l)).toList();
+      return CourseSection(id: id, title: title, lectures: lectures);
+    } catch (_) {
+      return CourseSection(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        title: 'Chương mới',
+        lectures: <Lecture>[],
+      );
+    }
+  }
+
+  Lecture _coerceLecture(dynamic l) {
+    try {
+      if (l is Lecture) return l;
+      final title = _getString(l, ['title']) ?? 'Bài giảng mới';
+      final id =
+          _getString(l, ['id']) ??
+          DateTime.now().millisecondsSinceEpoch.toString();
+      final type = _getString(l, ['type']) ?? 'text';
+      return Lecture(
+        id: id,
+        title: title,
+        type: type,
+        url: _getString(l, ['url']),
+        filePath: _getString(l, ['filePath']),
+        textJson: _getString(l, ['textJson']),
+        duration: _getString(l, ['duration']),
+      );
+    } catch (_) {
+      return Lecture(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        title: 'Bài giảng mới',
+        type: 'text',
+      );
+    }
+  }
+
+  String? _getString(dynamic obj, List<String> keys) {
+    try {
+      if (obj is Map) {
+        for (final k in keys) {
+          final v = obj[k];
+          if (v is String && v.isNotEmpty) return v;
+          if (v is num) return v.toString();
+        }
+      } else {
+        for (final k in keys) {
+          try {
+            final toJson = (obj as dynamic).toJson;
+            if (toJson is Function) {
+              final m = toJson();
+              if (m is Map && m.containsKey(k)) {
+                final v = m[k];
+                if (v is String && v.isNotEmpty) return v;
+                if (v is num) return v.toString();
+              }
+            }
+          } catch (_) {}
+          try {
+            final v2 = (obj as dynamic);
+            switch (k) {
+              case 'id':
+                final w = v2.id;
+                if (w is String && w.isNotEmpty) return w;
+                if (w is num) return w.toString();
+                break;
+              case 'title':
+                final w = v2.title;
+                if (w is String && w.isNotEmpty) return w;
+                break;
+              case 'type':
+                final w = v2.type;
+                if (w is String && w.isNotEmpty) return w;
+                break;
+            }
+          } catch (_) {}
+        }
+      }
+    } catch (_) {}
+    return null;
+  }
+
+  List<dynamic>? _getList(dynamic obj, List<String> keys) {
+    try {
+      if (obj is Map) {
+        for (final k in keys) {
+          final v = obj[k];
+          if (v is List) return v;
+        }
+      } else {
+        for (final k in keys) {
+          try {
+            final toJson = (obj as dynamic).toJson;
+            if (toJson is Function) {
+              final m = toJson();
+              if (m is Map && m.containsKey(k)) {
+                final v = m[k];
+                if (v is List) return v;
+              }
+            }
+          } catch (_) {
+            try {
+              final v2 = (obj as dynamic).lectures;
+              if (v2 is List) return v2;
+            } catch (_) {}
+          }
+        }
+      }
+    } catch (_) {}
+    return null;
+  }
+
+  Future<void> _handleAddSection(BuildContext ctx) async {
+    final title = await _showSectionDialog(ctx);
+    if (title == null) return;
+    setState(() {
+      _sections.add(
+        CourseSection(
+          id: DateTime.now().millisecondsSinceEpoch.toString(),
+          title: title,
+          lectures: <Lecture>[],
+        ),
+      );
+    });
+    // Hook
+    try {
+      widget.onAddSection(ctx);
+    } catch (_) {}
+  }
+
+  Future<void> _handleEditSection(BuildContext ctx, int sectionIndex) async {
+    final section = _sections[sectionIndex];
+    final currentTitle = _getString(section, ['title']) ?? '';
+    final title = await _showSectionDialog(ctx, initial: currentTitle);
+    if (title == null) return;
+    setState(() {
+      section.title = title;
+    });
+    try {
+      widget.onEditSection(ctx, sectionIndex);
+    } catch (_) {}
+  }
+
+  Future<void> _handleDeleteSection(BuildContext ctx, int sectionIndex) async {
+    final confirmed = await _confirmDelete(ctx, 'Xóa chương này?');
+    if (confirmed != true) return;
+    setState(() {
+      _sections.removeAt(sectionIndex);
+    });
+    try {
+      widget.onDeleteSection(ctx, sectionIndex);
+    } catch (_) {}
+  }
+
+  Future<void> _handleAddEditLecture(
+    BuildContext ctx,
+    int sectionIndex, {
+    dynamic lecture,
+    int? lectureIndex,
+  }) async {
+    final initialTitle = lecture == null
+        ? ''
+        : _getString(lecture, ['title']) ?? '';
+    final initialType = lecture == null
+        ? 'text'
+        : _getString(lecture, ['type']) ?? 'text';
+
+    final result = await _showLectureDialog(
+      ctx,
+      initialTitle: initialTitle,
+      initialType: initialType,
+    );
+    if (result == null) return;
+
+    final section = _sections[sectionIndex];
+
+    setState(() {
+      if (lecture == null) {
+        section.lectures.add(
+          Lecture(
+            id: DateTime.now().millisecondsSinceEpoch.toString(),
+            title: result.title,
+            type: result.type,
+          ),
+        );
+      } else {
+        if (lectureIndex != null &&
+            lectureIndex >= 0 &&
+            lectureIndex < section.lectures.length) {
+          final target = section.lectures[lectureIndex];
+          target.title = result.title;
+          target.type = result.type;
+        }
+      }
+    });
+
+    try {
+      widget.onAddEditLecture(
+        ctx,
+        sectionIndex,
+        lecture: lecture,
+        lectureIndex: lectureIndex,
+      );
+    } catch (_) {}
+  }
+
+  Future<void> _handleDeleteLecture(
+    BuildContext ctx,
+    int sectionIndex,
+    int lectureIndex,
+    String title,
+  ) async {
+    final confirmed = await _confirmDelete(ctx, 'Xóa bài giảng "$title"?');
+    if (confirmed != true) return;
+    final section = _sections[sectionIndex];
+    setState(() {
+      section.lectures.removeAt(lectureIndex);
+    });
+    try {
+      widget.onDeleteLecture(ctx, sectionIndex, lectureIndex, title);
+    } catch (_) {}
+  }
+
+  Future<String?> _showSectionDialog(
+    BuildContext context, {
+    String initial = '',
+  }) async {
+    final controller = TextEditingController(text: initial);
+    return showDialog<String>(
+      context: context,
+      builder: (ctx) {
+        return AlertDialog(
+          title: const Text('Chương'),
+          content: TextField(
+            controller: controller,
+            decoration: const InputDecoration(labelText: 'Tên chương'),
+            autofocus: true,
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(),
+              child: const Text('Hủy'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                final v = controller.text.trim();
+                if (v.isEmpty) return;
+                Navigator.of(ctx).pop(v);
+              },
+              child: const Text('Lưu'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<_LectureFormResult?> _showLectureDialog(
+    BuildContext context, {
+    String initialTitle = '',
+    String initialType = 'text',
+  }) async {
+    final titleCtrl = TextEditingController(text: initialTitle);
+    String type = initialType;
+    return showDialog<_LectureFormResult>(
+      context: context,
+      builder: (ctx) {
+        return AlertDialog(
+          title: const Text('Bài giảng'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: titleCtrl,
+                decoration: const InputDecoration(labelText: 'Tiêu đề'),
+                autofocus: true,
+              ),
+              const SizedBox(height: 12),
+              DropdownButtonFormField<String>(
+                value: type,
+                items: const [
+                  DropdownMenuItem(value: 'video', child: Text('Video')),
+                  DropdownMenuItem(value: 'file', child: Text('Tệp')),
+                  DropdownMenuItem(value: 'text', child: Text('Văn bản')),
+                ],
+                onChanged: (v) {
+                  if (v != null) type = v;
+                },
+                decoration: const InputDecoration(labelText: 'Loại nội dung'),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(),
+              child: const Text('Hủy'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                final t = titleCtrl.text.trim();
+                if (t.isEmpty) return;
+                Navigator.of(ctx).pop(_LectureFormResult(title: t, type: type));
+              },
+              child: const Text('Lưu'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<bool?> _confirmDelete(BuildContext context, String message) {
+    return showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Xác nhận'),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text('Hủy'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: const Text('Xóa'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _reorderSections(int oldIndex, int newIndex) {
+    setState(() {
+      if (newIndex > oldIndex) newIndex -= 1;
+      final item = _sections.removeAt(oldIndex);
+      _sections.insert(newIndex, item);
+    });
+    try {
+      widget.onReorderSections(oldIndex, newIndex);
+    } catch (_) {}
+  }
+
+  void _reorderLectures(int sectionIndex, int oldIndex, int newIndex) {
+    final section = _sections[sectionIndex];
+    setState(() {
+      if (newIndex > oldIndex) newIndex -= 1;
+      final item = section.lectures.removeAt(oldIndex);
+      section.lectures.insert(newIndex, item);
+    });
+    try {
+      widget.onReorderLectures(sectionIndex, oldIndex, newIndex);
+    } catch (_) {}
+  }
+
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    if (courseContent.isEmpty) {
+    if (_sections.isEmpty) {
       return Padding(
         padding: const EdgeInsets.all(24),
         child: Center(
@@ -73,7 +454,7 @@ class TeacherContentTab extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               ElevatedButton.icon(
-                onPressed: () => onAddSection(context),
+                onPressed: () => _handleAddSection(context),
                 icon: const Icon(Icons.add_rounded),
                 label: const Text('Thêm Chương mới'),
                 style: ElevatedButton.styleFrom(
@@ -96,13 +477,13 @@ class TeacherContentTab extends StatelessWidget {
         Expanded(
           child: ReorderableListView.builder(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
-            itemCount: courseContent.length,
+            itemCount: _sections.length,
             buildDefaultDragHandles: false,
             onReorder: (oldIndex, newIndex) =>
-                onReorderSections(oldIndex, newIndex),
+                _reorderSections(oldIndex, newIndex),
             itemBuilder: (context, index) {
-              final section = courseContent[index];
-              final List<dynamic> lectures = section.lectures as List<dynamic>;
+              final section = _sections[index];
+              final List<Lecture> lectures = section.lectures;
               return Container(
                 key: ValueKey(section.id),
                 margin: const EdgeInsets.only(bottom: 16),
@@ -140,7 +521,7 @@ class TeacherContentTab extends StatelessWidget {
                       ),
                     ),
                     title: Text(
-                      section.title as String,
+                      section.title,
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
@@ -160,7 +541,7 @@ class TeacherContentTab extends StatelessWidget {
                         IconButton(
                           tooltip: 'Sửa tên chương',
                           icon: const Icon(Icons.edit_outlined),
-                          onPressed: () => onEditSection(context, index),
+                          onPressed: () => _handleEditSection(context, index),
                         ),
                         IconButton(
                           tooltip: 'Xóa chương',
@@ -168,7 +549,7 @@ class TeacherContentTab extends StatelessWidget {
                             Icons.delete_outline,
                             color: Colors.red,
                           ),
-                          onPressed: () => onDeleteSection(context, index),
+                          onPressed: () => _handleDeleteSection(context, index),
                         ),
                         ReorderableDragStartListener(
                           index: index,
@@ -188,7 +569,8 @@ class TeacherContentTab extends StatelessWidget {
                         child: Align(
                           alignment: Alignment.centerLeft,
                           child: OutlinedButton.icon(
-                            onPressed: () => onAddEditLecture(context, index),
+                            onPressed: () =>
+                                _handleAddEditLecture(context, index),
                             icon: const Icon(Icons.add_rounded),
                             label: const Text('Thêm bài giảng'),
                           ),
@@ -208,34 +590,31 @@ class TeacherContentTab extends StatelessWidget {
                         )
                       else
                         ReorderableListView.builder(
-                          key: ValueKey('${section.id}-lectures'),
+                          key: ValueKey('lectures-$index'),
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
                           itemCount: lectures.length,
                           buildDefaultDragHandles: false,
                           onReorder: (oldIndex, newIndex) =>
-                              onReorderLectures(index, oldIndex, newIndex),
+                              _reorderLectures(index, oldIndex, newIndex),
                           itemBuilder: (context, li) {
                             final lecture = lectures[li];
-                            final color = getColorForType(
-                              lecture.type as String,
-                            );
+                            final color = widget.getColorForType(lecture.type);
                             String subtitle = '';
-                            switch (lecture.type as String) {
+                            switch (lecture.type) {
                               case 'video':
                                 subtitle =
-                                    (lecture.url as String?) != null &&
-                                        (lecture.url as String).isNotEmpty
+                                    (lecture.url != null &&
+                                        lecture.url!.isNotEmpty)
                                     ? 'Video • ${lecture.url}'
                                     : 'Video';
                                 break;
                               case 'file':
-                                final name =
-                                    ((lecture.filePath as String?) ?? '')
-                                        .split('\\')
-                                        .last
-                                        .split('/')
-                                        .last;
+                                final name = (lecture.filePath ?? '')
+                                    .split('\\')
+                                    .last
+                                    .split('/')
+                                    .last;
                                 subtitle = name.isNotEmpty
                                     ? 'Tệp • $name'
                                     : 'Tệp tin';
@@ -244,7 +623,7 @@ class TeacherContentTab extends StatelessWidget {
                                 subtitle = 'Văn bản';
                                 break;
                               default:
-                                subtitle = (lecture.duration as String?) ?? '';
+                                subtitle = lecture.duration ?? '';
                             }
                             return Container(
                               key: ValueKey(lecture.id),
@@ -268,13 +647,13 @@ class TeacherContentTab extends StatelessWidget {
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   child: Icon(
-                                    getIconForType(lecture.type as String),
+                                    widget.getIconForType(lecture.type),
                                     color: color,
                                     size: 20,
                                   ),
                                 ),
                                 title: Text(
-                                  lecture.title as String,
+                                  lecture.title,
                                   style: const TextStyle(fontSize: 14),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
@@ -297,7 +676,7 @@ class TeacherContentTab extends StatelessWidget {
                                         Icons.edit_outlined,
                                         size: 20,
                                       ),
-                                      onPressed: () => onAddEditLecture(
+                                      onPressed: () => _handleAddEditLecture(
                                         context,
                                         index,
                                         lecture: lecture,
@@ -311,11 +690,11 @@ class TeacherContentTab extends StatelessWidget {
                                         size: 20,
                                         color: Colors.red,
                                       ),
-                                      onPressed: () => onDeleteLecture(
+                                      onPressed: () => _handleDeleteLecture(
                                         context,
                                         index,
                                         li,
-                                        lecture.title as String,
+                                        lecture.title,
                                       ),
                                     ),
                                     ReorderableDragStartListener(
@@ -346,7 +725,7 @@ class TeacherContentTab extends StatelessWidget {
             child: Align(
               alignment: Alignment.center,
               child: ElevatedButton.icon(
-                onPressed: () => onAddSection(context),
+                onPressed: () => _handleAddSection(context),
                 icon: const Icon(Icons.add_rounded),
                 label: const Text('Thêm Chương mới'),
                 style: ElevatedButton.styleFrom(
@@ -364,4 +743,10 @@ class TeacherContentTab extends StatelessWidget {
       ],
     );
   }
+}
+
+class _LectureFormResult {
+  final String title;
+  final String type;
+  _LectureFormResult({required this.title, required this.type});
 }

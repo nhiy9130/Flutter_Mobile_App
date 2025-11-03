@@ -37,7 +37,11 @@ class _CourseDetailScreenState extends ConsumerState<CourseDetailScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 5, vsync: this);
+    // Khởi tạo TabController theo vai trò để tránh lệch số tab ngay lần đầu
+    final isInstructorInitial =
+        (ref.read(authProvider).user?.role == 'instructor');
+    final initialLength = isInstructorInitial ? 6 : 4; // GV: 6 tab, SV: 4 tab
+    _tabController = TabController(length: initialLength, vsync: this);
     // Keep provider in sync with TabController when user swipes or taps
     _tabController.addListener(() {
       // Avoid spamming while index is changing
@@ -56,6 +60,7 @@ class _CourseDetailScreenState extends ConsumerState<CourseDetailScreen>
   Widget build(BuildContext context) {
     final user = ref.watch(authProvider).user;
     final bool isInstructor = user?.role == 'instructor';
+    final coursesService = CoursesService();
 
     // Listen for external tab switch requests from children (Riverpod requires listen inside build)
     ref.listen<int>(selectedCourseTabProvider, (previous, next) {
@@ -67,9 +72,9 @@ class _CourseDetailScreenState extends ConsumerState<CourseDetailScreen>
     final tabs = <Tab>[
       const Tab(text: 'Tổng quan'),
       const Tab(text: 'Nội dung'),
+      const Tab(text: 'Bài tập'),
       if (isInstructor) const Tab(text: 'Sinh viên'),
       if (isInstructor) const Tab(text: 'Điểm'),
-      const Tab(text: 'Bài tập'),
       const Tab(text: 'Thảo luận'),
     ];
 
@@ -253,9 +258,10 @@ class _CourseDetailScreenState extends ConsumerState<CourseDetailScreen>
                         },
                       )
                     : const StudentContentTab(),
+                AssignmentsTab(readOnly: !isInstructor),
                 if (isInstructor) const StudentsTab(),
                 if (isInstructor) const GradesTab(),
-                AssignmentsTab(readOnly: !isInstructor),
+
                 ChatTabView(courseId: widget.courseId),
               ],
             ),

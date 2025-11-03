@@ -13,11 +13,21 @@ class _CourseManagementScreenState extends ConsumerState<CourseManagementScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   final _searchController = TextEditingController();
+  String _searchQuery = '';
+
+  // Local state lists to allow moving items across tabs
+  // Khởi tạo mặc định để tránh LateInitializationError khi hot reload
+  // (hot reload không gọi lại initState, dẫn tới biến late chưa được gán)
+  List<Map<String, dynamic>> _activeCourses = [];
+  List<Map<String, dynamic>> _suspendedCourses = [];
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 2, vsync: this);
+    // Initialize local state from mock sources
+    _activeCourses = _getMockCourses('active');
+    _suspendedCourses = _getMockCourses('suspended');
   }
 
   @override
@@ -46,70 +56,67 @@ class _CourseManagementScreenState extends ConsumerState<CourseManagementScreen>
           controller: _tabController,
           tabs: const [
             Tab(text: 'Đang hoạt động'),
-            Tab(text: 'Chờ duyệt'),
             Tab(text: 'Đã tạm dừng'),
           ],
         ),
       ),
       body: TabBarView(
         controller: _tabController,
-        children: [
-          _buildCourseList('active'),
-          _buildCourseList('pending'),
-          _buildCourseList('suspended'),
-        ],
+        children: [_buildCourseList('active'), _buildCourseList('suspended')],
       ),
     );
   }
 
   Widget _buildCourseList(String status) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        return SingleChildScrollView(
-          child: ConstrainedBox(
-            constraints: BoxConstraints(minHeight: constraints.maxHeight),
-            child: IntrinsicHeight(
-              child: Column(
-                children: [
-                  // Search and Filter
-                  Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: TextField(
-                            controller: _searchController,
-                            decoration: InputDecoration(
-                              hintText: 'Tìm kiếm khóa học...',
-                              prefixIcon: const Icon(Icons.search),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        IconButton(
-                          onPressed: () => _showFilterDialog(context),
-                          icon: const Icon(Icons.filter_list),
-                        ),
-                      ],
+    // Tránh dùng IntrinsicHeight với ListView (Viewport) để không gây lỗi intrinsic dimensions.
+    // Dùng Column + Expanded(ListView) để bố cục chiếm chiều cao linh hoạt và cuộn mượt.
+    return Column(
+      children: [
+        // Search and Filter
+        Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: _searchController,
+                  textInputAction: TextInputAction.search,
+                  onChanged: (value) => setState(() => _searchQuery = value),
+                  decoration: InputDecoration(
+                    hintText: 'Tìm kiếm khóa học...',
+                    prefixIcon: const Icon(Icons.search),
+                    suffixIcon: _searchQuery.isNotEmpty
+                        ? IconButton(
+                            icon: const Icon(Icons.clear),
+                            onPressed: () {
+                              _searchController.clear();
+                              setState(() => _searchQuery = '');
+                            },
+                          )
+                        : null,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  // Stats
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: _buildStatsRow(status),
-                  ),
-                  const SizedBox(height: 16),
-                  // Course List
-                  Expanded(child: _buildCourses(status)),
-                ],
+                ),
               ),
-            ),
+              const SizedBox(width: 12),
+              IconButton(
+                onPressed: () => _showFilterDialog(context),
+                icon: const Icon(Icons.filter_list),
+              ),
+            ],
           ),
-        );
-      },
+        ),
+        // Stats
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: _buildStatsRow(status),
+        ),
+        const SizedBox(height: 16),
+        // Course List
+        Expanded(child: _buildCourses(status)),
+      ],
     );
   }
 
@@ -149,8 +156,6 @@ class _CourseManagementScreenState extends ConsumerState<CourseManagementScreen>
     switch (status) {
       case 'active':
         return {'Tổng cộng': 156, 'Miễn phí': 45, 'Trả phí': 111};
-      case 'pending':
-        return {'Chờ duyệt': 12, 'Cần sửa': 5, 'Mới tạo': 7};
       case 'suspended':
         return {'Tạm dừng': 8, 'Vi phạm': 3, 'Hết hạn': 5};
       default:
@@ -159,16 +164,72 @@ class _CourseManagementScreenState extends ConsumerState<CourseManagementScreen>
   }
 
   Widget _buildCourses(String status) {
-    final courses = _getMockCourses(status);
+    final List<Map<String, dynamic>> courses;
+    switch (status) {
+      case 'active':
+        courses = _activeCourses;
+        break;
+      case 'suspended':
+        courses = _suspendedCourses;
+        break;
+      default:
+        courses = const [];
+    }
+    final query = _searchQuery.trim().toLowerCase();
+    final List<Map<String, dynamic>> displayCourses = query.isEmpty
+        ? courses
+        : courses.where((c) {
+            final title = (c['title'] ?? '').toString().toLowerCase();
+            final instructor = (c['instructor'] ?? '').toString().toLowerCase();
+            final category = (c['category'] ?? '').toString().toLowerCase();
+            return title.contains(query) ||
+                instructor.contains(query) ||
+                category.contains(query);
+          }).toList();
 
     return ListView.builder(
       padding: const EdgeInsets.symmetric(horizontal: 16),
-      itemCount: courses.length,
+      itemCount: displayCourses.length,
       itemBuilder: (context, index) {
-        final course = courses[index];
+        final course = displayCourses[index];
         return _buildCourseCard(course, status);
       },
     );
+  }
+
+  void _moveCourseToSuspended(
+    String courseId,
+    String fromStatus,
+    String reason,
+  ) {
+    Map<String, dynamic>? removed;
+    if (fromStatus == 'active') {
+      removed = _activeCourses.firstWhere(
+        (c) => c['id'] == courseId,
+        orElse: () => {},
+      );
+      if (removed.isNotEmpty) {
+        _activeCourses.removeWhere((c) => c['id'] == courseId);
+      }
+    }
+    // Fallback: search in all if not found in declared status
+    if (removed == null || removed.isEmpty) {
+      final inActive = _activeCourses.firstWhere(
+        (c) => c['id'] == courseId,
+        orElse: () => {},
+      );
+      if (inActive.isNotEmpty) {
+        removed = inActive;
+        _activeCourses.removeWhere((c) => c['id'] == courseId);
+      }
+    }
+
+    if (removed != null && removed.isNotEmpty) {
+      final toAdd = Map<String, dynamic>.from(removed);
+      toAdd['reason'] = reason;
+      toAdd['suspendedAt'] = 'Hôm nay';
+      _suspendedCourses.insert(0, toAdd);
+    }
   }
 
   List<Map<String, dynamic>> _getMockCourses(String status) {
@@ -198,18 +259,6 @@ class _CourseManagementScreenState extends ConsumerState<CourseManagementScreen>
             'thumbnail': '🌐',
             'createdAt': '2023-02-20',
             'lastUpdated': '1 tuần trước',
-          },
-        ];
-      case 'pending':
-        return [
-          {
-            'id': '3',
-            'title': 'React Native for Beginners',
-            'instructor': 'Nguyễn Văn Khải',
-            'category': 'Lập trình Mobile',
-            'reason': 'Cần bổ sung nội dung',
-            'submittedAt': '3 ngày trước',
-            'thumbnail': '⚛️',
           },
         ];
       case 'suspended':
@@ -328,31 +377,6 @@ class _CourseManagementScreenState extends ConsumerState<CourseManagementScreen>
               style: const TextStyle(fontSize: 12, color: Colors.orange),
             ),
             const Spacer(),
-            Text(
-              course['price'],
-              style: TextStyle(
-                fontSize: 12,
-                color: theme.colorScheme.primary,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
-        );
-      case 'pending':
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Lý do: ${course['reason']}',
-              style: TextStyle(fontSize: 12, color: Colors.orange.shade700),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
-            const SizedBox(height: 4),
-            Text(
-              'Gửi: ${course['submittedAt']}',
-              style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
-            ),
           ],
         );
       case 'suspended':
@@ -386,12 +410,6 @@ class _CourseManagementScreenState extends ConsumerState<CourseManagementScreen>
           PopupMenuItem(value: 'analytics', child: Text('Phân tích')),
           PopupMenuItem(value: 'suspend', child: Text('Tạm dừng')),
           PopupMenuItem(value: 'delete', child: Text('Xóa')),
-        ];
-      case 'pending':
-        return const [
-          PopupMenuItem(value: 'approve', child: Text('Duyệt')),
-          PopupMenuItem(value: 'reject', child: Text('Từ chối')),
-          PopupMenuItem(value: 'feedback', child: Text('Gửi phản hồi')),
         ];
       case 'suspended':
         return const [
@@ -454,8 +472,8 @@ class _CourseManagementScreenState extends ConsumerState<CourseManagementScreen>
     String status,
   ) {
     switch (action) {
-      case 'view':
-        // TODO: Navigate to course detail
+      case 'viTODO: Navigate to course detailew':
+        //
         break;
       case 'edit':
         // TODO: Navigate to course editor
@@ -469,15 +487,13 @@ class _CourseManagementScreenState extends ConsumerState<CourseManagementScreen>
         _showApproveDialog(context, courseId);
         break;
       case 'reject':
-        _showRejectDialog(context, courseId);
+        // Tab "Chờ duyệt" đã bị loại bỏ; bỏ qua action này
         break;
       case 'suspend':
-        _showSuspendDialog(context, courseId);
+        _showSuspendDialog(context, courseId, status);
         break;
       case 'restore':
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('Đã khôi phục khóa học')));
+        _showRestoreDialog(context, courseId);
         break;
       case 'delete':
         _showDeleteDialog(context, courseId);
@@ -510,58 +526,28 @@ class _CourseManagementScreenState extends ConsumerState<CourseManagementScreen>
     );
   }
 
-  void _showRejectDialog(BuildContext context, String courseId) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Từ chối khóa học'),
-        content: const Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text('Lý do từ chối:'),
-            SizedBox(height: 8),
-            TextField(
-              maxLines: 3,
-              decoration: InputDecoration(
-                hintText: 'Nhập lý do từ chối...',
-                border: OutlineInputBorder(),
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Hủy'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Đã từ chối khóa học')),
-              );
-            },
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            child: const Text('Từ chối'),
-          ),
-        ],
-      ),
-    );
-  }
+  // Dialog "Từ chối" không còn dùng do đã bỏ tab "Chờ duyệt"
 
-  void _showSuspendDialog(BuildContext context, String courseId) {
+  void _showSuspendDialog(
+    BuildContext context,
+    String courseId,
+    String currentStatus,
+  ) {
+    final reasonCtl = TextEditingController();
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Tạm dừng khóa học'),
-        content: const Column(
+        content: Column(
           mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Lý do tạm dừng:'),
-            SizedBox(height: 8),
+            const Text('Lý do tạm dừng:'),
+            const SizedBox(height: 8),
             TextField(
+              controller: reasonCtl,
               maxLines: 3,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 hintText: 'Nhập lý do tạm dừng...',
                 border: OutlineInputBorder(),
               ),
@@ -575,6 +561,14 @@ class _CourseManagementScreenState extends ConsumerState<CourseManagementScreen>
           ),
           ElevatedButton(
             onPressed: () {
+              final reason = reasonCtl.text.trim().isEmpty
+                  ? 'Tạm dừng theo quyết định quản trị'
+                  : reasonCtl.text.trim();
+              setState(() {
+                _moveCourseToSuspended(courseId, currentStatus, reason);
+                // Chuyển sang tab "Đã tạm dừng" (index 1 sau khi bỏ tab "Chờ duyệt")
+                _tabController.index = 1;
+              });
               Navigator.of(context).pop();
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('Đã tạm dừng khóa học')),
@@ -611,6 +605,70 @@ class _CourseManagementScreenState extends ConsumerState<CourseManagementScreen>
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
             child: const Text('Xóa'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _moveCourseToActive(String courseId, {String? note}) {
+    final idx = _suspendedCourses.indexWhere((c) => c['id'] == courseId);
+    if (idx == -1) return;
+    final removed = Map<String, dynamic>.from(_suspendedCourses.removeAt(idx));
+    // Clean suspended-only fields
+    removed.remove('reason');
+    removed.remove('suspendedAt');
+    // Provide sensible defaults for active stats if missing
+    removed['students'] = removed['students'] ?? 0;
+    removed['rating'] = removed['rating'] ?? 0.0;
+    removed['price'] = removed['price'] ?? 'Miễn phí';
+    if (note != null && note.isNotEmpty) {
+      removed['restoredNote'] = note;
+    }
+    _activeCourses.insert(0, removed);
+  }
+
+  void _showRestoreDialog(BuildContext context, String courseId) {
+    final noteCtl = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Khôi phục khóa học'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('Ghi chú (tuỳ chọn):'),
+            const SizedBox(height: 8),
+            TextField(
+              controller: noteCtl,
+              maxLines: 3,
+              decoration: const InputDecoration(
+                hintText: 'Nhập ghi chú khôi phục... (tuỳ chọn)',
+                border: OutlineInputBorder(),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Hủy'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              final note = noteCtl.text.trim();
+              setState(() {
+                _moveCourseToActive(courseId, note: note);
+                // Chuyển về tab "Đang hoạt động"
+                _tabController.index = 0;
+              });
+              Navigator.of(context).pop();
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Đã khôi phục khóa học')),
+              );
+            },
+            child: const Text('Khôi phục'),
           ),
         ],
       ),
