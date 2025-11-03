@@ -4,7 +4,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter_quill/flutter_quill.dart' as quill;
 import 'package:uuid/uuid.dart';
 import '../../../features/courses/course_model.dart';
-import 'tabs/content_tab.dart';
+import 'tabs/teacher_content_tab.dart';
 import 'models/course_content_models.dart';
 import 'tabs/students_tab.dart';
 import 'tabs/assignments_tab.dart';
@@ -326,7 +326,7 @@ class _TeacherCourseDetailScreenState extends State<TeacherCourseDetailScreen>
           controller: _tabController,
           children: [
             // TAB 1: NỘI DUNG KHÓA HỌC (mới)
-            ContentTab(
+            TeacherContentTab(
               courseContent: _courseContent,
               onAddSection: (ctx) => _showAddSectionDialog(ctx),
               onEditSection: (ctx, i) => _showEditSectionDialog(ctx, i),

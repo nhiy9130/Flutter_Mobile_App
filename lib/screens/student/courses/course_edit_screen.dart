@@ -119,72 +119,7 @@ class _CourseEditScreenState extends State<CourseEditScreen> {
                 ],
               ),
               
-              const SizedBox(height: 24),
-              
-              // Course Settings
-              _buildSection(
-                title: 'Thông tin khóa học',
-                icon: Icons.settings,
-                children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _buildDropdown(
-                          label: 'Danh mục',
-                          value: _selectedCategory,
-                          items: [
-                            'Mobile Development',
-                            'Web Development', 
-                            'Data Science',
-                            'UI/UX Design',
-                            'DevOps',
-                          ],
-                          onChanged: (value) => setState(() => _selectedCategory = value!),
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: _buildDropdown(
-                          label: 'Cấp độ',
-                          value: _selectedLevel,
-                          items: ['Beginner', 'Intermediate', 'Advanced'],
-                          onChanged: (value) => setState(() => _selectedLevel = value!),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _buildTextField(
-                          controller: _priceController,
-                          label: 'Giá khóa học (VNĐ)',
-                          hint: '0',
-                          keyboardType: TextInputType.number,
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: _buildTextField(
-                          controller: _durationController,
-                          label: 'Thời lượng (tuần)',
-                          hint: '4',
-                          keyboardType: TextInputType.number,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  _buildDropdown(
-                    label: 'Ngôn ngữ',
-                    value: _selectedLanguage,
-                    items: ['Vietnamese', 'English', 'Bilingual'],
-                    onChanged: (value) => setState(() => _selectedLanguage = value!),
-                  ),
-                ],
-              ),
-              
+        
               const SizedBox(height: 24),
               
               // Requirements

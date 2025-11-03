@@ -5,9 +5,13 @@ import '../grading_screen.dart';
 import '../gradebook_screen.dart';
 import '../models/course_content_models.dart';
 import '../../../../core/widgets/widgets.dart';
+import '../../../student/courses/assignments/assignment_detail_screen.dart';
 
 class AssignmentsTab extends ConsumerWidget {
-  const AssignmentsTab({super.key});
+  const AssignmentsTab({super.key, this.readOnly = false});
+
+  // If true, hide teacher-only actions (create, gradebook) and show read-only item view
+  final bool readOnly;
 
   String _fmtDateTime(DateTime dt) {
     return '${dt.day.toString().padLeft(2, '0')}/${dt.month.toString().padLeft(2, '0')} ${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
@@ -21,64 +25,71 @@ class AssignmentsTab extends ConsumerWidget {
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        LayoutBuilder(
-          builder: (context, constraints) {
-            final bool isNarrow = constraints.maxWidth < 700;
-            if (isNarrow) {
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
+        if (!readOnly)
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final bool isNarrow = constraints.maxWidth < 700;
+              if (isNarrow) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    CustomButton(
+                      onPressed: () =>
+                          _openCreateAssignment(context, ref, students.length),
+                      text: 'Tạo bài tập mới',
+                      icon: Icons.add_task_rounded,
+                      variant: ButtonVariant.primary,
+                    ),
+                    const SizedBox(height: 12),
+                    CustomButton(
+                      onPressed: () => _openGradebook(context, ref),
+                      text: 'Xem Bảng điểm tổng hợp',
+                      icon: Icons.grid_on_rounded,
+                      variant: ButtonVariant.outline,
+                    ),
+                  ],
+                );
+              }
+              return Row(
                 children: [
-                  CustomButton(
-                    onPressed: () =>
-                        _openCreateAssignment(context, ref, students.length),
-                    text: 'Tạo bài tập mới',
-                    icon: Icons.add_task_rounded,
-                    variant: ButtonVariant.primary,
+                  Expanded(
+                    child: CustomButton(
+                      onPressed: () =>
+                          _openCreateAssignment(context, ref, students.length),
+                      text: 'Tạo bài tập mới',
+                      icon: Icons.add_task_rounded,
+                      variant: ButtonVariant.primary,
+                    ),
                   ),
-                  const SizedBox(height: 12),
-                  CustomButton(
-                    onPressed: () => _openGradebook(context, ref),
-                    text: 'Xem Bảng điểm tổng hợp',
-                    icon: Icons.grid_on_rounded,
-                    variant: ButtonVariant.outline,
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: CustomButton(
+                      onPressed: () => _openGradebook(context, ref),
+                      text: 'Xem Bảng điểm tổng hợp',
+                      icon: Icons.grid_on_rounded,
+                      variant: ButtonVariant.outline,
+                    ),
                   ),
                 ],
               );
-            }
-            return Row(
-              children: [
-                Expanded(
-                  child: CustomButton(
-                    onPressed: () =>
-                        _openCreateAssignment(context, ref, students.length),
-                    text: 'Tạo bài tập mới',
-                    icon: Icons.add_task_rounded,
-                    variant: ButtonVariant.primary,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: CustomButton(
-                    onPressed: () => _openGradebook(context, ref),
-                    text: 'Xem Bảng điểm tổng hợp',
-                    icon: Icons.grid_on_rounded,
-                    variant: ButtonVariant.outline,
-                  ),
-                ),
-              ],
-            );
-          },
-        ),
+            },
+          ),
         const SizedBox(height: 16),
         if (assignments.isEmpty)
-          EmptyState(
-            icon: Icons.assignment_outlined,
-            title: 'Chưa có bài tập nào',
-            subtitle: 'Tạo bài tập mới để bắt đầu giao và chấm.',
-            actionLabel: 'Tạo bài tập mới',
-            onAction: () =>
-                _openCreateAssignment(context, ref, students.length),
-          )
+          (readOnly
+              ? EmptyState(
+                  icon: Icons.assignment_outlined,
+                  title: 'Chưa có bài tập nào',
+                  subtitle: 'Hiện chưa có bài tập nào được giao.',
+                )
+              : EmptyState(
+                  icon: Icons.assignment_outlined,
+                  title: 'Chưa có bài tập nào',
+                  subtitle: 'Tạo bài tập mới để bắt đầu giao và chấm.',
+                  actionLabel: 'Tạo bài tập mới',
+                  onAction: () =>
+                      _openCreateAssignment(context, ref, students.length),
+                ))
         else ...[
           const SectionHeader(
             title: 'Danh sách bài tập',
@@ -91,7 +102,9 @@ class AssignmentsTab extends ConsumerWidget {
               subtitle:
                   'Hạn nộp: ${_fmtDateTime(a.deadline)} • Đã nộp: ${a.submitted}/${a.total}',
               icon: Icons.assignment_outlined,
-              onTap: () => _openGrading(context, a, students),
+              onTap: () => readOnly
+                  ? _openStudentAssignment(context, a)
+                  : _openGrading(context, a, students),
             ),
           ),
         ],
@@ -267,6 +280,20 @@ class AssignmentsTab extends ConsumerWidget {
           ),
         );
       },
+    );
+  }
+
+  void _openStudentAssignment(BuildContext context, AssignmentItem a) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => AssignmentDetailScreen(
+          assignment: a,
+          // Optional demo description/attachments
+          description:
+              'Hãy nộp báo cáo tuần dưới dạng PDF. Yêu cầu: tối thiểu 2 trang, mô tả tiến độ và vấn đề gặp phải.',
+          attachments: const ['Huong_dan_nop_bai.pdf'],
+        ),
+      ),
     );
   }
 }

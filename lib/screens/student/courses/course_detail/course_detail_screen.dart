@@ -4,11 +4,22 @@ import '../../../../features/courses/courses_service.dart';
 import '../../../../features/auth/auth_state.dart';
 import '../../../../core/widgets/custom_cards.dart';
 import '../../../../core/widgets/section_header.dart';
+import '../../../../core/widgets/quick_action_card.dart';
+import 'package:go_router/go_router.dart';
 import 'student_content_tab.dart';
-import 'files_tab.dart';
 import 'chat_tab.dart';
-import 'quizzes_tab.dart';
 import '../course_edit_screen.dart';
+import '../../../teacher/quiz/quiz_creation_screen.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart'
+    as rp
+    show StateProvider;
+import '../../../teacher/courses/tabs/assignments_tab.dart';
+import '../../../teacher/courses/tabs/teacher_content_tab.dart';
+import '../../../teacher/courses/tabs/students_tab.dart';
+import '../../../teacher/courses/tabs/grades_tab.dart';
+
+// Provider to control/switch CourseDetail tabs from child widgets
+final selectedCourseTabProvider = rp.StateProvider<int>((ref) => 0);
 
 // student-course-detail-screen.dart
 class CourseDetailScreen extends ConsumerStatefulWidget {
@@ -20,13 +31,19 @@ class CourseDetailScreen extends ConsumerStatefulWidget {
 }
 
 class _CourseDetailScreenState extends ConsumerState<CourseDetailScreen>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   late TabController _tabController;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 5, vsync: this);
+    // Keep provider in sync with TabController when user swipes or taps
+    _tabController.addListener(() {
+      // Avoid spamming while index is changing
+      if (_tabController.indexIsChanging) return;
+      ref.read(selectedCourseTabProvider.notifier).state = _tabController.index;
+    });
   }
 
   @override
@@ -38,6 +55,40 @@ class _CourseDetailScreenState extends ConsumerState<CourseDetailScreen>
   @override
   Widget build(BuildContext context) {
     final user = ref.watch(authProvider).user;
+    final bool isInstructor = user?.role == 'instructor';
+
+    // Listen for external tab switch requests from children (Riverpod requires listen inside build)
+    ref.listen<int>(selectedCourseTabProvider, (previous, next) {
+      if (next != _tabController.index) {
+        _tabController.animateTo(next);
+      }
+    });
+    // Build dynamic tabs & views based on role
+    final tabs = <Tab>[
+      const Tab(text: 'Tổng quan'),
+      const Tab(text: 'Nội dung'),
+      if (isInstructor) const Tab(text: 'Sinh viên'),
+      if (isInstructor) const Tab(text: 'Điểm'),
+      const Tab(text: 'Bài tập'),
+      const Tab(text: 'Thảo luận'),
+    ];
+
+    // Ensure TabController length matches dynamic tab count
+    if (_tabController.length != tabs.length) {
+      final prevIndex = _tabController.index;
+      _tabController.dispose();
+      _tabController = TabController(
+        length: tabs.length,
+        vsync: this,
+        initialIndex: prevIndex.clamp(0, tabs.length - 1),
+      );
+      _tabController.addListener(() {
+        if (_tabController.indexIsChanging) return;
+        ref.read(selectedCourseTabProvider.notifier).state =
+            _tabController.index;
+      });
+    }
+
     return FutureBuilder(
       future: coursesService.getById(widget.courseId),
       builder: (context, snapshot) {
@@ -135,16 +186,11 @@ class _CourseDetailScreenState extends ConsumerState<CourseDetailScreen>
                     TabBar(
                       controller: _tabController,
                       isScrollable: true,
+                      tabAlignment: TabAlignment.center,
                       indicatorWeight: 3,
                       indicatorSize: TabBarIndicatorSize.label,
                       labelStyle: const TextStyle(fontWeight: FontWeight.w600),
-                      tabs: const [
-                        Tab(text: 'Tổng quan'),
-                        Tab(text: 'Nội dung'),
-                        Tab(text: 'Tài liệu'),
-                        Tab(text: 'Bài tập'),
-                        Tab(text: 'Thảo luận'),
-                      ],
+                      tabs: tabs,
                     ),
                   ),
                 ),
@@ -158,9 +204,58 @@ class _CourseDetailScreenState extends ConsumerState<CourseDetailScreen>
                   course: course,
                   user: user,
                 ),
-                const StudentContentTab(),
-                FilesTabView(courseId: widget.courseId),
-                QuizzesTabView(courseId: widget.courseId),
+                isInstructor
+                    ? TeacherContentTab(
+                        courseContent: const [],
+                        onAddSection: (ctx) => _showInstructorOnly(ctx),
+                        onEditSection: (ctx, i) => _showInstructorOnly(ctx),
+                        onDeleteSection: (ctx, i) => _showInstructorOnly(ctx),
+                        onAddEditLecture:
+                            (ctx, sectionIndex, {lecture, lectureIndex}) =>
+                                _showInstructorOnly(ctx),
+                        onDeleteLecture:
+                            (ctx, sectionIndex, lectureIndex, title) =>
+                                _showInstructorOnly(ctx),
+                        onReorderSections: (oldIndex, newIndex) {},
+                        onReorderLectures:
+                            (sectionIndex, oldIndex, newIndex) {},
+                        getIconForType: (type) {
+                          switch (type) {
+                            case 'video':
+                              return Icons.play_circle_outline;
+                            case 'file':
+                              return Icons.insert_drive_file_outlined;
+                            case 'text':
+                              return Icons.description_outlined;
+                            case 'article':
+                              return Icons.article_outlined;
+                            case 'quiz':
+                              return Icons.quiz_outlined;
+                            default:
+                              return Icons.help_outline;
+                          }
+                        },
+                        getColorForType: (type) {
+                          switch (type) {
+                            case 'video':
+                              return Colors.red;
+                            case 'file':
+                              return Colors.teal;
+                            case 'text':
+                              return Colors.purple;
+                            case 'article':
+                              return Colors.blue;
+                            case 'quiz':
+                              return Colors.indigo;
+                            default:
+                              return Colors.grey;
+                          }
+                        },
+                      )
+                    : const StudentContentTab(),
+                if (isInstructor) const StudentsTab(),
+                if (isInstructor) const GradesTab(),
+                AssignmentsTab(readOnly: !isInstructor),
                 ChatTabView(courseId: widget.courseId),
               ],
             ),
@@ -169,6 +264,14 @@ class _CourseDetailScreenState extends ConsumerState<CourseDetailScreen>
       },
     );
   }
+}
+
+void _showInstructorOnly(BuildContext context) {
+  ScaffoldMessenger.of(context).showSnackBar(
+    const SnackBar(
+      content: Text('Tính năng chỉnh sửa nội dung sẽ mở ở chế độ giảng viên.'),
+    ),
+  );
 }
 
 class _TabBarDelegate extends SliverPersistentHeaderDelegate {
@@ -207,7 +310,7 @@ class _OverviewTab extends StatelessWidget {
   final dynamic user;
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final bool isInstructor = user?.role == 'instructor';
 
     return ListView(
       padding: const EdgeInsets.all(16),
@@ -216,9 +319,47 @@ class _OverviewTab extends StatelessWidget {
         if (course != null) _buildCourseInfoCard(context, course),
         const SizedBox(height: 24),
 
-        // Progress Section
-        _buildProgressSection(context),
-        const SizedBox(height: 24),
+        // Progress Section (chỉ dành cho học viên)
+        if (!isInstructor) ...[
+          _buildProgressSection(context),
+          const SizedBox(height: 24),
+        ],
+
+        // Quick Actions (chỉ dành cho giảng viên)
+        if (isInstructor) ...[
+          const SectionHeader(title: 'Hành động nhanh'),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: QuickActionCard(
+                  icon: Icons.quiz_outlined,
+                  title: 'Tạo quiz',
+                  subtitle: 'Thêm bài kiểm tra',
+                  color: Colors.indigo,
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => const QuizCreationScreen(),
+                      ),
+                    );
+                  },
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: QuickActionCard(
+                  icon: Icons.live_tv_rounded,
+                  title: 'Livestream',
+                  subtitle: 'Phát trực tiếp',
+                  color: Colors.redAccent,
+                  onTap: () => context.go('/course/$courseId/live'),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 24),
+        ],
 
         // Course Description
         SectionHeader(title: 'Mô tả khóa học'),
@@ -227,9 +368,11 @@ class _OverviewTab extends StatelessWidget {
         const SizedBox(height: 24),
 
         // Instructor Info
-        SectionHeader(title: 'Thông tin giảng viên'),
-        const SizedBox(height: 12),
-        _buildInstructorInfo(context),
+        if (!isInstructor) ...[
+          SectionHeader(title: 'Thông tin giảng viên'),
+          const SizedBox(height: 12),
+          _buildInstructorInfo(context),
+        ],
       ],
     );
   }
