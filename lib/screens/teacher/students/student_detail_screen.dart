@@ -322,7 +322,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
-                      '${course['grade']}',
+                      (course['grade']).toString(),
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Colors.green,
@@ -348,7 +348,11 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  _buildGradeStat('GPA', '${_studentData['gpa']}', Colors.blue),
+                  _buildGradeStat(
+                    'GPA',
+                    (_studentData['gpa']).toString(),
+                    Colors.blue,
+                  ),
                   _buildGradeStat('Xếp loại', 'Giỏi', Colors.green),
                   _buildGradeStat('Hạng', '5/120', Colors.orange),
                 ],
@@ -389,7 +393,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen>
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
-                    '${grade['grade']}',
+                    (grade['grade']).toString(),
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       color: _getGradeColor(grade['grade'] as double),

@@ -42,10 +42,8 @@ class AnimatedTextField extends StatefulWidget {
 
 class _AnimatedTextFieldState extends State<AnimatedTextField>
     with TickerProviderStateMixin {
-  late AnimationController _focusController;
   late AnimationController _errorController;
   late Animation<double> _errorShakeAnimation;
-  late Animation<Color?> _borderColorAnimation;
 
   FocusNode? _focusNode;
   bool _hasFocus = false;
@@ -56,11 +54,6 @@ class _AnimatedTextFieldState extends State<AnimatedTextField>
     super.initState();
     _focusNode = FocusNode();
 
-    _focusController = AnimationController(
-      duration: AppAnimations.normal,
-      vsync: this,
-    );
-
     _errorController = AnimationController(
       duration: AppAnimations.fast,
       vsync: this,
@@ -69,13 +62,14 @@ class _AnimatedTextFieldState extends State<AnimatedTextField>
     _errorShakeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(parent: _errorController, curve: Curves.elasticIn),
     );
-
-    _borderColorAnimation = ColorTween(
-      begin: Colors.grey,
-      end: Theme.of(context).primaryColor,
-    ).animate(_focusController);
-
+    // _borderColorAnimation is initialized in didChangeDependencies to avoid accessing Theme in initState
     _focusNode!.addListener(_onFocusChanged);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Initialize or update the color tween based on current theme safely here
   }
 
   @override
@@ -88,21 +82,19 @@ class _AnimatedTextFieldState extends State<AnimatedTextField>
 
   @override
   void dispose() {
+    _focusNode?.removeListener(_onFocusChanged); // Dọn dẹp listener
     _focusNode?.dispose();
-    _focusController.dispose();
+    // Bỏ _focusController.dispose()
     _errorController.dispose();
     super.dispose();
   }
 
   void _onFocusChanged() {
-    setState(() {
-      _hasFocus = _focusNode!.hasFocus;
-    });
-
-    if (_hasFocus) {
-      _focusController.forward();
-    } else {
-      _focusController.reverse();
+    // Chỉ cần setState cho _hasFocus để cập nhật shadow
+    if (mounted) {
+      setState(() {
+        _hasFocus = _focusNode!.hasFocus;
+      });
     }
   }
 
@@ -122,8 +114,45 @@ class _AnimatedTextFieldState extends State<AnimatedTextField>
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    // --- ĐỊNH NGHĨA CÁC VIỀN CHO TEXTFORMFIELD ---
+    final defaultBorder = OutlineInputBorder(
+      borderRadius: BorderRadius.circular(12),
+      borderSide: BorderSide(
+        color: colorScheme.outline.withValues(alpha: 0.5),
+        width: 1,
+      ),
+    );
+
+    final focusedBorder = OutlineInputBorder(
+      borderRadius: BorderRadius.circular(12),
+      borderSide: BorderSide(
+        color: colorScheme.primary, // Màu viền khi focus
+        width: 2,
+      ),
+    );
+
+    final errorBorder = OutlineInputBorder(
+      borderRadius: BorderRadius.circular(12),
+      borderSide: BorderSide(
+        color: colorScheme.error, // Màu viền khi lỗi
+        width: 1,
+      ),
+    );
+
+    final focusedErrorBorder = OutlineInputBorder(
+      borderRadius: BorderRadius.circular(12),
+      borderSide: BorderSide(
+        color: colorScheme.error, // Màu viền khi vừa focus vừa lỗi
+        width: 2,
+      ),
+    );
+    // ---------------------------------------------
+
     return AnimatedBuilder(
-      animation: Listenable.merge([_focusController, _errorController]),
+      animation: _errorController, // Chỉ cần lắng nghe error controller
       builder: (context, child) {
         return Transform.translate(
           offset: _hasError
@@ -134,74 +163,57 @@ class _AnimatedTextFieldState extends State<AnimatedTextField>
                   0,
                 )
               : Offset.zero,
-          child: Container(
-            margin: const EdgeInsets.symmetric(vertical: 8),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                AnimatedContainer(
-                  duration: AppAnimations.fast,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: _hasError
-                          ? Colors.red
-                          : _borderColorAnimation.value ?? Colors.grey,
-                      width: _hasFocus ? 2 : 1,
-                    ),
-                    boxShadow: _hasFocus
-                        ? [
-                            BoxShadow(
-                              color:
-                                  (_borderColorAnimation.value ?? Colors.grey)
-                                      .withValues(alpha: 0.3),
-                              blurRadius: 8,
-                              offset: const Offset(0, 2),
-                            ),
-                          ]
-                        : [],
-                  ),
-                  child: TextFormField(
-                    controller: widget.controller,
-                    focusNode: _focusNode,
-                    validator: widget.validator,
-                    keyboardType: widget.keyboardType,
-                    obscureText: widget.obscureText,
-                    maxLines: widget.maxLines,
-                    enabled: widget.enabled,
-                    onTap: widget.onTap,
-                    onChanged: widget.onChanged,
-                    decoration: InputDecoration(
-                      labelText: widget.labelText,
-                      hintText: widget.hintText,
-                      prefixIcon: widget.prefixIcon,
-                      suffixIcon: widget.suffixIcon,
-                      border: InputBorder.none,
-                      contentPadding: const EdgeInsets.all(16),
-                      labelStyle: TextStyle(
-                        color: _hasFocus
-                            ? Theme.of(context).primaryColor
-                            : Colors.grey,
-                      ),
-                    ),
-                  ),
-                ),
-                if (widget.showError && widget.errorText != null)
-                  FadeSlideAnimation(
-                    slideBegin: const Offset(0, -0.3),
-                    child: Padding(
-                      padding: const EdgeInsets.only(top: 4, left: 16),
-                      child: Text(
-                        widget.errorText!,
-                        style: const TextStyle(color: Colors.red, fontSize: 12),
-                      ),
-                    ),
-                  ),
-              ],
-            ),
-          ),
+          child: child, // child ở đây là AnimatedContainer
         );
       },
+      child: AnimatedContainer(
+        duration: AppAnimations.fast,
+        margin: const EdgeInsets.symmetric(vertical: 8),
+        decoration: BoxDecoration(
+          // Giữ lại borderRadius và boxShadow
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: _hasFocus
+              ? [
+                  BoxShadow(
+                    color: colorScheme.primary.withValues(alpha: 0.3),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ]
+              : [],
+          // --- BỎ HOÀN TOÀN 'border' Ở ĐÂY ---
+        ),
+        child: TextFormField(
+          controller: widget.controller,
+          focusNode: _focusNode,
+          validator: widget.validator,
+          keyboardType: widget.keyboardType,
+          obscureText: widget.obscureText,
+          maxLines: widget.maxLines,
+          enabled: widget.enabled,
+          onTap: widget.onTap,
+          onChanged: widget.onChanged,
+          decoration: InputDecoration(
+            labelText: widget.labelText,
+            hintText: widget.hintText,
+            prefixIcon: widget.prefixIcon,
+            suffixIcon: widget.suffixIcon,
+            contentPadding: const EdgeInsets.all(16),
+
+            // --- THAY 'border: InputBorder.none' BẰNG CÁC LOẠI VIỀN NÀY ---
+            border: defaultBorder,
+            enabledBorder: defaultBorder,
+            focusedBorder: focusedBorder,
+            errorBorder: errorBorder,
+            focusedErrorBorder: focusedErrorBorder,
+
+            // Tự động hiển thị lỗi (không cần widget riêng bên ngoài)
+            errorText: widget.showError ? widget.errorText : null,
+
+            // Bỏ labelStyle tùy chỉnh, để nó tự đổi màu theo theme (xanh khi focus, đỏ khi lỗi)
+          ),
+        ),
+      ),
     );
   }
 }
@@ -290,8 +302,7 @@ class _AnimatedDropdownState<T> extends State<AnimatedDropdown<T>>
                       : [],
                 ),
                 child: DropdownButtonFormField<T>(
-                  // ignore: deprecated_member_use
-                  value: widget.value,
+                  initialValue: widget.value,
                   items: widget.items.map((T item) {
                     return DropdownMenuItem<T>(
                       value: item,

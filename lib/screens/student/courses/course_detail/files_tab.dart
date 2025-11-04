@@ -161,7 +161,7 @@ class _FilesTabViewState extends State<FilesTabView> {
                                 }
                               },
                             ),
-                          Text('${f.downloadCount}'),
+                          Text(f.downloadCount.toString()),
                         ],
                       ),
                       onTap: () async {

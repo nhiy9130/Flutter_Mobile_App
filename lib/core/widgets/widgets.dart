@@ -21,3 +21,6 @@ export 'quick_action_card.dart';
 export 'safe_wrapper.dart';
 export 'section_header.dart';
 export 'stat_card.dart' hide StatCard;
+export 'common_app_bar.dart';
+export 'advanced_info_card.dart';
+export 'badges.dart';

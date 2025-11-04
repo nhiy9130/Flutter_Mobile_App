@@ -8,7 +8,6 @@ import 'core/providers/notification_provider.dart';
 
 import 'features/auth/auth_state.dart';
 import 'package:overlay_support/overlay_support.dart';
-import 'features/chatbot/chatbot_widget.dart';
 import 'routes/app_router.dart';
 import 'features/admin/system/system_settings_provider.dart';
 
@@ -116,8 +115,8 @@ class LMSApp extends ConsumerWidget {
                     ),
                   ),
                 ),
+
               // Floating AI chatbot - Now inside MaterialApp context
-              const ChatbotFloating(),
             ],
           );
         },

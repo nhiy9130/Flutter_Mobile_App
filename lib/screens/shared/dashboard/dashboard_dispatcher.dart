@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../features/auth/auth_state.dart';
-import '../../../features/auth/models/user_model.dart';
-import 'package:go_router/go_router.dart';
+import '../../../core/widgets/common_app_bar.dart';
 import '../../student/dashboard/student_dashboard.dart';
 import '../../teacher/dashboard/teacher_dashboard.dart';
 import '../../admin/dashboard/admin_dashboard.dart';
@@ -27,41 +26,37 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(_getDashboardTitle(user.role)),
-        actions: [
-          IconButton(
-            tooltip: 'Notifications',
-            icon: const Icon(Icons.notifications_outlined),
-            onPressed: () => context.go('/notifications-demo'),
-          ),
-        ],
+      appBar: CommonAppBar(
+        title: _getDashboardTitle(user.role),
+        showNotificationsAction: true,
       ),
       body: _buildDashboardBody(user),
     );
   }
 
-  String _getDashboardTitle(UserRole role) {
+  String _getDashboardTitle(String role) {
     switch (role) {
-      case UserRole.student:
+      case 'student':
         return 'Trang chủ Sinh viên';
-      case UserRole.instructor:
+      case 'instructor':
         return 'Trang chủ Giáo viên';
-      case UserRole.admin:
-      case UserRole.superAdmin:
+      case 'admin':
         return 'Trang chủ Quản trị';
+      default:
+        return 'Dashboard';
     }
   }
 
-  Widget _buildDashboardBody(UserModel user) {
+  Widget _buildDashboardBody(User user) {
     switch (user.role) {
-      case UserRole.student:
+      case 'student':
         return StudentDashboard(user: user);
-      case UserRole.instructor:
+      case 'instructor':
         return TeacherDashboard(user: user);
-      case UserRole.admin:
-      case UserRole.superAdmin:
+      case 'admin':
         return AdminDashboard(user: user);
+      default:
+        return const Center(child: Text('Unsupported user role'));
     }
   }
 }

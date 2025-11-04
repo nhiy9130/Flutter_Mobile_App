@@ -1,546 +1,529 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../../core/widgets/section_header.dart';
+import '../../../core/widgets/common_app_bar.dart';
+import '../../../core/widgets/teacher_course_card.dart';
 import '../../../core/widgets/quick_action_card.dart';
-import '../../../core/widgets/info_card.dart';
-import '../../../core/widgets/empty_state.dart';
-import '../../../features/courses/providers/course_provider.dart';
-import '../../../features/courses/models/course_model.dart';
+import '../../../core/widgets/section_header.dart';
 
-
-import '../../../core/services/snackbar_service.dart';
-
-import '../../../features/auth/auth_state.dart';
-
-import '../students/student_management_screen.dart';
-
-class TeacherCoursesScreen extends ConsumerWidget {
+class TeacherCoursesScreen extends ConsumerStatefulWidget {
   const TeacherCoursesScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<TeacherCoursesScreen> createState() =>
+      _TeacherCoursesScreenState();
+}
+
+class _TeacherCoursesScreenState extends ConsumerState<TeacherCoursesScreen> {
+  final TextEditingController _searchController = TextEditingController();
+
+  // Bộ lọc đơn giản (demo)
+  final List<Map<String, dynamic>> _allCourses = [
+    {
+      'id': 'course-1',
+      'title': 'Lập trình Flutter từ A-Z',
+      'thumbnail':
+          'https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=800&auto=format&fit=crop',
+      'category': 'Lập trình',
+      'level': 'Cơ bản',
+      'rating': 4.6,
+      'enrolled': '10,8k',
+      'duration': '24 giờ',
+    },
+    {
+      'id': 'course-2',
+      'title': 'Thiết kế UI/UX chuyên sâu',
+      'thumbnail':
+          'https://images.unsplash.com/photo-1545239351-1141bd82e8a6?q=80&w=800&auto=format&fit=crop',
+      'category': 'Thiết kế',
+      'level': 'Nâng cao',
+      'rating': 4.2,
+      'enrolled': '5,3k',
+      'duration': '18 giờ',
+    },
+    {
+      'id': 'course-3',
+      'title': 'Kinh doanh cho người mới bắt đầu',
+      'thumbnail':
+          'https://images.unsplash.com/photo-1556157382-97eda2d62296?q=80&w=800&auto=format&fit=crop',
+      'category': 'Kinh doanh',
+      'level': 'Cơ bản',
+      'rating': 4.8,
+      'enrolled': '2,1k',
+      'duration': '12 giờ',
+    },
+  ];
+
+  final Set<String> _selectedCategories = {};
+  final Set<String> _selectedLevels = {};
+  double _minRating = 0.0;
+
+  List<Map<String, dynamic>> get _filteredCourses {
+    final q = _searchController.text.trim().toLowerCase();
+    return _allCourses.where((c) {
+      final matchQuery =
+          q.isEmpty || (c['title'] as String).toLowerCase().contains(q);
+      final matchCategory =
+          _selectedCategories.isEmpty ||
+          _selectedCategories.contains(c['category']);
+      final matchLevel =
+          _selectedLevels.isEmpty || _selectedLevels.contains(c['level']);
+      final matchRating = (c['rating'] as num).toDouble() >= _minRating;
+      return matchQuery && matchCategory && matchLevel && matchRating;
+    }).toList();
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Quản lý khóa học'),
+      backgroundColor: Colors.grey.shade50,
+      appBar: CommonAppBar(
+        title: 'Tất cả khóa học',
+        showNotificationsAction: false,
         actions: [
           IconButton(
-            icon: const Icon(Icons.add),
-            onPressed: () => _showCreateCourseDialog(context),
+            icon: const Icon(Icons.filter_list_rounded),
+            tooltip: 'Bộ lọc',
+            onPressed: _openFilterSheet,
           ),
+          const SizedBox(width: 8),
         ],
+        backgroundColor: Colors.white,
+        elevation: 0,
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
+      body: Column(
         children: [
-          // Quick Actions for Teachers
-          const SectionHeader(title: 'Hành động nhanh', icon: Icons.flash_on),
-          const SizedBox(height: 12),
-          _buildTeacherQuickActions(context),
-          const SizedBox(height: 24),
-
-          // My Active Courses
-          const SectionHeader(
-            title: 'Khóa học đang giảng dạy',
-            action: 'Xem tất cả',
+          Container(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+            decoration: const BoxDecoration(color: Colors.white),
+            child: TextField(
+              controller: _searchController,
+              onChanged: (_) => setState(() {}),
+              decoration: InputDecoration(
+                hintText: 'Tìm kiếm khóa học...',
+                prefixIcon: const Icon(Icons.search_rounded),
+                isDense: true,
+                contentPadding: const EdgeInsets.symmetric(
+                  vertical: 12,
+                  horizontal: 12,
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                suffixIcon: _searchController.text.isNotEmpty
+                    ? IconButton(
+                        icon: const Icon(Icons.clear_rounded),
+                        onPressed: () {
+                          _searchController.clear();
+                          setState(() {});
+                        },
+                      )
+                    : null,
+              ),
+            ),
           ),
-          const SizedBox(height: 12),
-          _buildActiveCourses(context),
-          const SizedBox(height: 24),
+          Expanded(
+            child: ListView(
+              // <-- Thay đổi từ ListView.separated
+              padding: const EdgeInsets.fromLTRB(
+                16,
+                16,
+                16,
+                24,
+              ), // <-- Padding cho cả ListView
+              children: [
+                // === PHẦN "QUICK ACTIONS" ĐƯỢC THÊM VÀO ĐÂY ===
+                const SectionHeader(
+                  title: 'Hành động nhanh',
+                  icon: Icons.bolt_rounded,
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    Expanded(
+                      child: QuickActionCard(
+                        icon: Icons.announcement_rounded,
+                        title: 'Thông báo',
+                        subtitle: 'Gửi thông báo cho lớp',
+                        color: Colors.orange,
+                        onTap: () => _createAnnouncement(context),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: QuickActionCard(
+                        icon: Icons.assessment_rounded,
+                        title: 'Báo cáo',
+                        subtitle: 'Xem thống kê lớp học',
+                        color: Colors.teal,
+                        onTap: () => _viewReports(context),
+                      ),
+                    ),
+                  ],
+                ),
+                // ===============================================
 
-          // Draft Courses
-          const SectionHeader(title: 'Khóa học nháp', icon: Icons.drafts),
-          const SizedBox(height: 12),
-          _buildDraftCourses(context),
-          const SizedBox(height: 24),
+                // Khoảng cách giữa "Quick Actions" và danh sách khóa học
+                const SizedBox(height: 24),
 
-          // Recent Activities
-          const SectionHeader(title: 'Hoạt động gần đây', icon: Icons.history),
-          const SizedBox(height: 12),
-          _buildRecentActivities(context),
+                // (Bạn có thể thêm một tiêu đề cho danh sách khóa học nếu muốn)
+                const SectionHeader(
+                  title: 'Khóa học đang hoạt động',
+                  icon: Icons.play_lesson_rounded,
+                ),
+                const SizedBox(height: 16),
+
+                // === DANH SÁCH KHÓA HỌC (Đã thay đổi) ===
+                // Chúng ta dùng 'for' (collection-for) để tạo danh sách
+                // và 'if' (collection-if) để thêm separator
+                Column(
+                  children: _filteredCourses.asMap().entries.map((entry) {
+                    final int index = entry.key;
+                    final Map<String, dynamic> raw = entry.value;
+
+                    return Padding(
+                      padding: EdgeInsets.only(
+                        bottom: (index == _filteredCourses.length - 1) ? 0 : 12,
+                      ),
+                      child: TeacherCourseCard(
+                        title: raw['title'] as String,
+                        thumbnailUrl: raw['thumbnail'] as String?,
+                        enrolledText: '${raw['enrolled']} học viên',
+                        durationText: raw['duration'] as String,
+                        onTap: () => context.go('/course/${raw['id']}'),
+                        trailing: PopupMenuButton<String>(
+                          tooltip: 'Tùy chọn',
+                          itemBuilder: (context) => const [
+                            PopupMenuItem(
+                              value: 'edit',
+                              child: Text('Chỉnh sửa'),
+                            ),
+                            PopupMenuItem(
+                              value: 'analytics',
+                              child: Text('Xem phân tích'),
+                            ),
+                            PopupMenuItem(value: 'delete', child: Text('Xoá')),
+                          ],
+                          onSelected: (value) {
+                            switch (value) {
+                              case 'edit':
+                                // TODO: điều hướng đến màn hình chỉnh sửa
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text(
+                                      'Mở màn hình chỉnh sửa khoá học',
+                                    ),
+                                  ),
+                                );
+                                break;
+                              case 'analytics':
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text('Xem phân tích khoá học'),
+                                  ),
+                                );
+                                break;
+                              case 'delete':
+                                showDialog(
+                                  context: context,
+                                  builder: (context) => AlertDialog(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    title: const Text('Xoá khoá học?'),
+                                    content: const Text(
+                                      'Hành động này không thể hoàn tác.',
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () => Navigator.pop(context),
+                                        child: const Text('Huỷ'),
+                                      ),
+                                      ElevatedButton(
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                          ScaffoldMessenger.of(
+                                            context,
+                                          ).showSnackBar(
+                                            const SnackBar(
+                                              content: Text('Đã xoá khoá học'),
+                                            ),
+                                          );
+                                        },
+                                        child: const Text('Xoá'),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                                break;
+                            }
+                          },
+                          icon: const Icon(
+                            Icons.more_vert_rounded,
+                            color: Colors.grey,
+                          ),
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ],
+            ),
+          ),
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => context.go('/create-course'), // Đã thay đổi ở đây
-        icon: const Icon(Icons.add),
-        label: const Text('Tạo khóa học'),
+        onPressed: () => context.go('/create-course'),
+        icon: const Icon(Icons.add_rounded),
+        label: const Text(
+          'Tạo khóa học',
+          style: TextStyle(fontWeight: FontWeight.w600),
+        ),
+        backgroundColor: Colors.green.shade600,
+        foregroundColor: Colors.white,
+        elevation: 4,
       ),
     );
   }
 
-  Widget _buildTeacherQuickActions(BuildContext context) {
-    return GridView.count(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      crossAxisCount: 2,
-      childAspectRatio: 1.1,
-      mainAxisSpacing: 12,
-      crossAxisSpacing: 12,
-      children: [
-        QuickActionCard(
-          icon: Icons.school,
-          title: 'Quản lý khóa học',
-          subtitle: 'Xem và chỉnh sửa khóa học',
-          color: Colors.blue,
-          onTap: () => context.go('/teacher/courses'),
+  void _createAnnouncement(BuildContext context) {
+    showDialog(
+      context: context,
+
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+
+        title: const Text(
+          'Tạo thông báo',
+
+          style: TextStyle(fontWeight: FontWeight.bold),
         ),
-        QuickActionCard(
-          icon: Icons.people,
-          title: 'Học viên',
-          subtitle: 'Quản lý học viên của tôi',
-          color: Colors.green,
-          onTap: () => ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Vui lòng chọn khóa học cụ thể để xem danh sách học viên'),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
 
-  Widget _buildActiveCourses(BuildContext context) {
-    return Consumer(
-      builder: (context, ref, child) {
-        // Get courses where current user is instructor
-        final coursesState = ref.watch(coursesProvider);
-        final auth = ref.watch(authProvider);
+        content: const Column(
+          mainAxisSize: MainAxisSize.min,
 
-        if (coursesState.isLoading && coursesState.courses.isEmpty) {
-          return const Center(child: CircularProgressIndicator());
-        }
+          children: [
+            TextField(
+              decoration: InputDecoration(
+                labelText: 'Tiêu đề',
 
-        if (coursesState.error != null && coursesState.courses.isEmpty) {
-          return EmptyState(
-            icon: Icons.error_outline,
-            title: 'Có lỗi xảy ra',
-            subtitle: coursesState.error!,
-            actionText: 'Thử lại',
-            onAction: () => ref.read(coursesProvider.notifier).refresh(),
-          );
-        }
+                hintText: 'Thông báo quan trọng...',
 
-        // Filter courses by current instructor
-        final instructorCourses = coursesState.courses
-            .where((course) => course.instructorId == auth.user?.id)
-            .where((course) => course.status == CourseStatus.published)
-            .toList();
-
-        if (instructorCourses.isEmpty) {
-          return EmptyState(
-            icon: Icons.school_outlined,
-            title: 'Chưa có khóa học nào',
-            subtitle: 'Bạn chưa tạo khóa học nào. Tạo khóa học đầu tiên!',
-            actionText: 'Tạo khóa học',
-            onAction: () => _showCreateCourseDialog(context),
-          );
-        }
-
-        return Column(
-          children: instructorCourses
-              .map((course) => _buildCourseCard(context, course))
-              .toList(),
-        );
-      },
-    );
-  }
-
-  Widget _buildCourseCard(BuildContext context, CourseModel course) {
-    final theme = Theme.of(context);
-
-    return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      child: InkWell(
-        onTap: () => context.go('/teacher/courses/${course.id}'),
-        borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.primary.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      course.categoryName ?? 'General',
-                      style: TextStyle(
-                        color: theme.colorScheme.primary,
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  const Spacer(),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.green.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      course.status.displayName,
-                      style: const TextStyle(
-                        color: Colors.green,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ],
+                border: OutlineInputBorder(),
               ),
-              const SizedBox(height: 12),
-              Text(
-                course.title,
-                style: theme.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
+            ),
+
+            SizedBox(height: 16),
+
+            TextField(
+              maxLines: 4,
+
+              decoration: InputDecoration(
+                labelText: 'Nội dung',
+
+                hintText: 'Nội dung thông báo...',
+
+                border: OutlineInputBorder(),
+              ),
+            ),
+          ],
+        ),
+
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+
+            child: const Text('Hủy'),
+          ),
+
+          ElevatedButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: const Row(
+                    children: [
+                      Icon(Icons.check_circle_rounded, color: Colors.white),
+
+                      SizedBox(width: 12),
+
+                      Text('Thông báo đã được gửi!'),
+                    ],
+                  ),
+                  backgroundColor: Colors.green.shade600,
+
+                  behavior: SnackBarBehavior.floating,
+
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
                 ),
-              ),
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  Icon(Icons.people, size: 16, color: Colors.grey.shade600),
-                  const SizedBox(width: 4),
-                  Text(
-                    '${course.totalStudents} sinh viên',
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: Colors.grey.shade600,
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Icon(Icons.schedule, size: 16, color: Colors.grey.shade600),
-                  const SizedBox(width: 4),
-                  Text(
-                    'Tạo: ${_formatDate(course.createdAt)}',
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: Colors.grey.shade600,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Tiến độ khóa học',
-                          style: theme.textTheme.bodySmall,
-                        ),
-                        const SizedBox(height: 4),
-                        Row(
-                          children: [
-                            Icon(Icons.star, size: 16, color: Colors.amber),
-                            const SizedBox(width: 4),
-                            Text(
-                              '${course.rating} (${course.totalRatings} đánh giá)',
-                              style: theme.textTheme.bodySmall,
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Text(
-                    course.formattedPrice,
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: course.isFree
-                          ? Colors.green
-                          : theme.colorScheme.primary,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              Row(
-                children: [
-                  TextButton.icon(
-                    onPressed: () => _manageStudents(context, course.id),
-                    icon: const Icon(Icons.people, size: 16),
-                    label: const Text('Sinh viên'),
-                  ),
-                  TextButton.icon(
-                    onPressed: () => _startLiveForCourse(context, course.id),
-                    icon: const Icon(Icons.videocam, size: 16),
-                    label: const Text('Live'),
-                  ),
-                  TextButton.icon(
-                    onPressed: () => _viewGrades(context, course.id),
-                    icon: const Icon(Icons.grade, size: 16),
-                    label: const Text('Điểm'),
-                  ),
-                ],
-              ),
-            ],
+              );
+            },
+
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.green.shade600,
+
+              foregroundColor: Colors.white,
+            ),
+
+            child: const Text('Gửi'),
           ),
-        ),
+        ],
       ),
     );
   }
 
-  Widget _buildDraftCourses(BuildContext context) {
-    return Consumer(
-      builder: (context, ref, child) {
-        final coursesState = ref.watch(coursesProvider);
-        final auth = ref.watch(authProvider);
-
-        // Filter draft courses by current instructor
-        final draftCourses = coursesState.courses
-            .where((course) => course.instructorId == auth.user?.id)
-            .where((course) => course.status == CourseStatus.draft)
-            .toList();
-
-        if (draftCourses.isEmpty) {
-          return Card(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: EmptyState(
-                icon: Icons.drafts,
-                title: 'Chưa có khóa học nháp',
-                subtitle: 'Tạo khóa học mới để bắt đầu',
-                actionText: 'Tạo khóa học',
-                onAction: () => _showCreateCourseDialog(context),
-              ),
-            ),
-          );
-        }
-
-        return Column(
-          children: draftCourses
-              .map((course) => _buildDraftCourseCard(context, course))
-              .toList(),
-        );
-      },
-    );
+  void _viewReports(BuildContext context) {
+    // TODO: Navigate to reports
   }
 
-  Widget _buildRecentActivities(BuildContext context) {
-    final activities = [
-      {
-        'type': 'quiz_created',
-        'title': 'Tạo quiz "Flutter Widgets"',
-        'course': 'FLT101',
-        'time': '2 giờ trước',
-        'icon': Icons.quiz,
-        'color': Colors.purple,
-      },
-      {
-        'type': 'announcement',
-        'title': 'Thông báo về deadline bài tập',
-        'course': 'AMD201',
-        'time': '4 giờ trước',
-        'icon': Icons.announcement,
-        'color': Colors.orange,
-      },
-      {
-        'type': 'livestream',
-        'title': 'Buổi live "State Management"',
-        'course': 'FLT101',
-        'time': '1 ngày trước',
-        'icon': Icons.videocam,
-        'color': Colors.red,
-      },
-    ];
-
-    return Column(
-      children: activities.map((activity) {
-        return InfoCard(
-          leading: Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: (activity['color'] as Color).withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Icon(
-              activity['icon'] as IconData,
-              color: activity['color'] as Color,
-            ),
-          ),
-          title: activity['title'] as String,
-          subtitle: '${activity['course']} • ${activity['time']}',
-          trailing: const Icon(Icons.more_vert),
-        );
-      }).toList(),
-    );
-  }
-
-  void _showCreateCourseDialog(BuildContext context) {
-    // Navigate to full create course screen
-    context.go('/create-course');
-  }
-
-  // Removed unused methods: _startLivestream, _createQuiz, _createAnnouncement, _viewReports
-  // These features are not part of the core LMS functionality
-
-  void _manageStudents(BuildContext context, String courseId) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => StudentManagementScreen(courseId: courseId),
+  void _openFilterSheet() {
+    final categories = ['Lập trình', 'Thiết kế', 'Kinh doanh'];
+    final levels = ['Cơ bản', 'Nâng cao'];
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: false,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
-    );
-  }
-
-  void _startLiveForCourse(BuildContext context, String courseId) {
-    context.go('/course/$courseId/live');
-  }
-
-  void _viewGrades(BuildContext context, String courseId) {
-    context.go('/teacher/courses/$courseId/grades');
-  }
-
-  String _formatDate(DateTime date) {
-    return '${date.day}/${date.month}/${date.year}';
-  }
-
-  Widget _buildDraftCourseCard(BuildContext context, CourseModel course) {
-    final theme = Theme.of(context);
-
-    return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      child: InkWell(
-        onTap: () => context.go('/teacher/courses/${course.id}/edit'),
-        borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.orange.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: const Text(
-                      'Nháp',
-                      style: TextStyle(
-                        color: Colors.orange,
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
+                  Row(
+                    children: [
+                      const Icon(Icons.filter_list_rounded),
+                      const SizedBox(width: 8),
+                      const Text(
+                        'Bộ lọc',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                        ),
                       ),
-                    ),
+                      const Spacer(),
+                      TextButton(
+                        onPressed: () {
+                          setModalState(() {
+                            _selectedCategories.clear();
+                            _selectedLevels.clear();
+                            _minRating = 0.0;
+                          });
+                        },
+                        child: const Text('Đặt lại'),
+                      ),
+                    ],
                   ),
-                  const Spacer(),
-                  PopupMenuButton<String>(
-                    onSelected: (value) =>
-                        _handleDraftAction(context, course, value),
-                    itemBuilder: (context) => [
-                      const PopupMenuItem(
-                        value: 'edit',
-                        child: ListTile(
-                          leading: Icon(Icons.edit),
-                          title: Text('Chỉnh sửa'),
+                  const SizedBox(height: 12),
+                  const Text(
+                    'Danh mục',
+                    style: TextStyle(fontWeight: FontWeight.w600),
+                  ),
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: categories.map((cat) {
+                      final selected = _selectedCategories.contains(cat);
+                      return FilterChip(
+                        label: Text(cat),
+                        selected: selected,
+                        onSelected: (v) {
+                          setModalState(() {
+                            if (v) {
+                              _selectedCategories.add(cat);
+                            } else {
+                              _selectedCategories.remove(cat);
+                            }
+                          });
+                        },
+                      );
+                    }).toList(),
+                  ),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'Mức độ',
+                    style: TextStyle(fontWeight: FontWeight.w600),
+                  ),
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: levels.map((lv) {
+                      final selected = _selectedLevels.contains(lv);
+                      return FilterChip(
+                        label: Text(lv),
+                        selected: selected,
+                        onSelected: (v) {
+                          setModalState(() {
+                            if (v) {
+                              _selectedLevels.add(lv);
+                            } else {
+                              _selectedLevels.remove(lv);
+                            }
+                          });
+                        },
+                      );
+                    }).toList(),
+                  ),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'Đánh giá tối thiểu',
+                    style: TextStyle(fontWeight: FontWeight.w600),
+                  ),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Slider(
+                          min: 0.0,
+                          max: 5.0,
+                          divisions: 10,
+                          label: _minRating.toStringAsFixed(1),
+                          value: _minRating,
+                          onChanged: (v) => setModalState(() => _minRating = v),
                         ),
                       ),
-                      const PopupMenuItem(
-                        value: 'publish',
-                        child: ListTile(
-                          leading: Icon(Icons.publish),
-                          title: Text('Xuất bản'),
-                        ),
-                      ),
-                      const PopupMenuItem(
-                        value: 'delete',
-                        child: ListTile(
-                          leading: Icon(Icons.delete, color: Colors.red),
-                          title: Text(
-                            'Xóa',
-                            style: TextStyle(color: Colors.red),
-                          ),
+                      SizedBox(
+                        width: 48,
+                        child: Text(
+                          _minRating.toStringAsFixed(1),
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(fontWeight: FontWeight.w600),
                         ),
                       ),
                     ],
                   ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              Text(
-                course.title,
-                style: theme.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                course.shortDescription ?? course.description,
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: Colors.grey.shade600,
-                ),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
-              const SizedBox(height: 12),
-              Row(
-                children: [
-                  Icon(Icons.schedule, size: 16, color: Colors.grey.shade600),
-                  const SizedBox(width: 4),
-                  Text(
-                    'Tạo: ${_formatDate(course.createdAt)}',
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: Colors.grey.shade600,
+                  const SizedBox(height: 8),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      icon: const Icon(Icons.check_rounded),
+                      label: const Text('Áp dụng'),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        setState(() {});
+                      },
                     ),
                   ),
-                  const Spacer(),
-                  TextButton(
-                    onPressed: () =>
-                        _handleDraftAction(context, course, 'edit'),
-                    child: const Text('Tiếp tục chỉnh sửa'),
-                  ),
                 ],
               ),
-            ],
-          ),
-        ),
-      ),
+            );
+          },
+        );
+      },
     );
   }
-
-  void _handleDraftAction(
-    BuildContext context,
-    CourseModel course,
-    String action,
-  ) {
-    switch (action) {
-      case 'edit':
-        context.go('/teacher/courses/${course.id}/edit');
-        break;
-      case 'publish':
-        // Note: WidgetRef not available in this scope, need to call from build method
-        SnackbarService.showInfo(
-          context,
-          'Vui lòng sử dụng menu context để xuất bản',
-          duration: const Duration(seconds: 4),
-        );
-        break;
-      case 'delete':
-        // Note: WidgetRef not available in this scope, need to call from build method
-        SnackbarService.showInfo(
-          context,
-          'Vui lòng sử dụng menu context để xóa',
-          duration: const Duration(seconds: 4),
-        );
-        break;
-    }
-  }
-
-  // Removed _showCourseSelectionDialog - not needed for core LMS functionality
 }

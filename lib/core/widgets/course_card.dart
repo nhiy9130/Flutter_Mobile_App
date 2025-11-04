@@ -1,12 +1,13 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_typography.dart';
 import '../theme/app_dimensions.dart';
-import '../../features/courses/models/course_model.dart';
 import 'custom_cards.dart';
+import '../../features/courses/course_model.dart';
 
 class CourseCard extends StatelessWidget {
-  final CourseModel course;
+  final dynamic course; // Có thể là Course (model) hoặc dữ liệu khác (Map)
   final VoidCallback? onTap;
   final bool isEnrolled;
   final bool showProgress;
@@ -40,7 +41,7 @@ class CourseCard extends StatelessWidget {
 
                 // Course Title
                 Text(
-                  course.title,
+                  _title(),
                   style: AppTypography.h6,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
@@ -49,7 +50,7 @@ class CourseCard extends StatelessWidget {
 
                 // Course Description
                 Text(
-                  course.shortDescription ?? course.description,
+                  _description(),
                   style: AppTypography.bodyMedium.copyWith(
                     color: AppColors.grey600,
                   ),
@@ -77,7 +78,7 @@ class CourseCard extends StatelessWidget {
                         ),
                         const SizedBox(width: AppSpacing.xs),
                         Text(
-                          '${course.totalStudents}',
+                          _enrollmentCount().toString(),
                           style: AppTypography.bodySmall.copyWith(
                             color: AppColors.grey600,
                           ),
@@ -96,7 +97,7 @@ class CourseCard extends StatelessWidget {
                         ),
                         const SizedBox(width: AppSpacing.xs),
                         Text(
-                          '${_getRating()}',
+                          _getRating().toStringAsFixed(1),
                           style: AppTypography.bodySmall.copyWith(
                             color: AppColors.grey600,
                           ),
@@ -132,14 +133,27 @@ class CourseCard extends StatelessWidget {
       child: Stack(
         children: [
           // Placeholder or Network Image
-          if (course.thumbnailUrl != null && course.thumbnailUrl!.isNotEmpty)
+          if (_imageFile() != null)
+            ClipRRect(
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(AppRadius.md),
+                topRight: Radius.circular(AppRadius.md),
+              ),
+              child: Image.file(
+                _imageFile()!,
+                width: double.infinity,
+                height: double.infinity,
+                fit: BoxFit.cover,
+              ),
+            )
+          else if (_imageUrl() != null && _imageUrl()!.isNotEmpty)
             ClipRRect(
               borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(AppRadius.md),
                 topRight: Radius.circular(AppRadius.md),
               ),
               child: Image.network(
-                course.thumbnailUrl!,
+                _imageUrl()!,
                 width: double.infinity,
                 height: double.infinity,
                 fit: BoxFit.cover,
@@ -208,7 +222,7 @@ class CourseCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppRadius.sm),
       ),
       child: Text(
-        course.categoryName ?? 'General',
+        _categoryLabel(),
         style: AppTypography.bodySmall.copyWith(fontWeight: FontWeight.w600),
       ),
     );
@@ -260,7 +274,7 @@ class CourseCard extends StatelessWidget {
         ),
         const SizedBox(width: AppSpacing.xs),
         Text(
-          '${course.durationHours ?? 2}h',
+          '${course.duration ?? '30'} phút',
           style: AppTypography.bodySmall.copyWith(color: AppColors.grey600),
         ),
         const SizedBox(width: AppSpacing.md),
@@ -365,7 +379,8 @@ class CourseCard extends StatelessWidget {
   }
 
   Widget _buildPriceChip() {
-    final isFree = course.isFree;
+    final price = _price();
+    final isFree = price == null || price == 0.0;
 
     return Container(
       padding: const EdgeInsets.symmetric(
@@ -384,7 +399,7 @@ class CourseCard extends StatelessWidget {
         ),
       ),
       child: Text(
-        course.formattedPrice,
+        isFree ? 'Miễn phí' : '${price.toStringAsFixed(0)} VNĐ',
         style: AppTypography.bodySmall.copyWith(
           color: isFree ? AppColors.success : AppColors.primary,
           fontWeight: FontWeight.w600,
@@ -394,7 +409,7 @@ class CourseCard extends StatelessWidget {
   }
 
   LinearGradient _getCategoryGradient() {
-    final category = course.categoryName?.toLowerCase() ?? 'general';
+    final category = _categoryLower();
 
     switch (category) {
       case 'programming':
@@ -437,7 +452,7 @@ class CourseCard extends StatelessWidget {
   }
 
   IconData _getCategoryIcon() {
-    final category = course.categoryName?.toLowerCase() ?? 'general';
+    final category = _categoryLower();
 
     switch (category) {
       case 'programming':
@@ -456,16 +471,106 @@ class CourseCard extends StatelessWidget {
   }
 
   String _getDifficultyText() {
-    return course.levelDisplay;
+    // Model Course hiện không có độ khó -> trả về mặc định
+    return 'Cơ bản';
   }
 
   double _getRating() {
-    return course.rating;
+    // Model Course không có rating -> mặc định
+    try {
+      // Nếu dữ liệu là Map và có 'rating'
+      if (course is Map && (course as Map).containsKey('rating')) {
+        final r = (course as Map)['rating'];
+        if (r is num) return r.toDouble();
+      }
+    } catch (_) {}
+    return 4.5;
   }
 
   double _getProgress() {
-    // Progress should be handled by enrollment data, not course data
-    // This is just a placeholder - actual progress will come from enrollment
+    if (!isEnrolled) return 0.0;
+    // Model Course không có progress -> mặc định 0
+    try {
+      if (course is Map && (course as Map).containsKey('progress')) {
+        final p = (course as Map)['progress'];
+        if (p is num) return p.toDouble();
+      }
+    } catch (_) {}
     return 0.0;
+  }
+
+  // ------- Helpers để an toàn với model Course hiện tại -------
+  Course? get _courseOrNull => course is Course ? course as Course : null;
+
+  String _title() =>
+      _courseOrNull?.title ??
+      (course is Map
+          ? ((course as Map)['title']?.toString() ?? 'Untitled Course')
+          : 'Untitled Course');
+
+  String _description() =>
+      _courseOrNull?.description ??
+      (course is Map
+          ? ((course as Map)['description']?.toString() ??
+                'No description available')
+          : 'No description available');
+
+  int _enrollmentCount() =>
+      _courseOrNull?.enrollmentCount ??
+      (course is Map
+          ? (((course as Map)['enrollmentCount'] as num?)?.toInt() ?? 0)
+          : 0);
+
+  String? _imageUrl() =>
+      _courseOrNull?.thumbnailUrl ??
+      (course is Map
+          ? ((course as Map)['imageUrl']?.toString() ??
+                ((course as Map)['thumbnailUrl']?.toString()))
+          : null);
+
+  File? _imageFile() => _courseOrNull?.imageFile;
+
+  String _categoryLower() {
+    // Nếu là Course -> suy diễn từ code; nếu là Map -> lấy trực tiếp nếu có
+    if (_courseOrNull != null) {
+      final code = _courseOrNull!.code.toUpperCase();
+      if (code.startsWith('CS') || code.startsWith('IT')) return 'programming';
+      if (code.startsWith('DES')) return 'design';
+      if (code.startsWith('BUS')) return 'business';
+      if (code.startsWith('MK')) return 'marketing';
+      if (code.startsWith('DATA')) return 'data';
+      return 'general';
+    }
+    if (course is Map) {
+      final cat = (course as Map)['category']?.toString().toLowerCase();
+      if (cat != null && cat.isNotEmpty) return cat;
+    }
+    return 'general';
+  }
+
+  String _categoryLabel() {
+    final c = _categoryLower();
+    switch (c) {
+      case 'programming':
+        return 'Lập trình';
+      case 'design':
+        return 'Thiết kế';
+      case 'business':
+        return 'Kinh doanh';
+      case 'marketing':
+        return 'Marketing';
+      case 'data':
+        return 'Data Science';
+      default:
+        return 'General';
+    }
+  }
+
+  double? _price() {
+    if (course is Map && (course as Map).containsKey('price')) {
+      final p = (course as Map)['price'];
+      if (p is num) return p.toDouble();
+    }
+    return 0.0; // Mặc định miễn phí
   }
 }

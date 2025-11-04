@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/widgets/animated_form_widgets.dart';
 import '../../../core/widgets/animated_buttons.dart';
+import '../../../core/widgets/custom_cards.dart';
+import '../../../core/widgets/section_header.dart';
 import '../../../core/animations/app_animations.dart';
 
 // Form validation provider
@@ -96,15 +98,39 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen>
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Chỉnh sửa hồ sơ'),
+        elevation: 0,
         actions: [
-          BounceButton(
-            onPressed: _saveProfile,
-            child: TextButton(
+          Padding(
+            padding: const EdgeInsets.only(right: 8),
+            child: BounceButton(
               onPressed: _saveProfile,
-              child: const Text('Lưu'),
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      theme.colorScheme.primary,
+                      theme.colorScheme.secondary,
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: const Text(
+                  'Lưu',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
             ),
           ),
         ],
@@ -116,72 +142,109 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen>
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Profile Picture Section
+              // Profile Picture Section with enhanced styling
               FadeSlideAnimation(
                 slideBegin: const Offset(0, -0.3),
-                child: Center(
-                  child: Column(
-                    children: [
-                      Stack(
-                        children: [
-                          CircleAvatar(
-                            radius: 60,
-                            backgroundColor: Theme.of(
-                              context,
-                            ).colorScheme.primary.withValues(alpha: 0.1),
-                            child: Icon(
-                              Icons.person,
-                              size: 60,
-                              color: Theme.of(context).colorScheme.primary,
-                            ),
-                          ),
-                          Positioned(
-                            bottom: 0,
-                            right: 0,
-                            child: Container(
+                child: CustomCard(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      theme.colorScheme.primary.withValues(alpha: 0.1),
+                      theme.colorScheme.secondary.withValues(alpha: 0.1),
+                    ],
+                  ),
+                  child: Center(
+                    child: Column(
+                      children: [
+                        Stack(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(4),
                               decoration: BoxDecoration(
-                                color: Theme.of(context).colorScheme.primary,
                                 shape: BoxShape.circle,
-                              ),
-                              child: IconButton(
-                                icon: const Icon(
-                                  Icons.camera_alt,
-                                  color: Colors.white,
+                                gradient: LinearGradient(
+                                  colors: [
+                                    theme.colorScheme.primary,
+                                    theme.colorScheme.secondary,
+                                  ],
                                 ),
+                              ),
+                              child: CircleAvatar(
+                                radius: 56,
+                                backgroundColor: Colors.white,
+                                child: Icon(
+                                  Icons.person,
+                                  size: 56,
+                                  color: theme.colorScheme.primary,
+                                ),
+                              ),
+                            ),
+                            Positioned(
+                              bottom: 0,
+                              right: 0,
+                              child: BounceButton(
                                 onPressed: () {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     const SnackBar(
                                       content: Text(
                                         'Chức năng thay đổi ảnh đại diện',
                                       ),
+                                      behavior: SnackBarBehavior.floating,
                                     ),
                                   );
                                 },
+                                child: Container(
+                                  padding: const EdgeInsets.all(12),
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      colors: [
+                                        theme.colorScheme.primary,
+                                        theme.colorScheme.secondary,
+                                      ],
+                                    ),
+                                    shape: BoxShape.circle,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: theme.colorScheme.primary
+                                            .withValues(alpha: 0.3),
+                                        blurRadius: 8,
+                                        offset: const Offset(0, 2),
+                                      ),
+                                    ],
+                                  ),
+                                  child: const Icon(
+                                    Icons.camera_alt,
+                                    color: Colors.white,
+                                    size: 20,
+                                  ),
+                                ),
                               ),
                             ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 12),
-                      Text(
-                        'Thay đổi ảnh đại diện',
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: Theme.of(context).colorScheme.primary,
+                          ],
                         ),
-                      ),
-                    ],
+                        const SizedBox(height: 16),
+                        Text(
+                          'Thay đổi ảnh đại diện',
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: theme.colorScheme.primary,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
 
               const SizedBox(height: 32),
 
-              // Personal Information
+              // Personal Information Section
               FadeSlideAnimation(
                 delay: const Duration(milliseconds: 100),
                 child: _buildSection(
                   title: 'Thông tin cá nhân',
-                  icon: Icons.person,
+                  icon: Icons.person_outline,
                   children: [
                     Row(
                       children: [
@@ -240,12 +303,12 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen>
 
               const SizedBox(height: 24),
 
-              // Contact Information
+              // Contact Information Section
               FadeSlideAnimation(
                 delay: const Duration(milliseconds: 200),
                 child: _buildSection(
                   title: 'Thông tin liên hệ',
-                  icon: Icons.contact_phone,
+                  icon: Icons.contact_phone_outlined,
                   children: [
                     _buildTextField(
                       controller: _emailController,
@@ -293,7 +356,7 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen>
 
               const SizedBox(height: 24),
 
-              // Social Links
+              // Social Links Section
               FadeSlideAnimation(
                 delay: const Duration(milliseconds: 300),
                 child: _buildSection(
@@ -319,12 +382,12 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen>
 
               const SizedBox(height: 24),
 
-              // Privacy Settings
+              // Privacy Settings Section
               FadeSlideAnimation(
                 delay: const Duration(milliseconds: 400),
                 child: _buildSection(
                   title: 'Cài đặt riêng tư',
-                  icon: Icons.privacy_tip,
+                  icon: Icons.privacy_tip_outlined,
                   children: [
                     _buildSwitchTile(
                       title: 'Hồ sơ công khai',
@@ -333,6 +396,7 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen>
                       onChanged: (value) =>
                           setState(() => _isPublicProfile = value),
                     ),
+                    const SizedBox(height: 8),
                     _buildSwitchTile(
                       title: 'Cho phép nhắn tin',
                       subtitle: 'Người khác có thể gửi tin nhắn cho bạn',
@@ -346,12 +410,12 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen>
 
               const SizedBox(height: 24),
 
-              // Notification Settings
+              // Notification Settings Section
               FadeSlideAnimation(
                 delay: const Duration(milliseconds: 500),
                 child: _buildSection(
                   title: 'Thông báo',
-                  icon: Icons.notifications,
+                  icon: Icons.notifications_outlined,
                   children: [
                     _buildSwitchTile(
                       title: 'Thông báo email',
@@ -360,6 +424,7 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen>
                       onChanged: (value) =>
                           setState(() => _emailNotifications = value),
                     ),
+                    const SizedBox(height: 8),
                     _buildSwitchTile(
                       title: 'Thông báo đẩy',
                       subtitle: 'Nhận thông báo đẩy trên điện thoại',
@@ -373,7 +438,7 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen>
 
               const SizedBox(height: 32),
 
-              // Action Buttons
+              // Action Buttons with enhanced styling
               FadeSlideAnimation(
                 delay: const Duration(milliseconds: 600),
                 slideBegin: const Offset(0, 0.5),
@@ -382,12 +447,25 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen>
                     Expanded(
                       child: BounceButton(
                         onPressed: () => Navigator.pop(context),
-                        child: OutlinedButton(
-                          onPressed: () => Navigator.pop(context),
-                          style: OutlinedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(vertical: 16),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: theme.colorScheme.outline,
+                              width: 2,
+                            ),
+                            borderRadius: BorderRadius.circular(12),
                           ),
-                          child: const Text('Hủy'),
+                          child: Center(
+                            child: Text(
+                              'Hủy',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: theme.colorScheme.onSurface,
+                              ),
+                            ),
+                          ),
                         ),
                       ),
                     ),
@@ -417,6 +495,7 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen>
                   ],
                 ),
               ),
+              const SizedBox(height: 16),
             ],
           ),
         ),
@@ -432,30 +511,14 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          children: [
-            Icon(icon, size: 24, color: Theme.of(context).colorScheme.primary),
-            const SizedBox(width: 8),
-            Text(
-              title,
-              style: Theme.of(
-                context,
-              ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
-            ),
-          ],
-        ),
-        const SizedBox(height: 16),
-        Container(
+        SectionHeader(title: title, icon: icon),
+        const SizedBox(height: 12),
+        CustomCard(
           padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surface,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: Theme.of(
-                context,
-              ).colorScheme.outline.withValues(alpha: 0.2),
-            ),
-          ),
+          elevation: 0,
+          borderColor: Theme.of(
+            context,
+          ).colorScheme.outline.withValues(alpha: 0.2),
           child: Column(children: children),
         ),
       ],
@@ -513,25 +576,48 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen>
     required DateTime value,
     required void Function(DateTime) onChanged,
   }) {
-    return InkWell(
-      onTap: () async {
-        final date = await showDatePicker(
-          context: context,
-          initialDate: value,
-          firstDate: DateTime(1950),
-          lastDate: DateTime.now(),
-        );
-        if (date != null) {
-          onChanged(date);
-        }
-      },
-      child: InputDecorator(
-        decoration: InputDecoration(
-          labelText: label,
-          border: const OutlineInputBorder(),
-          suffixIcon: const Icon(Icons.calendar_today),
+    final theme = Theme.of(context);
+
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: theme.colorScheme.outline.withValues(alpha: 0.5),
+          width: 1,
         ),
-        child: Text('${value.day}/${value.month}/${value.year}'),
+      ),
+      child: InkWell(
+        onTap: () async {
+          final date = await showDatePicker(
+            context: context,
+            initialDate: value,
+            firstDate: DateTime(1950),
+            lastDate: DateTime.now(),
+          );
+          if (date != null) {
+            onChanged(date);
+          }
+        },
+        borderRadius: BorderRadius.circular(12),
+        child: InputDecorator(
+          decoration: InputDecoration(
+            labelText: label,
+            border: InputBorder.none,
+            contentPadding: const EdgeInsets.all(16),
+            suffixIcon: Icon(
+              Icons.calendar_today,
+              color: theme.colorScheme.primary,
+            ),
+            labelStyle: TextStyle(
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+            ),
+          ),
+          child: Text(
+            '${value.day}/${value.month}/${value.year}',
+            style: theme.textTheme.bodyLarge,
+          ),
+        ),
       ),
     );
   }
