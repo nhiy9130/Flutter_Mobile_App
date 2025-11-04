@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../features/auth/auth_state.dart';
-import '../../../features/courses/courses_service.dart';
+import '../../../features/courses/services/course_service.dart';
 import '../../../core/widgets/widgets.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_dimensions.dart';
@@ -21,7 +21,7 @@ enum CourseFilter {
   newCourses,
 }
 
-final coursesServiceProvider = Provider((ref) => CoursesService());
+final coursesServiceProvider = Provider((ref) => CourseService());
 
 final myCoursesProvider = FutureProvider.autoDispose<List<dynamic>>((ref) {
   final auth = ref.watch(authProvider);

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../features/courses/courses_service.dart';
+import '../../../../features/courses/services/course_service.dart';
 import '../../../teacher/courses/providers/teacher_course_providers.dart';
 import '../../../../features/auth/auth_state.dart';
 import '../../../../core/widgets/custom_cards.dart';
@@ -61,7 +61,7 @@ class _CourseDetailScreenState extends ConsumerState<CourseDetailScreen>
   Widget build(BuildContext context) {
     final user = ref.watch(authProvider).user;
     final bool isInstructor = user?.role == 'instructor';
-    final coursesService = CoursesService();
+    final courseService = CourseService();
     final courseFromState = ref.watch(
       teacherCourseByIdProvider(widget.courseId),
     );
@@ -101,7 +101,7 @@ class _CourseDetailScreenState extends ConsumerState<CourseDetailScreen>
     return FutureBuilder(
       future: courseFromState != null
           ? Future.value(courseFromState)
-          : coursesService.getById(widget.courseId),
+          : courseService.getCourseById(widget.courseId),
       builder: (context, snapshot) {
         final course = snapshot.data;
         final title = course?.title ?? 'Course ${widget.courseId}';

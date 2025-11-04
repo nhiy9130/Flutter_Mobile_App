@@ -9,7 +9,6 @@ import '../../../core/widgets/info_card.dart';
 import '../../../core/widgets/advanced_info_card.dart';
 import '../users/user_management_screen.dart';
 import '../courses/course_management_screen.dart';
-import '../system/system_settings_screen.dart';
 
 class AdminDashboard extends ConsumerWidget {
   const AdminDashboard({super.key, required this.user});
