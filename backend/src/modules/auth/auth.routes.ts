@@ -1,0 +1,11 @@
+import { Router } from 'express';
+import { login, logout, refresh, register } from './auth.controller';
+import { authMiddleware } from '../../middleware/authMiddleware';
+
+export const authRouter = Router();
+
+authRouter.post('/register', register);
+authRouter.post('/login', login);
+authRouter.post('/refresh-token', authMiddleware, refresh);
+authRouter.post('/logout', authMiddleware, logout);
+
