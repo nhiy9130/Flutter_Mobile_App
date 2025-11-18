@@ -1,4 +1,4 @@
-buildscript {
+image.pngbuildscript {
     repositories {
         google()
         mavenCentral()
